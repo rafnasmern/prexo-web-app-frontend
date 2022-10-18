@@ -70,7 +70,7 @@ export default function StickyHeadTable({ props }) {
   const [isCheck, setIsCheck] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const [open, setOpen] = useState(false);
-  const [chargingPerson, setChargingPerson] = useState("");
+  const [bqcPerson, setBqcPerson] = useState("");
   const [chargingArr, setChrgingArr] = useState([]);
   const navigate = useNavigate();
   const handleClose = () => {
@@ -81,7 +81,9 @@ export default function StickyHeadTable({ props }) {
     const fetchData = async () => {
       try {
         $("#example").DataTable().destroy();
-        let response = await axiosWarehouseIn.post("/wht-tray/" + "Inuse");
+        let response = await axiosWarehouseIn.post(
+          "/wht-tray/" + "Ready to BQC"
+        );
         if (response.status === 200) {
           setWhtTray(response.data.data);
           dataTableFun();
@@ -96,7 +98,7 @@ export default function StickyHeadTable({ props }) {
   useEffect(() => {
     try {
       const fetchData = async () => {
-        let res = await axiosMisUser.post("/get-charging-users/" + "Charging");
+        let res = await axiosMisUser.post("/get-charging-users/" + "BQC");
         if (res.status == 200) {
           setChrgingArr(res.data.data);
         }
@@ -140,8 +142,8 @@ export default function StickyHeadTable({ props }) {
     try {
       let obj = {
         tray: isCheck,
-        user_name: chargingPerson,
-        sort_id:"Send for charging"
+        user_name: bqcPerson,
+        sort_id: "Send for BQC",
       };
       let res = await axiosMisUser.post("/wht-sendTo-wharehouse", obj);
       if (res.status === 200) {
@@ -157,7 +159,7 @@ export default function StickyHeadTable({ props }) {
       }
     }
   };
-  console.log(chargingPerson);
+
   return (
     <>
       <BootstrapDialog
@@ -198,7 +200,7 @@ export default function StickyHeadTable({ props }) {
                   <MenuItem
                     value={data.user_name}
                     onClick={(e) => {
-                      setChargingPerson(data.user_name);
+                        setBqcPerson(data.user_name);
                     }}
                   >
                     {data.user_name}
@@ -216,7 +218,7 @@ export default function StickyHeadTable({ props }) {
             fullwidth
             variant="contained"
             style={{ backgroundColor: "green" }}
-            disabled={chargingPerson == "" ? true : false}
+            disabled={bqcPerson == "" ? true : false}
             component="span"
             onClick={(e) => {
               if (window.confirm("You Want to assign?")) {
@@ -250,7 +252,7 @@ export default function StickyHeadTable({ props }) {
             }
           }}
         >
-          ASSIGN TO CHARGING
+          ASSIGN TO BQC
         </Button>
       </Box>
       <Box>

@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import { FormLabel, Box, Link } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { axiosMisUser } from "../../../axios";
-import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-
+import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -12,11 +11,10 @@ export default function Dashboard() {
     e.preventDefault();
     navigate("/view-assigned-tray-charging");
   };
-
   return (
     <div>
       <h4 style={{ marginTop: "100px", marginLeft: "27px", color: "#495057" }}>
-        Hi Charging! Welcome to Prexo Dashboard
+        Hi BQC Welcome to Prexo Dashboard
       </h4>
       <Box
         sx={{
@@ -29,11 +27,21 @@ export default function Dashboard() {
         }}
       >
         <Box style={{ background: "#495057", height: "52px" }}>
-          <h5 style={{ color: "#FFFFFF", margin: "10px", textAlign: "center", paddingTop: "2px" }}>Dashboard</h5>
+          <h5
+            style={{
+              color: "#FFFFFF",
+              margin: "10px",
+              
+              textAlign: "center",
+              paddingTop: "2px",
+            }}
+          >
+            Dashboard
+          </h5>
         </Box>
         <div style={{ margin: "12px" }}>
           <Box style={{ marginBottom: "12px", marginTop: "20" }}>
-          <ArrowRightIcon sx={{ marginTop: "1px" }} />
+            <ArrowRightIcon sx={{ marginTop: "1px" }} />
             <Link
               style={{
                 textDecoration: "none",

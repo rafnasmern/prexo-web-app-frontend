@@ -7,9 +7,12 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  TablePagination,
   TableRow,
   Box,
   Button,
+  MenuItem,
+  Menu,
 } from "@mui/material";
 import {
   axiosMisUser,
@@ -28,7 +31,7 @@ export default function StickyHeadTable({ props }) {
   useEffect(() => {
     try {
       const fetchData = async () => {
-        let res = await axiosWarehouseIn.post("/request-for-assign/" + "Send_for_charging");
+        let res = await axiosWarehouseIn.post("/request-for-assign/" + "send_for_bqc");
         if (res.status == 200) {
           setChargingRequest(res.data.data);
           dataTableFun();
@@ -48,6 +51,7 @@ export default function StickyHeadTable({ props }) {
 
   //api for delete a employee
 
+ 
   function dataTableFun() {
     $("#example").DataTable({
       destroy: true,

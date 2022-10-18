@@ -142,11 +142,11 @@ export default function StickyHeadTable({ props }) {
   }
   const handelViewTray = (e, id) => {
     e.preventDefault();
-    navigate("/tray-details/" + id);
+    navigate("/view-charging-done-item/" + id);
   };
   const handelViewDetailTray = (e, id) => {
     e.preventDefault();
-    navigate("/tray-view-detail/" + id);
+    navigate("/charge-done-item-verify/" + id);
   };
   const label = { inputProps: { "aria-label": "Checkbox demo" } };
   // HANDEL RECEIVED TRY
@@ -318,7 +318,7 @@ export default function StickyHeadTable({ props }) {
                       </TableCell>
                       <TableCell>{data.issued_user_name}</TableCell>
                       <TableCell>
-                        {/* <Button
+                        <Button
                           sx={{
                             m: 1,
                           }}
@@ -329,23 +329,23 @@ export default function StickyHeadTable({ props }) {
                           }}
                         >
                           View
-                        </Button> */}
-                        {/* {data.sort_id != "Received" ? ( */}
-                        <Button
-                          sx={{
-                            m: 1,
-                          }}
-                          variant="contained"
-                          style={{ backgroundColor: "green" }}
-                          onClick={(e) => {
-                            setOpen(true);
-                            setTrayId(data.code);
-                          }}
-                        >
-                          RECEIVED
                         </Button>
-                        {/* ) : ( */}
-                        {/* <Button
+                        {data.sort_id != "Received" ? (
+                          <Button
+                            sx={{
+                              m: 1,
+                            }}
+                            variant="contained"
+                            style={{ backgroundColor: "green" }}
+                            onClick={(e) => {
+                              setOpen(true);
+                              setTrayId(data.code);
+                            }}
+                          >
+                            RECEIVED
+                          </Button>
+                        ) : (
+                          <Button
                             sx={{
                               m: 1,
                             }}
@@ -357,7 +357,7 @@ export default function StickyHeadTable({ props }) {
                           >
                             Close
                           </Button>
-                        )} */}
+                        )}
                       </TableCell>
                     </TableRow>
                   ))}

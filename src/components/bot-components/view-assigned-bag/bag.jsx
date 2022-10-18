@@ -20,6 +20,10 @@ import {
   Select,
   MenuItem,
   InputLabel,
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
 } from "@mui/material";
 import PropTypes from "prop-types";
 import { useParams } from "react-router-dom";
@@ -87,6 +91,7 @@ export default function DialogBox() {
   const [stickerFour, setStickerFour] = useState("");
   const [loading, setLoading] = useState(false);
   const [awbn, setAwbn] = useState("");
+  const [bodyDamage, setBodyDamage] = useState("");
   let admin = localStorage.getItem("prexo-authentication");
   let { user_name } = jwt_decode(admin);
   useEffect(() => {
@@ -128,6 +133,7 @@ export default function DialogBox() {
     setStickerThree("");
     setStickerFour("");
     setOpneProductMisMatch(false);
+    setBodyDamage("");
   };
   const handleCloseApprove = () => {
     setStickerOne("");
@@ -135,6 +141,7 @@ export default function DialogBox() {
     setStickerThree("");
     setStickerFour("");
     setOpenApprove(false);
+    setBodyDamage("");
   };
   const handleCloseModelMisMatch = () => {
     setStickerOne("");
@@ -142,6 +149,7 @@ export default function DialogBox() {
     setStickerThree("");
     setStickerFour("");
     setModelMisMatch(false);
+    setBodyDamage("");
   };
   /***************************************************************************************** */
   // BAG AND BOT TRAY CLOSE
@@ -243,7 +251,7 @@ export default function DialogBox() {
             awbn_number: awabnDetails?.[0]?.tracking_id,
             order_id: awabnDetails?.[0]?.order_id,
             order_date: awabnDetails?.[0]?.order_date,
-            imei:awabnDetails?.[0]?.imei,
+            imei: awabnDetails?.[0]?.imei,
             stickerOne: stickerOne,
             stickerTwo: stickerTwo,
             stickerThree: stickertThree,
@@ -256,6 +264,7 @@ export default function DialogBox() {
               awabnDetails?.[0]?.uic_code?.code == undefined
                 ? "PENDING"
                 : awabnDetails?.[0]?.uic_code?.code,
+            body_damage: bodyDamage,
           };
           let res = await axiosBot.post("/traySegregation", obj);
           if (res.status == 200) {
@@ -266,6 +275,7 @@ export default function DialogBox() {
             setStickerTwo("");
             setStickerThree("");
             setStickerFour("");
+            setBodyDamage("");
             setModelMisMatch(false);
           }
         }
@@ -294,7 +304,7 @@ export default function DialogBox() {
             awbn_number: awabnDetails?.[0]?.tracking_id,
             order_id: awabnDetails?.[0]?.order_id,
             order_date: awabnDetails?.[0]?.order_date,
-            imei:awabnDetails?.[0]?.imei,
+            imei: awabnDetails?.[0]?.imei,
             stickerOne: stickerOne,
             stickerTwo: stickerTwo,
             stickerThree: stickertThree,
@@ -302,6 +312,7 @@ export default function DialogBox() {
             status: awabnDetails?.[0].status,
             tray_id: tray[0].code,
             bag_id: bagId,
+            body_damage: bodyDamage,
             user_name: user_name,
             uic:
               awabnDetails?.[0]?.uic_code?.code == undefined
@@ -318,6 +329,7 @@ export default function DialogBox() {
             setStickerThree("");
             setStickerFour("");
             setOpenApprove(false);
+            setBodyDamage("");
             setOpneProductMisMatch(false);
           }
         }
@@ -329,6 +341,7 @@ export default function DialogBox() {
         setStickerFour("");
         setOpenApprove(false);
         setModelMisMatch(false);
+        setBodyDamage("");
         setOpneProductMisMatch(false);
         setLoading(false);
       }
@@ -518,6 +531,28 @@ export default function DialogBox() {
               />
               UIC Pasted On Sleeve
             </h6>
+            <FormControl sx={{ ml: 5 }}>
+              <FormLabel id="demo-radio-buttons-group-label" sx={{ mt: 2 }}>
+                Any Damage
+              </FormLabel>
+              <RadioGroup
+                aria-labelledby="demo-radio-buttons-group-label"
+                defaultValue="NO"
+                onClick={(e) => {
+                  setBodyDamage(e.target.value);
+                }}
+                name="radio-buttons-group"
+              >
+                <Box>
+                  <FormControlLabel
+                    value="YES"
+                    control={<Radio />}
+                    label="YES"
+                  />
+                  <FormControlLabel value="NO" control={<Radio />} label="NO" />
+                </Box>
+              </RadioGroup>
+            </FormControl>
           </Box>
         </DialogContent>
         <DialogActions>

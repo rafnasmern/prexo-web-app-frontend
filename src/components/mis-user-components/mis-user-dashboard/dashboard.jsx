@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { FormLabel, Box, Link } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { axiosMisUser } from "../../../axios";
-import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -35,9 +35,9 @@ export default function Dashboard() {
     e.preventDefault();
     navigate("/assign-to-charging");
   };
-  const handelPickupList = (e) => {
+  const handelAssignToBqc = (e) => {
     e.preventDefault();
-    navigate("/create-pickup-list");
+    navigate("/assign-to-bqc");
   };
   return (
     <div>
@@ -50,15 +50,22 @@ export default function Dashboard() {
           m: 3,
           width: 300,
           boxShadow: 2,
-          height: "489px",
+          height: "552px",
           backgroundColor: "#FFFFFF",
         }}
       >
         <div style={{ background: "#495057", height: "52px" }}>
-          <h5 style={{ color: "#FFFFFF", textAlign: "center", paddingTop: "2px" }}>Dashboard</h5>
+          <h5
+            style={{ color: "#FFFFFF", textAlign: "center", paddingTop: "2px" }}
+          >
+            Dashboard
+          </h5>
         </div>
         <div style={{ margin: "12px" }}>
-          <Box style={{ marginBottom: "12px", marginTop: "20" }}  sx={{ display: "flex", flexDirection: "start" }}>
+          <Box
+            style={{ marginBottom: "12px", marginTop: "20" }}
+            sx={{ display: "flex", flexDirection: "start" }}
+          >
             <ArrowRightIcon sx={{ marginTop: "4px" }} />
             <Link
               style={{
@@ -75,8 +82,11 @@ export default function Dashboard() {
             </Link>
           </Box>
           <hr />
-          <Box style={{ marginBottom: "12px", marginTop: "20" }} sx={{ display: "flex", flexDirection: "start" }}>
-          <ArrowRightIcon sx={{ marginTop: "4px" }} />
+          <Box
+            style={{ marginBottom: "12px", marginTop: "20" }}
+            sx={{ display: "flex", flexDirection: "start" }}
+          >
+            <ArrowRightIcon sx={{ marginTop: "4px" }} />
             <Link
               style={{
                 textDecoration: "none",
@@ -92,8 +102,11 @@ export default function Dashboard() {
             </Link>
           </Box>
           <hr />
-          <Box style={{ marginBottom: "12px", marginTop: "20" }} sx={{ display: "flex", flexDirection: "start" }}>
-          <ArrowRightIcon sx={{ marginTop: "4px" }} />
+          <Box
+            style={{ marginBottom: "12px", marginTop: "20" }}
+            sx={{ display: "flex", flexDirection: "start" }}
+          >
+            <ArrowRightIcon sx={{ marginTop: "4px" }} />
             <Link
               style={{
                 textDecoration: "none",
@@ -109,8 +122,11 @@ export default function Dashboard() {
             </Link>
           </Box>
           <hr />
-          <Box style={{ marginBottom: "12px", marginTop: "20" }} sx={{ display: "flex", flexDirection: "start" }}>
-          <ArrowRightIcon sx={{ marginTop: "4px" }} />
+          <Box
+            style={{ marginBottom: "12px", marginTop: "20" }}
+            sx={{ display: "flex", flexDirection: "start" }}
+          >
+            <ArrowRightIcon sx={{ marginTop: "4px" }} />
             <Link
               style={{
                 textDecoration: "none",
@@ -126,8 +142,11 @@ export default function Dashboard() {
             </Link>
           </Box>
           <hr />
-          <Box style={{ marginBottom: "12px", marginTop: "20" }} sx={{ display: "flex", flexDirection: "start" }}>
-          <ArrowRightIcon sx={{ marginTop: "4px" }} />
+          <Box
+            style={{ marginBottom: "12px", marginTop: "20" }}
+            sx={{ display: "flex", flexDirection: "start" }}
+          >
+            <ArrowRightIcon sx={{ marginTop: "4px" }} />
             <Link
               style={{
                 textDecoration: "none",
@@ -143,8 +162,11 @@ export default function Dashboard() {
             </Link>
           </Box>
           <hr />
-          <Box style={{ marginBottom: "12px", marginTop: "20" }} sx={{ display: "flex", flexDirection: "start" }}>
-          <ArrowRightIcon sx={{ marginTop: "4px" }} />
+          <Box
+            style={{ marginBottom: "12px", marginTop: "20" }}
+            sx={{ display: "flex", flexDirection: "start" }}
+          >
+            <ArrowRightIcon sx={{ marginTop: "4px" }} />
             <Link
               style={{
                 textDecoration: "none",
@@ -160,8 +182,11 @@ export default function Dashboard() {
             </Link>
           </Box>
           <hr />
-          <Box style={{ marginBottom: "12px", marginTop: "20" }} sx={{ display: "flex", flexDirection: "start" }}>
-          <ArrowRightIcon sx={{ marginTop: "4px" }} />
+          <Box
+            style={{ marginBottom: "12px", marginTop: "20" }}
+            sx={{ display: "flex", flexDirection: "start" }}
+          >
+            <ArrowRightIcon sx={{ marginTop: "4px" }} />
             <Link
               style={{
                 textDecoration: "none",
@@ -174,6 +199,26 @@ export default function Dashboard() {
               }}
             >
               Track Item
+            </Link>
+          </Box>
+          <hr />
+          <Box
+            style={{ marginBottom: "12px", marginTop: "20" }}
+            sx={{ display: "flex", flexDirection: "start" }}
+          >
+            <ArrowRightIcon sx={{ marginTop: "4px" }} />
+            <Link
+              style={{
+                textDecoration: "none",
+                color: "black",
+                fontSize: "20px",
+                marginLeft: "5px",
+              }}
+              onClick={(e) => {
+                handelAssignToBqc(e);
+              }}
+            >
+              Assign for BQC
             </Link>
           </Box>
           <hr />

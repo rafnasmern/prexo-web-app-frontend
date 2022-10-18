@@ -442,7 +442,7 @@ export default function DialogBox() {
                       <TableCell style={{ color: "green" }}>
                         {data?.item_status}
                       </TableCell>
-                      <TableCell>
+                      {/* <TableCell>
                         <Button
                           sx={{
                             ml: 2,
@@ -458,7 +458,7 @@ export default function DialogBox() {
                         >
                           Remove
                         </Button>
-                      </TableCell>
+                      </TableCell> */}
                     </TableRow>
                   ))}
                 </TableBody>

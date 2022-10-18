@@ -25,7 +25,7 @@ import "datatables.net";
 export default function StickyHeadTable({ props }) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(2);
-  const [infraData, setInfraData] = useState([]);
+  const [trayData, setTrayData] = useState([]);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [request, setRequest] = useState(false);
   const { trayId } = useParams();
@@ -40,7 +40,7 @@ export default function StickyHeadTable({ props }) {
         const fetchData = async () => {
           let res = await axiosBot.post("/trayItem/" + trayId);
           if (res.status == 200) {
-            setInfraData(res.data.data);
+            setTrayData(res.data.data);
             dataTableFun();
           }
         };
@@ -93,29 +93,36 @@ export default function StickyHeadTable({ props }) {
                     <TableCell>S.NO</TableCell>
                     <TableCell>UIC</TableCell>
                     <TableCell>IMEI</TableCell>
-                    <TableCell>BagId</TableCell>
-                    <TableCell>Body Damage</TableCell>
-                    <TableCell>Other Info</TableCell>
-                   
+                    <TableCell>Brand</TableCell>
+                    <TableCell>Model</TableCell>
+                    <TableCell>Battery Status</TableCell>
+                    <TableCell>Charge Percentage</TableCell>
+                    <TableCell>Body Condiation</TableCell>
+                    <TableCell>Display Condiation</TableCell>
+                    <TableCell>Lock Status</TableCell>
+                    <TableCell>Charging Jack Type</TableCell>
                     <TableCell>Added Date Time</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {infraData?.items?.map((data, index) => (
+                  {trayData?.actual_items?.map((data, index) => (
                     <TableRow hover role="checkbox" tabIndex={-1}>
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>{data.uic}</TableCell>
                       <TableCell>{data.imei}</TableCell>
-                      <TableCell>{data.bag_id}</TableCell>
-                      <TableCell>{data.body_damage}</TableCell>
-                      <TableCell>{data?.stickerOne + "," + data?.stickerTwo + "," + data?.stickerThree + ","  + data?.stickerFour }</TableCell>
+                      <TableCell>{trayData.brand}</TableCell>
+                      <TableCell>{trayData.model}</TableCell>
+                      <TableCell>{data.charging.battery_tatus}</TableCell>
+                      <TableCell>{data.charging.charge_percentage}</TableCell>
+                      <TableCell>{data.charging.body_condition}</TableCell>
+                      <TableCell>{data.charging.display_condition}</TableCell>
+                      <TableCell>{data.charging.lock_status}</TableCell>
+                      <TableCell>{data.charging.charging_jack_type}</TableCell>
                       <TableCell>
-                        {new Date(data.added_time).toLocaleString(
-                          "en-GB",
-                          { hour12: true }
-                        )}
+                        {new Date(data.added_time).toLocaleString("en-GB", {
+                          hour12: true,
+                        })}
                       </TableCell>
-                    
                     </TableRow>
                   ))}
                 </TableBody>

@@ -16,42 +16,94 @@ import {
   TableHead,
   TableRow,
   Grid,
-  InputAdornment,
 } from "@mui/material";
 import PropTypes from "prop-types";
 import { useParams } from "react-router-dom";
 import "yup-phone";
+import CloseIcon from "@mui/icons-material/Close";
+import { styled, alpha } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
-// import jwt from "jsonwebtoken"
-import jwt_decode from "jwt-decode";
-import { axiosWarehouseIn } from "../../../axios";
+import { axiosBot, axiosWarehouseIn } from "../../../axios";
+import Swal from "sweetalert2";
+import Checkbox from "@mui/material/Checkbox";
+
 export default function DialogBox() {
   const navigate = useNavigate();
   const [trayData, setTrayData] = useState([]);
   const { trayId } = useParams();
   /**************************************************************************** */
-  const [uic, setUic] = useState("");
-  const [description, setDescription] = useState([]);
   const [refresh, setRefresh] = useState(false);
+  const [uic, setUic] = useState("");
+  const [bagReuse, setBagReuse] = useState(false);
+  const [description, setDescription] = useState([]);
   /*********************************************************** */
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        let response = await axiosWarehouseIn.post("/getWhtTrayItem/" + trayId);
+        let response = await axiosWarehouseIn.post(
+          "/charging-done-recieved/" + trayId
+        );
         if (response.status === 200) {
           setTrayData(response.data.data);
-          //   dataTableFun()
-        } else {
-          navigate("/bag-issue-request");
         }
       } catch (error) {
-        alert(error);
+        if (error.response.status === 403) {
+          alert(error.response.data.message);
+        } else {
+          alert(error);
+        }
       }
     };
     fetchData();
   }, [refresh]);
 
+  /************************************************************************** */
+  const addActualitem = async (obj) => {
+    alert();
+    if (trayData?.limit <= trayData?.items?.length) {
+      alert("All Items are Verified");
+    } else {
+      try {
+        let objData = {
+          trayId: trayId,
+          item: obj,
+        };
+        let res = await axiosWarehouseIn.post(
+          "/charging-done-put-item",
+          objData
+        );
+        if (res?.status == 200) {
+          setRefresh((refresh) => !refresh);
+          setUic("");
+        }
+      } catch (error) {
+        alert(error);
+      }
+    }
+  };
+
+  /************************************************************************** */
+  const handelIssue = async (e) => {
+    e.preventDefault();
+    try {
+      if (description == "") {
+        alert("Please Add Description");
+      } else {
+        let obj = {
+          trayId: trayId,
+          description: description,
+        };
+        let res = await axiosWarehouseIn.post("/close-wht-tray-ready-to-bqc", obj);
+        if (res.status == 200) {
+          alert(res.data.message);
+          navigate("/tray-return-from-charging");
+        }
+      }
+    } catch (error) {
+      alert(error);
+    }
+  };
   const handelUic = async (e) => {
     if (e.target.value.length === 11) {
       try {
@@ -59,7 +111,7 @@ export default function DialogBox() {
           uic: e.target.value,
           trayId: trayId,
         };
-        let res = await axiosWarehouseIn.post("/check-uic", obj);
+        let res = await axiosWarehouseIn.post("/check-uic-charging-done", obj);
         if (res?.status == 200) {
           addActualitem(res.data.data);
         }
@@ -73,69 +125,6 @@ export default function DialogBox() {
       }
     }
   };
-  /************************************************************************** */
-  const addActualitem = async (obj) => {
-    console.log(obj);
-    if (trayData.limit <= trayData?.actual_items?.length) {
-      alert("All Items Scanned");
-    } else {
-      try {
-        let objData = {
-          trayId: trayId,
-          item: obj,
-        };
-        let res = await axiosWarehouseIn.post("/wht-add-actual-item", objData);
-        if (res.status == 200) {
-          setUic("");
-          setRefresh((refresh) => !refresh);
-        }
-      } catch (error) {
-        alert(error);
-      }
-    }
-  };
-  /************************************************************************** */
-  const handelIssue = async (e) => {
-    try {
-      if (description == "") {
-        alert("Please Add Description");
-      } else if (trayData?.actual_items?.length == trayData?.items?.length) {
-        let obj = {
-          trayId: trayId,
-          description: description,
-        };
-
-        let res = await axiosWarehouseIn.post("/issue-to-agent-wht", obj);
-        if (res.status == 200) {
-          alert(res.data.message);
-          if (trayData?.sort_id == "Send for BQC") {
-            navigate("/bqc-request");
-          } else {
-            navigate("/charging-request");
-          }
-        }
-      } else {
-        alert("Please Verify Actual Data");
-      }
-    } catch (error) {
-      alert(error);
-    }
-  };
-  const handelDelete = async (id) => {
-    try {
-      let obj = {
-        trayId: trayId,
-        id: id,
-      };
-      let data = await axiosWarehouseIn.put("/actualBagItem", obj);
-      if (data.status == 200) {
-        alert(data.data.message);
-      }
-    } catch (error) {
-      alert(error);
-    }
-  };
-  /*********************************TRAY ASSIGNEMENT********************************** */
 
   /***************************************************************************************** */
   const label = { inputProps: { "aria-label": "Checkbox demo" } };
@@ -153,7 +142,7 @@ export default function DialogBox() {
             float: "left",
           }}
         >
-          <h6 style={{ marginLeft: "13px" }}>TRAY ID - {trayId}</h6>
+          <h6 style={{ marginLeft: "13px" }}>Tray ID - {trayId}</h6>
           <h6 style={{ marginLeft: "13px" }}>
             AGENT NAME - {trayData?.issued_user_name}
           </h6>
@@ -163,6 +152,12 @@ export default function DialogBox() {
             float: "right",
           }}
         >
+          <h6 style={{ marginRight: "13px" }}>
+            Closed On --{" "}
+            {new Date(trayData?.closed_time_bot).toLocaleString("en-GB", {
+              hour12: true,
+            })}
+          </h6>
           <h6 style={{ marginRight: "13px" }}>Brand -- {trayData?.brand}</h6>
           <h6 style={{ marginRight: "13px" }}>Model -- {trayData?.model}</h6>
         </Box>
@@ -170,30 +165,34 @@ export default function DialogBox() {
       <Grid container spacing={1}>
         <Grid item xs={6}>
           <Paper sx={{ width: "95%", overflow: "hidden", m: 1 }}>
-            <Box sx={{}}>
+            <h6>Expected</h6>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "end",
+              }}
+            >
               <Box
                 sx={{
-                  float: "left",
-                  ml: 2,
-                }}
-              >
-                <h6>Expected</h6>
-              </Box>
-              <Box
-                sx={{
-                  float: "right",
-                  mr: 2,
+                  m: 2,
                 }}
               >
                 <Box sx={{}}>
                   <h5>Total</h5>
                   <p style={{ paddingLeft: "5px", fontSize: "22px" }}>
-                    {
-                      trayData?.items?.filter(function (item) {
-                        return item.status != "Duplicate";
-                      }).length
-                    }
-                    /{trayData?.limit}
+                    {trayData?.actual_items?.length}/{trayData?.limit}
+                  </p>
+                </Box>
+              </Box>
+              <Box
+                sx={{
+                  m: 2,
+                }}
+              >
+                <Box sx={{}}>
+                  <h5>Valid</h5>
+                  <p style={{ marginLeft: "14px", fontSize: "24px" }}>
+                    {trayData?.actual_items?.length}
                   </p>
                 </Box>
               </Box>
@@ -210,19 +209,22 @@ export default function DialogBox() {
                     <TableCell>S.NO</TableCell>
                     <TableCell>UIC</TableCell>
                     <TableCell>MUIC</TableCell>
-                    <TableCell>BOT Tray</TableCell>
-                    <TableCell>BOT Agent</TableCell>
-                    {/* <TableCell>Tracking Number</TableCell> */}
+                    <TableCell>IMEI</TableCell>
+                    <TableCell>Brand Name</TableCell>
+                    <TableCell>Model Name</TableCell>
+                    <TableCell>VSKU ID</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {trayData?.items?.map((data, index) => (
+                  {trayData?.actual_items?.map((data, index) => (
                     <TableRow hover role="checkbox" tabIndex={-1}>
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>{data?.uic}</TableCell>
                       <TableCell>{data?.muic}</TableCell>
-                      <TableCell>{data?.tray_id}</TableCell>
-                      <TableCell>{data?.bot_agent}</TableCell>
+                      <TableCell>{data?.imei}</TableCell>
+                      <TableCell>{data?.brand_name}</TableCell>
+                      <TableCell>{data?.model_name}</TableCell>
+                      <TableCell>{data?.vendor_sku_id}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -232,48 +234,53 @@ export default function DialogBox() {
         </Grid>
         <Grid item xs={6}>
           <Paper sx={{ width: "98%", overflow: "hidden", m: 1 }}>
-            <Box sx={{}}>
+            <h6>ACTUAL</h6>
+            <TextField
+              sx={{ mt: 1 }}
+              id="outlined-password-input"
+              type="text"
+              name="doorsteps_diagnostics"
+              label="Please Enter UIC"
+              value={uic}
+              // onChange={(e) => setAwbn(e.target.value)}
+              onChange={(e) => {
+                setUic(e.target.value);
+                handelUic(e);
+              }}
+              inputProps={{
+                style: {
+                  width: "auto",
+                },
+              }}
+            />
+
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "end",
+              }}
+            >
               <Box
                 sx={{
-                  float: "left",
-                  ml: 2,
-                }}
-              >
-                <h6>ACTUAL</h6>
-                <TextField
-                  sx={{ mt: 1 }}
-                  id="outlined-password-input"
-                  type="text"
-                  name="doorsteps_diagnostics"
-                  label="Please Enter UIC"
-                  value={uic}
-                  // onChange={(e) => setAwbn(e.target.value)}
-                  onChange={(e) => {
-                    setUic(e.target.value);
-                    handelUic(e);
-                  }}
-                  inputProps={{
-                    style: {
-                      width: "auto",
-                    },
-                  }}
-                />
-              </Box>
-              <Box
-                sx={{
-                  float: "right",
-                  mr: 2,
+                  m: 2,
                 }}
               >
                 <Box sx={{}}>
                   <h5>Total</h5>
                   <p style={{ marginLeft: "5px", fontSize: "24px" }}>
-                    {
-                      trayData.actual_items?.filter(function (item) {
-                        return item.status != "Duplicate";
-                      }).length
-                    }
-                    /{trayData?.limit}
+                    {trayData?.items?.length}/{trayData?.limit}
+                  </p>
+                </Box>
+              </Box>
+              <Box
+                sx={{
+                  m: 2,
+                }}
+              >
+                <Box sx={{}}>
+                  <h5>Valid</h5>
+                  <p style={{ marginLeft: "19px", fontSize: "24px" }}>
+                    {trayData?.items?.length}
                   </p>
                 </Box>
               </Box>
@@ -290,19 +297,23 @@ export default function DialogBox() {
                     <TableCell>S.NO</TableCell>
                     <TableCell>UIC</TableCell>
                     <TableCell>MUIC</TableCell>
-                    <TableCell>BOT Tray</TableCell>
-                    <TableCell>BOT Agent</TableCell>
+                    <TableCell>IMEI</TableCell>
+                    <TableCell>Brand Name</TableCell>
+                    <TableCell>Model Name</TableCell>
+                    <TableCell>VSKU ID</TableCell>
                   </TableRow>
                 </TableHead>
 
                 <TableBody>
-                  {trayData?.actual_items?.map((data, index) => (
+                  {trayData?.items?.map((data, index) => (
                     <TableRow hover role="checkbox" tabIndex={-1}>
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>{data?.uic}</TableCell>
                       <TableCell>{data?.muic}</TableCell>
-                      <TableCell>{data?.tray_id}</TableCell>
-                      <TableCell>{data?.bot_agent}</TableCell>
+                      <TableCell>{data?.imei}</TableCell>
+                      <TableCell>{data?.brand_name}</TableCell>
+                      <TableCell>{data?.model_name}</TableCell>
+                      <TableCell>{data?.vendor_sku_id}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -320,17 +331,42 @@ export default function DialogBox() {
           style={{ width: "400px" }}
           placeholder="Description"
         ></textarea>
+        {trayData[0]?.type_taxanomy == "BOT" ? (
+          <>
+            <Checkbox
+              checked={bagReuse}
+              onClick={(e) => {
+                if (
+                  window.confirm(
+                    bagReuse ? "Already Added" : "You Want to Release Bag ?"
+                  )
+                ) {
+                  setBagReuse(true);
+                }
+              }}
+              {...label}
+            />
+            <label>Bag Release</label>
+          </>
+        ) : (
+          ""
+        )}
         <Button
           sx={{ m: 3, mb: 9 }}
           variant="contained"
-          style={{ backgroundColor: "#206CE2" }}
-          onClick={() => {
-            if (window.confirm("You Want to Issue?")) {
-              handelIssue();
+          disabled={
+            trayData?.items?.length == trayData?.actual_items?.length
+              ? false
+              : true
+          }
+          style={{ backgroundColor: "green" }}
+          onClick={(e) => {
+            if (window.confirm("You Want to Close?")) {
+              handelIssue(e);
             }
           }}
         >
-          Issue To Agent
+          Tray Close
         </Button>
       </Box>
     </>

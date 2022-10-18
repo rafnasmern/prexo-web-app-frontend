@@ -66,6 +66,9 @@ export default function Login() {
         } else if (response.data.data?.user_type == "Charging") {
           navigate("/charging-dashboard");
         }
+        else if (response.data.data?.user_type == "BQC") {
+          navigate("/bqc-dashboard");
+        }
       }
     } catch (error) {
       if (error.response.status === 401) {
@@ -99,6 +102,9 @@ export default function Login() {
         navigate("/bot-dashboard");
       } else if (user_type == "Charging") {
         navigate("/charging-dashboard");
+      }
+      else if (user_type == "BQC") {
+        navigate("/bqc-dashboard");
       }
     } else {
       navigate("/");

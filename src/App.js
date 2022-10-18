@@ -39,6 +39,7 @@ import RevalidateBadDelivery from "./pages/mis-pages/revalidate-bad-delivery-pag
 import UicgerateBagwise from "./pages/mis-pages/uic-generate-bagwise";
 import TrackDeliveredItem from "./pages/mis-pages/track-delivered-item-page";
 import AssignToCharging from "./pages/mis-pages/assign-to-charging";
+import AssignToBqc from "./pages/mis-pages/assign-to-bqc";
 /*--------------------------------------------------------------------------------------------
 BOT
 ---------------------------------------------------------------------------------------------- */
@@ -74,11 +75,16 @@ import ChargingRequestRecieved from "./pages/warehouse-page/charging-request-rec
 import ChargingRequestApprove from "./pages/warehouse-page/charging-request-approve";
 import TraysInChargingWarehouse from "./pages/warehouse-page/trays-in-charging";
 import TrayReturnedFromCharging from "./pages/warehouse-page/returning-from-charging";
+import ViewChargingDoneItem from "./pages/warehouse-page/view-charging-done-item";
+import ReturnChargeDoneClose from "./pages/warehouse-page/return-from-charging/close-tray";
+import ViewBqcRequest from "./pages/warehouse-page/bqc-request/view-page";
 /**********************************CHARGING PANEL************************************* */
 import ChargingPanelDashboard from "./pages/charging-pages/charging-dashboard";
 import ViewAssignedTrayCharging from "./pages/charging-pages/view-assigned-tray";
 import ViewDetailsTrayCharging from "./pages/charging-pages/view-details-tray";
 import ChargingOut from "./pages/charging-pages/charging-out";
+/**********************************BQC PANEL************************************* */
+import BqcDashboard from "./pages/bqc-pages/dashboard";
 /************************************************************************************** */
 import Login from "./pages/Login";
 import ChangePassword from "./pages/change-password";
@@ -190,7 +196,7 @@ function App() {
             element={<ChargingRequestRecieved />}
           />
           <Route
-            path="/charging-request-approve/:trayId"
+            path="/request-approve/:trayId"
             element={<ChargingRequestApprove />}
           />
           <Route
@@ -210,6 +216,17 @@ function App() {
             element={<TrayReturnedFromCharging />}
           />
           <Route path="/charging-out/:trayId" element={<ChargingOut />} />
+          <Route
+            path="/view-charging-done-item/:trayId"
+            element={<ViewChargingDoneItem />}
+          />
+          <Route
+            path="/charge-done-item-verify/:trayId"
+            element={<ReturnChargeDoneClose />}
+          />
+          <Route path="/assign-to-bqc" element={<AssignToBqc />} />
+          <Route path="/bqc-dashboard" element={<BqcDashboard />} />
+          <Route path="/bqc-request" element={<ViewBqcRequest />} />
         </Routes>
       </BrowserRouter>
     </>

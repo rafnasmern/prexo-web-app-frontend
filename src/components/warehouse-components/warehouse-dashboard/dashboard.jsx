@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { FormLabel, Box, Link } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { axiosWarehouseIn } from "../../../axios";
-import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -68,251 +68,347 @@ export default function Dashboard() {
     e.preventDefault();
     navigate("/trays-in-charging");
   };
-  const handelTrayReturnFromCharging =(e)=>{
+  const handelTrayReturnFromCharging = (e) => {
     e.preventDefault();
     navigate("/tray-return-from-charging");
-  }
+  };
+  const handelBqcRequest = (e) => {
+    e.preventDefault();
+    navigate("/bqc-request");
+  };
   return (
     <div>
-      <h4 style={{ marginTop: "100px", marginLeft: "27px", color: "#495057" }}>
+      <h4 style={{ marginTop: "100px", marginLeft: "22px", color: "#495057" }}>
         Hi Warehouse Welcome to Prexo Dashboard
       </h4>
       <Box
-        sx={{
-          cursor: "pointer",
-          m: 3,
-          width: 300,
-          boxShadow: 2,
-          height: "867px",
-          backgroundColor: "#FFFFFF",
+        style={{
+          background: "#495057",
+          height: "52px",
+          marginLeft: "23px",
+          width: "610px",
+          marginTop: "19px",
         }}
       >
-        <div style={{ background: "#495057", height: "52px" }}>
-          <h5 style={{ color: "#FFFFFF" ,textAlign: "center", paddingTop: "2px" }}>Dashboard</h5>
-        </div>
-        <div style={{ margin: "12px" }}>
-          <Box style={{ marginBottom: "12px", marginTop: "20" }} sx={{ display: "flex", flexDirection: "start" }}>
-          <ArrowRightIcon sx={{ marginTop: "4px" }} />
-            <Link
-              style={{
-                textDecoration: "none",
-                color: "black",
-                fontSize: "20px",
-                marginLeft: "5px",
-              }}
-              onClick={(e) => {
-                handelSearch(e);
-              }}
+        <h5
+          style={{ color: "#FFFFFF", textAlign: "center", paddingTop: "2px" }}
+        >
+          Dashboard
+        </h5>
+      </Box>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+        }}
+      >
+        <Box
+          sx={{
+            cursor: "pointer",
+            ml: 3,
+            width: 300,
+            boxShadow: 2,
+            height: "500px",
+            backgroundColor: "#FFFFFF",
+          }}
+        >
+          <div style={{ margin: "12px" }}>
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
             >
-              Search
-            </Link>
-          </Box>
-          <hr />
-          <Box style={{ marginBottom: "12px", marginTop: "20" }} sx={{ display: "flex", flexDirection: "start" }}>
-          <ArrowRightIcon sx={{ marginTop: "4px" }} />
-            <Link
-              style={{
-                textDecoration: "none",
-                color: "black",
-                fontSize: "20px",
-                marginLeft: "5px",
-              }}
-              onClick={(e) => {
-                handelScan(e);
-              }}
+              <ArrowRightIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelSearch(e);
+                }}
+              >
+                Search
+              </Link>
+            </Box>
+            <hr />
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
             >
-              Scan
-            </Link>
-          </Box>
-          <hr />
-          <Box style={{ marginBottom: "12px", marginTop: "20" }} sx={{ display: "flex", flexDirection: "start" }}>
-          <ArrowRightIcon sx={{ marginTop: "4px" }} />
-            <Link
-              style={{
-                textDecoration: "none",
-                color: "black",
-                fontSize: "20px",
-                marginLeft: "5px",
-              }}
-              onClick={(e) => {
-                handelBagIssue(e);
-              }}
+              <ArrowRightIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelScan(e);
+                }}
+              >
+                Scan
+              </Link>
+            </Box>
+            <hr />
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
             >
-              Bag issue request
-            </Link>
-          </Box>
-          <hr />
-          <Box style={{ marginBottom: "12px", marginTop: "20" }} sx={{ display: "flex", flexDirection: "start" }}>
-          <ArrowRightIcon sx={{ marginTop: "4px" }} />
-            <Link
-              style={{
-                textDecoration: "none",
-                color: "black",
-                fontSize: "20px",
-                marginLeft: "5px",
-              }}
-              onClick={(e) => {
-                handelTrayCloseRequest(e);
-              }}
+              <ArrowRightIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelBagIssue(e);
+                }}
+              >
+                Bag issue request
+              </Link>
+            </Box>
+            <hr />
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
             >
-              Tray close request
-            </Link>
-          </Box>
-          <hr />
-          <Box style={{ marginBottom: "12px", marginTop: "20" }} sx={{ display: "flex", flexDirection: "start" }}>
-          <ArrowRightIcon sx={{ marginTop: "4px" }} />
-            <Link
-              style={{
-                textDecoration: "none",
-                color: "black",
-                fontSize: "20px",
-                marginLeft: "5px",
-              }}
-              onClick={(e) => {
-                handelBagCloseRequest(e);
-              }}
+              <ArrowRightIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelTrayCloseRequest(e);
+                }}
+              >
+                Tray close request
+              </Link>
+            </Box>
+            <hr />
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
             >
-              Bag close request
-            </Link>
-          </Box>
-          <hr />
-          <Box style={{ marginBottom: "12px", marginTop: "20" }} sx={{ display: "flex", flexDirection: "start" }}>
-          <ArrowRightIcon sx={{ marginTop: "4px" }} />
-            <Link
-              style={{
-                textDecoration: "none",
-                color: "black",
-                fontSize: "20px",
-                marginLeft: "5px",
-              }}
-              onClick={(e) => {
-                handelWhtTray(e);
-              }}
+              <ArrowRightIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelBagCloseRequest(e);
+                }}
+              >
+                Bag close request
+              </Link>
+            </Box>
+            <hr />
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
             >
-              Wht tray
-            </Link>
-          </Box>
-          <hr />
-          <Box style={{ marginBottom: "12px", marginTop: "20" }} sx={{ display: "flex", flexDirection: "start" }}>
-          <ArrowRightIcon sx={{ marginTop: "4px" }} />
-            <Link
-              style={{
-                textDecoration: "none",
-                color: "black",
-                fontSize: "20px",
-                marginLeft: "5px",
-              }}
-              onClick={(e) => {
-                handelPicklist(e);
-              }}
+              <ArrowRightIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelWhtTray(e);
+                }}
+              >
+                Wht tray
+              </Link>
+            </Box>
+            <hr />
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
             >
-              Bot to wht
-            </Link>
-          </Box>
-          <hr />
-          <Box style={{ marginBottom: "12px", marginTop: "20" }} sx={{ display: "flex", flexDirection: "start" }}>
-          <ArrowRightIcon sx={{ marginTop: "4px" }} />
-            <Link
-              style={{
-                textDecoration: "none",
-                color: "black",
-                fontSize: "20px",
-                marginLeft: "5px",
-              }}
-              onClick={(e) => {
-                handelCreatedPickList(e);
-              }}
+              <ArrowRightIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelPicklist(e);
+                }}
+              >
+                Bot to wht
+              </Link>
+            </Box>
+            <hr />
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
             >
-              Picklist
-            </Link>
-          </Box>
-          <hr />
-          <Box style={{ marginBottom: "12px", marginTop: "20" }} sx={{ display: "flex", flexDirection: "start" }}>
-          <ArrowRightIcon sx={{ marginTop: "4px" }} />
-            <Link
-              style={{
-                textDecoration: "none",
-                color: "black",
-                fontSize: "20px",
-                marginLeft: "5px",
-              }}
-              onClick={(e) => {
-                handelInUseWhtTray(e);
-              }}
+              <ArrowRightIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelCreatedPickList(e);
+                }}
+              >
+                Picklist
+              </Link>
+            </Box>
+            <hr />
+          </div>
+        </Box>
+        <Box
+          sx={{
+            cursor: "pointer",
+            ml: 1,
+            width: 300,
+            boxShadow: 2,
+            height: "374px",
+            backgroundColor: "#FFFFFF",
+          }}
+        >
+          <div style={{ margin: "12px" }}>
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
             >
-              Inuse wht
-            </Link>
-          </Box>
-          <hr />
-          <Box style={{ marginBottom: "12px", marginTop: "20" }} sx={{ display: "flex", flexDirection: "start" }}>
-          <ArrowRightIcon sx={{ marginTop: "4px" }} />
-            <Link
-              style={{
-                textDecoration: "none",
-                color: "black",
-                fontSize: "20px",
-                marginLeft: "5px",
-              }}
-              onClick={(e) => {
-                handelBotRelease(e);
-              }}
+              <ArrowRightIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelInUseWhtTray(e);
+                }}
+              >
+                Inuse wht
+              </Link>
+            </Box>
+            <hr />
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
             >
-              Bot to release
-            </Link>
-          </Box>
-          <hr />
-          <Box style={{ marginBottom: "12px", marginTop: "20" }} sx={{ display: "flex", flexDirection: "start" }}>
-          <ArrowRightIcon sx={{ marginTop: "4px" }} />
-            <Link
-              style={{
-                textDecoration: "none",
-                color: "black",
-                fontSize: "20px",
-                marginLeft: "5px",
-              }}
-              onClick={(e) => {
-                handelChargingRequest(e);
-              }}
+              <ArrowRightIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelBotRelease(e);
+                }}
+              >
+                Bot to release
+              </Link>
+            </Box>
+            <hr />
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
             >
-              Charging Request Received
-            </Link>
-          </Box>
-          <hr />
-          <Box style={{ marginBottom: "12px", marginTop: "20" }} sx={{ display: "flex", flexDirection: "start" }}>
-          <ArrowRightIcon sx={{ marginTop: "4px" }} />
-            <Link
-              style={{
-                textDecoration: "none",
-                color: "black",
-                fontSize: "20px",
-                marginLeft: "5px",
-              }}
-              onClick={(e) => {
-                handelTraysInCharging(e);
-              }}
+              <ArrowRightIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelChargingRequest(e);
+                }}
+              >
+                Charging Request Received
+              </Link>
+            </Box>
+            <hr />
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
             >
-              Trays in Charging
-            </Link>
-          </Box>
-          <hr />
-          <Box style={{ marginBottom: "12px", marginTop: "20" }} sx={{ display: "flex", flexDirection: "start" }}>
-          <ArrowRightIcon sx={{ marginTop: "4px" }} />
-            <Link
-              style={{
-                textDecoration: "none",
-                color: "black",
-                fontSize: "20px",
-                marginLeft: "5px",
-              }}
-              onClick={(e) => {
-                handelTrayReturnFromCharging(e);
-              }}
+              <ArrowRightIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelTraysInCharging(e);
+                }}
+              >
+                Trays in Charging
+              </Link>
+            </Box>
+            <hr />
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
             >
-              Return from Charging
-            </Link>
-          </Box>
-          <hr />
-        </div>
+              <ArrowRightIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelTrayReturnFromCharging(e);
+                }}
+              >
+                Return from Charging
+              </Link>
+            </Box>
+            <hr />
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
+            >
+              <ArrowRightIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelBqcRequest(e);
+                }}
+              >
+                BQC Request Received
+              </Link>
+            </Box>
+            <hr />
+          </div>
+        </Box>
       </Box>
     </div>
   );

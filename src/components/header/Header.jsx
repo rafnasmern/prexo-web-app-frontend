@@ -144,6 +144,10 @@ const ResponsiveAppBar = () => {
     e.preventDefault();
     navigate("/charging-dashboard");
   };
+  const handelBQC = (e) => {
+    e.preventDefault();
+    navigate("/bqc-dashboard");
+  };
 
   /************************************************************************* */
   const handelUsers = (e) => {
@@ -508,6 +512,37 @@ const ResponsiveAppBar = () => {
                   open={Boolean(anchorE5)}
                   onClose={handleClosea5}
                   MenuListProps={{ onMouseLeave: handleClosea5 }}
+                >
+                  {/* <MenuItem>Bags</MenuItem> */}
+                </Menu>
+              </>
+            ) : (
+              ""
+            )}
+            {user_type == "BQC" ? (
+              <>
+                <Button
+                  endIcon={<KeyboardArrowDownIcon />}
+                  aria-owns={anchorE5 ? "simple-menu5" : undefined}
+                  aria-haspopup="true"
+                  onClick={(e) => {
+                    handelBQC(e);
+                    // handelBot(e);
+                  }}
+                  sx={{ my: 3, color: "white" }}
+                  style={{
+                    backgroundColor:
+                      location.pathname == "/bqc-dashboard" ? "#495057" : "",
+                  }}
+                >
+                  BQC
+                </Button>
+                <Menu
+                  id="simple-menu5"
+                  anchorEl={anchorE5}
+                  open={Boolean(anchorE5)}
+                  onClose={handleClosea5}
+                  // MenuListProps={{ onMouseLeave: handleClosea5 }}
                 >
                   {/* <MenuItem>Bags</MenuItem> */}
                 </Menu>
