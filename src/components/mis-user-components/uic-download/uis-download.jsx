@@ -20,6 +20,7 @@ import {
   TablePagination,
   Box,
   TextField,
+  Container,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { axiosMisUser, axiosSuperAdminPrexo } from "../../../axios";
@@ -33,6 +34,7 @@ import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import LastPageIcon from "@mui/icons-material/LastPage";
 import PropTypes from "prop-types";
 import { useTheme } from "@mui/material/styles";
+import CircularProgress from "@mui/material/CircularProgress";
 // import jwt from "jsonwebtoken"
 import jwt_decode from "jwt-decode";
 //Datatable Modules
@@ -48,8 +50,10 @@ export default function Home() {
   const [isCheck, setIsCheck] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const [stateOfPage,setStateOfPage]=useState("")
+  const [stateOfPage, setStateOfPage] = useState("");
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [uicGenloading, setUicGenLoading] = useState(false);
   const [search, setSearch] = useState({
     type: "",
     searchData: "",
@@ -62,9 +66,11 @@ export default function Home() {
       if (admin) {
         let { location } = jwt_decode(admin);
         const fetchData = async () => {
+          setLoading(false);
           let res = await axiosMisUser.post("/uicPageData/" + location);
           if (res.status == 200) {
-            setStateOfPage("All")
+            setStateOfPage("All");
+            setLoading(true);
             setItem(res.data.data);
             // dataTableFun();
           }
@@ -88,42 +94,47 @@ export default function Home() {
         })
     );
   }, [page, item, rowsPerPage]);
-  let token = localStorage.getItem("prexo-authentication");
-  const { user_name } = jwt_decode(token);
   const handelUicGen = (e) => {
     e.preventDefault();
+
     if (isCheck.length == 0) {
       alert("Please Select Atleast One Delivered Data");
     } else {
-      const addUic = async () => {
-        let count = 0;
-        for (let i = 0; i < isCheck.length; i++) {
-          if (item[isCheck[i]].uic_status != "Pending") {
-            alert("Already UIC Created");
+      let token = localStorage.getItem("prexo-authentication");
+      if (token) {
+        const { user_name } = jwt_decode(token);
+        setUicGenLoading(true);
+        const addUic = async () => {
+          let count = 0;
+          for (let i = 0; i < isCheck.length; i++) {
+            if (item[isCheck[i]].uic_status != "Pending") {
+              alert("Already UIC Created");
 
-            break;
-          }
-          try {
-            let obj = {
-              _id: item[isCheck[i]]?._id,
-              email: user_name,
-              created_at: Date.now(),
-            };
-            let res = await axiosMisUser.post("/addUicCode", obj);
-            if (res.status == 200) {
+              break;
             }
-          } catch (error) {
-            alert(error);
+            try {
+              let obj = {
+                _id: item[isCheck[i]]?._id,
+                email: user_name,
+                created_at: Date.now(),
+              };
+              let res = await axiosMisUser.post("/addUicCode", obj);
+              if (res.status == 200) {
+              }
+            } catch (error) {
+              alert(error);
+            }
+            count++;
           }
-          count++;
-        }
-        if (count == isCheck.length) {
-          alert("Successfully Created");
-          setIsCheck([]);
-          setRefresh((refresh) => !refresh);
-        }
-      };
-      addUic();
+          if (count == isCheck.length) {
+            setUicGenLoading(false);
+            alert("Successfully Generated");
+            setIsCheck([]);
+            setRefresh((refresh) => !refresh);
+          }
+        };
+        addUic();
+      }
     }
   };
   const handleClose = () => {
@@ -135,7 +146,6 @@ export default function Home() {
   const fileExtension = ".xlsx";
 
   const exportToCSV = (fileName) => {
-    console.log("f");
     if (isCheck.length == 0) {
       alert("Please Select Atleast One Data");
     } else {
@@ -254,12 +264,14 @@ export default function Home() {
     try {
       // $("#example").DataTable().destroy();
       let admin = localStorage.getItem("prexo-authentication");
-      let { location } = jwt_decode(admin);
-      let res = await axiosMisUser.post("/uicPageData/" + location);
-      if (res.status == 200) {
-        setStateOfPage("All")
-        setItem(res.data.data);
-        // dataTableFun();
+      if (admin) {
+        let { location } = jwt_decode(admin);
+        let res = await axiosMisUser.post("/uicPageData/" + location);
+        if (res.status == 200) {
+          setStateOfPage("All");
+          setItem(res.data.data);
+          // dataTableFun();
+        }
       }
     } catch (error) {
       alert(error);
@@ -268,18 +280,20 @@ export default function Home() {
   const handelUicGenerated = async () => {
     try {
       let admin = localStorage.getItem("prexo-authentication");
-      let { location } = jwt_decode(admin);
-      // $("#example").DataTable().destroy();
-      let obj = {
-        status: "Created",
-        location: location,
-      };
-      let res = await axiosMisUser.post("/uicGeneratedRecon", obj);
-      if (res.status == 200) {
-        setItem(res.data.data);
-        setStateOfPage("Created")
+      if (admin) {
+        let { location } = jwt_decode(admin);
+        // $("#example").DataTable().destroy();
+        let obj = {
+          status: "Created",
+          location: location,
+        };
+        let res = await axiosMisUser.post("/uicGeneratedRecon", obj);
+        if (res.status == 200) {
+          setItem(res.data.data);
+          setStateOfPage("Created");
 
-        // dataTableFun();
+          // dataTableFun();
+        }
       }
     } catch (error) {
       alert(error);
@@ -288,17 +302,18 @@ export default function Home() {
   const handelUicNotGenrated = async () => {
     try {
       let admin = localStorage.getItem("prexo-authentication");
-      let { location } = jwt_decode(admin);
-      // $("#example").DataTable().destroy();
-      let obj = {
-        status: "Pending",
-        location: location,
-      };
-      let res = await axiosMisUser.post("/uicGeneratedRecon", obj);
-      if (res.status == 200) {
-        setItem(res.data.data);
-        setStateOfPage("Pending")
-
+      if (admin) {
+        let { location } = jwt_decode(admin);
+        // $("#example").DataTable().destroy();
+        let obj = {
+          status: "Pending",
+          location: location,
+        };
+        let res = await axiosMisUser.post("/uicGeneratedRecon", obj);
+        if (res.status == 200) {
+          setItem(res.data.data);
+          setStateOfPage("Pending");
+        }
       }
     } catch (error) {
       alert(error);
@@ -307,17 +322,19 @@ export default function Home() {
   const handelUicDownloaded = async () => {
     try {
       let admin = localStorage.getItem("prexo-authentication");
-      let { location } = jwt_decode(admin);
-      // $("#example").DataTable().destroy();
-      let obj = {
-        status: "Printed",
-        location: location,
-      };
-      let res = await axiosMisUser.post("/uicGeneratedRecon", obj);
-      if (res.status == 200) {
-        setItem(res.data.data);
-        setStateOfPage("Printed")
-        // dataTableFun();
+      if (admin) {
+        let { location } = jwt_decode(admin);
+        // $("#example").DataTable().destroy();
+        let obj = {
+          status: "Printed",
+          location: location,
+        };
+        let res = await axiosMisUser.post("/uicGeneratedRecon", obj);
+        if (res.status == 200) {
+          setItem(res.data.data);
+          setStateOfPage("Printed");
+          // dataTableFun();
+        }
       }
     } catch (error) {
       alert(error);
@@ -326,65 +343,62 @@ export default function Home() {
   const handleOptions = (event) => {
     setAnchorEl(event.currentTarget);
   };
-  console.log(stateOfPage);
   /*****************************************SEARCH ORDERS*************************************************** */
   const searchOrders = async (e) => {
     e.preventDefault();
-    let admin = localStorage.getItem("prexo-authentication");
-    let { location } = jwt_decode(admin);
     try {
-      if (e.target.value == "") {
-        if (stateOfPage== "All") {
-          handelUicAll();
-        } else if (stateOfPage== "Pending") {
-          handelUicNotGenrated();
-        } else if (stateOfPage == "Created") {
-          handelUicGenerated();
-        } else {
-          handelUicDownloaded();
-        }
-      } else if (search.type == "") {
-        alert("Please add input");
-      } else {
-       
-        if (stateOfPage =="All") {
-          let obj = {
-            location: location,
-            type: search.type,
-            searchData: e.target.value,
-          };
-          let res = await axiosMisUser.post("/searchUicPageAll", obj);
-          setRowsPerPage(10);
-          setPage(0);
-          if (res.status == 200 && res.data.data?.length !== 0) {
-            setItem(res.data.data);
+      let admin = localStorage.getItem("prexo-authentication");
+      if (admin) {
+        let { location } = jwt_decode(admin);
+        if (e.target.value == "") {
+          if (stateOfPage == "All") {
+            handelUicAll();
+          } else if (stateOfPage == "Pending") {
+            handelUicNotGenrated();
+          } else if (stateOfPage == "Created") {
+            handelUicGenerated();
           } else {
-            alert("No data found");
+            handelUicDownloaded();
           }
+        } else if (search.type == "") {
+          alert("Please add input");
         } else {
-          let obj = {
-            location: location,
-            type: search.type,
-            searchData: e.target.value,
-            uic_status:""
-          };
-          if(stateOfPage =="Pending"){
-            obj.uic_status="Pending"
-          }
-          else if(stateOfPage=="Created"){
-            obj.uic_status="Created"
-          }
-          else
-          {
-            obj.uic_status="Printed"
-          }
-          let res = await axiosMisUser.post("/searchUicPageAll", obj);
-          setRowsPerPage(10);
-          setPage(0);
-          if (res.status == 200 && res.data.data?.length !== 0) {
-            setItem(res.data.data);
+          if (stateOfPage == "All") {
+            let obj = {
+              location: location,
+              type: search.type,
+              searchData: e.target.value,
+            };
+            let res = await axiosMisUser.post("/searchUicPageAll", obj);
+            setRowsPerPage(10);
+            setPage(0);
+            if (res.status == 200 && res.data.data?.length !== 0) {
+              setItem(res.data.data);
+            } else {
+              alert("No data found");
+            }
           } else {
-            alert("No data found");
+            let obj = {
+              location: location,
+              type: search.type,
+              searchData: e.target.value,
+              uic_status: "",
+            };
+            if (stateOfPage == "Pending") {
+              obj.uic_status = "Pending";
+            } else if (stateOfPage == "Created") {
+              obj.uic_status = "Created";
+            } else {
+              obj.uic_status = "Printed";
+            }
+            let res = await axiosMisUser.post("/searchUicPageAll", obj);
+            setRowsPerPage(10);
+            setPage(0);
+            if (res.status == 200 && res.data.data?.length !== 0) {
+              setItem(res.data.data);
+            } else {
+              alert("No data found");
+            }
           }
         }
       }
@@ -726,6 +740,7 @@ export default function Home() {
                   {/* <MenuItem value="order_date">Order Date</MenuItem> */}
                   {/* <MenuItem value="order_status">Delivery Status</MenuItem> */}
                   <MenuItem value="imei">IMEI</MenuItem>
+                  <MenuItem value="uic">UIC</MenuItem>
                   <MenuItem value="tracking_id">Tracking ID</MenuItem>
                   <MenuItem value="item_id">Item ID</MenuItem>
                   {/* <MenuItem value="old_item_details">OLD Item Details</MenuItem>  */}
@@ -757,7 +772,7 @@ export default function Home() {
                 variant="contained"
                 // fullWidth
                 sx={{ m: 1, mt: 3 }}
-                style={{ backgroundColor: "#206CE2" }}
+                style={{ backgroundColor: "green" }}
                 onClick={(e) => {
                   handelUicGen(e);
                 }}
@@ -768,7 +783,7 @@ export default function Home() {
                 variant="contained"
                 // fullWidth
                 sx={{ m: 1, mt: 3 }}
-                style={{ backgroundColor: "#206CE2", float: "left" }}
+                style={{ backgroundColor: "#21b6ae", float: "left" }}
                 onClick={(e) => {
                   exportToCSV("UIC-Printing-Sheet");
                 }}
@@ -816,29 +831,48 @@ export default function Home() {
           </Box>
         </Box>
       </Box>
-      <Paper sx={{ width: "100%", overflow: "hidden" }}>
-        <TableContainer>
-          {tabelData}
-          <TableFooter>
-            <TablePagination
-              rowsPerPageOptions={[10, 50, 100]}
-              colSpan={3}
-              count={item.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              SelectProps={{
-                inputProps: {
-                  "aria-label": "rows per page",
-                },
-                native: true,
-              }}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-              ActionsComponent={TablePaginationActions}
-            />
-          </TableFooter>
-        </TableContainer>
-      </Paper>
+      {loading === false || uicGenloading === true ? (
+        <Container>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              flexDirection: "column",
+              pt: 30,
+            }}
+          >
+            <CircularProgress />
+            <p style={{ paddingTop: "10px" }}>
+              {" "}
+              {uicGenloading == true ? "Please Wait..." : "Loading..."}
+            </p>
+          </Box>
+        </Container>
+      ) : (
+        <Paper sx={{ width: "100%", overflow: "hidden" }}>
+          <TableContainer>
+            {tabelData}
+            <TableFooter>
+              <TablePagination
+                rowsPerPageOptions={[10, 50, 100]}
+                colSpan={3}
+                count={item.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                SelectProps={{
+                  inputProps: {
+                    "aria-label": "rows per page",
+                  },
+                  native: true,
+                }}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                ActionsComponent={TablePaginationActions}
+              />
+            </TableFooter>
+          </TableContainer>
+        </Paper>
+      )}
     </>
   );
 }

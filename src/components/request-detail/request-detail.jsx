@@ -28,14 +28,12 @@ import { axiosWarehouseIn } from "../../axios";
 import Checkbox from "@mui/material/Checkbox";
 import SearchIcon from "@mui/icons-material/Search";
 export default function DialogBox() {
-  const [open, setOpen] = React.useState(false);
-  const [editCall, setEditCall] = useState(false);
   const navigate = useNavigate();
   const [employeeData, setEmployeeData] = useState([]);
   const { bagId } = useParams();
+  const [loading, setLoading] = useState(false);
   /**************************************************************************** */
   const [awbn, setAwbn] = useState("");
-  const [awbnSuccess, setAwbnSuccess] = useState(false);
   const [uic, setUic] = useState(false);
   const [sleaves, setSleaves] = useState(false);
   const [description, setDescription] = useState([]);
@@ -108,11 +106,9 @@ export default function DialogBox() {
         };
         let res = await axiosWarehouseIn.post("/actualCheckAwbn", obj);
         if (res?.status == 200) {
-          setAwbnSuccess(true);
           addActualitem(res.data.data);
         }
       } catch (error) {
-        setAwbnSuccess(false);
         if (error.response.status == 403) {
           setAwbn("");
           alert(error.response.data.message);
@@ -162,20 +158,26 @@ export default function DialogBox() {
   /************************************************************************** */
   const handelIssue = async (e) => {
     try {
+      setLoading(true);
       if (uic == false) {
         alert("Please Confirm UIC");
+        setLoading(false);
       } else if (sleaves == false) {
         alert("Please Confirm Sleeves");
+        setLoading(false);
       } else if (description == "") {
         alert("Please Add Description");
+        setLoading(false);
       } else if (pmtTray == null || mmtTray == null || botTray == "") {
         alert("Please Assign Tray");
+        setLoading(false);
       } else if (
         employeeData[0]?.actual_items?.filter(function (item) {
           return item.status == "Duplicate";
         })?.length != 0
       ) {
         alert("Please Remove Duplicate Items");
+        setLoading(false);
       } else if (
         employeeData[0]?.actual_items?.length == employeeData[0]?.items?.length
       ) {
@@ -190,9 +192,11 @@ export default function DialogBox() {
         let res = await axiosWarehouseIn.post("/issueToBot", obj);
         if (res.status == 200) {
           alert(res.data.message);
+          setLoading(false);
           navigate("/bag-issue-request");
         }
       } else {
+        setLoading(false);
         alert("Please Verify Actual Data");
       }
     } catch (error) {
@@ -217,12 +221,18 @@ export default function DialogBox() {
   /*********************************TRAY ASSIGNEMENT********************************** */
   const handelBotTray = async (e, trayId) => {
     try {
-      if (trayId !== "") {
-        setBotTray("");
-        let res = await axiosWarehouseIn.post("/checkBotTray/" + trayId);
-        if (res.status == 200) {
-          alert(res.data.message);
-          setBotTray(res.data.data);
+      let admin = localStorage.getItem("prexo-authentication");
+      if (admin) {
+        let { location } = jwt_decode(admin);
+        if (trayId !== "") {
+          setBotTray("");
+          let res = await axiosWarehouseIn.post(
+            "/checkBotTray/" + trayId + "/" + location
+          );
+          if (res.status == 200) {
+            alert(res.data.message);
+            setBotTray(res.data.data);
+          }
         }
       } else {
         alert("Please enter tray id");
@@ -234,14 +244,20 @@ export default function DialogBox() {
   const handelMmtTray = async (e, trayId) => {
     try {
       if (trayId !== "") {
-        setMmtTray(null);
-        let res = await axiosWarehouseIn.post("/checkMmtTray/" + trayId);
-        if (res.status == 200) {
-          alert(res.data.message);
-          setMmtTray(res.data.data);
+        let admin = localStorage.getItem("prexo-authentication");
+        if (admin) {
+          let { location } = jwt_decode(admin);
+          setMmtTray(null);
+          let res = await axiosWarehouseIn.post(
+            "/checkMmtTray/" + trayId + "/" + location
+          );
+          if (res.status == 200) {
+            alert(res.data.message);
+            setMmtTray(res.data.data);
+          }
+        } else {
+          alert("Please enter tray id");
         }
-      } else {
-        alert("Please enter tray id");
       }
     } catch (error) {
       alert(error.response.data.message);
@@ -250,11 +266,17 @@ export default function DialogBox() {
   const handelPmtTray = async (e, trayId) => {
     try {
       if (trayId !== "") {
-        setPmtTray(null);
-        let res = await axiosWarehouseIn.post("/checkPmtTray/" + trayId);
-        if (res.status == 200) {
-          alert(res.data.message);
-          setPmtTray(res.data.data);
+        let admin = localStorage.getItem("prexo-authentication");
+        if (admin) {
+          let { location } = jwt_decode(admin);
+          setPmtTray(null);
+          let res = await axiosWarehouseIn.post(
+            "/checkPmtTray/" + trayId + "/" + location
+          );
+          if (res.status == 200) {
+            alert(res.data.message);
+            setPmtTray(res.data.data);
+          }
         }
       } else {
         alert("Please enter tray id");
@@ -385,7 +407,7 @@ export default function DialogBox() {
                   </p>
                 </Box>
               </Box>{" "}
-              <Box
+              {/* <Box
                 sx={{
                   m: 2,
                 }}
@@ -400,7 +422,7 @@ export default function DialogBox() {
                     }
                   </p>
                 </Box>
-              </Box>
+              </Box> */}
             </Box>
             <TableContainer>
               <Table
@@ -426,9 +448,9 @@ export default function DialogBox() {
                       <TableCell>{data?.order_id}</TableCell>
                       <TableCell>
                         {new Date(data?.order_date).toLocaleString("en-GB", {
-                           year: "numeric",
-                           month: "2-digit",
-                           day: "2-digit",
+                          year: "numeric",
+                          month: "2-digit",
+                          day: "2-digit",
                         })}
                       </TableCell>
                       <TableCell
@@ -541,7 +563,7 @@ export default function DialogBox() {
                   </p>
                 </Box>
               </Box>{" "}
-              <Box
+              {/* <Box
                 sx={{
                   m: 2,
                 }}
@@ -556,7 +578,7 @@ export default function DialogBox() {
                     }
                   </p>
                 </Box>
-              </Box>
+              </Box> */}
             </Box>
             <TableContainer>
               <Table
@@ -607,7 +629,7 @@ export default function DialogBox() {
                             style={{ backgroundColor: "red" }}
                             component="span"
                             onClick={() => {
-                              if (window.confirm("Delete the item?")) {
+                              if (window.confirm("You want to Remove?")) {
                                 handelDelete(data._id);
                               }
                             }}
@@ -712,7 +734,8 @@ export default function DialogBox() {
             <Button
               sx={{ m: 3, mb: 9 }}
               variant="contained"
-              style={{ backgroundColor: "#206CE2" }}
+              disabled={loading == true ? true : false}
+              style={{ backgroundColor: "green" }}
               onClick={() => {
                 if (window.confirm("You Want to Issue?")) {
                   handelIssue();

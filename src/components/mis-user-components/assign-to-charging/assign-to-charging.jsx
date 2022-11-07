@@ -24,6 +24,8 @@ import {
 import { axiosMisUser, axiosWarehouseIn } from "../../../axios";
 import Checkbox from "@mui/material/Checkbox";
 import PropTypes from "prop-types";
+// import jwt from "jsonwebtoken"
+import jwt_decode from "jwt-decode";
 //Datatable Modules
 import $ from "jquery";
 import "datatables.net";
@@ -76,15 +78,22 @@ export default function StickyHeadTable({ props }) {
   const handleClose = () => {
     setOpen(false);
   };
-
   useEffect(() => {
     const fetchData = async () => {
       try {
         $("#example").DataTable().destroy();
-        let response = await axiosWarehouseIn.post("/wht-tray/" + "Inuse");
-        if (response.status === 200) {
-          setWhtTray(response.data.data);
-          dataTableFun();
+        let admin = localStorage.getItem("prexo-authentication");
+        if (admin) {
+          let { location } = jwt_decode(admin);
+          let response = await axiosWarehouseIn.post(
+            "/wht-tray/" + "Closed/" + location
+          );
+          if (response.status === 200) {
+            setWhtTray(response.data.data);
+            dataTableFun();
+          }
+        } else {
+          navigate("/");
         }
       } catch (error) {
         alert(error);
@@ -96,9 +105,15 @@ export default function StickyHeadTable({ props }) {
   useEffect(() => {
     try {
       const fetchData = async () => {
-        let res = await axiosMisUser.post("/get-charging-users/" + "Charging");
-        if (res.status == 200) {
-          setChrgingArr(res.data.data);
+        let admin = localStorage.getItem("prexo-authentication");
+        if (admin) {
+          let { location } = jwt_decode(admin);
+          let res = await axiosMisUser.post(
+            "/get-charging-users/" + "Charging/" + location
+          );
+          if (res.status == 200) {
+            setChrgingArr(res.data.data);
+          }
         }
       };
       fetchData();
@@ -141,7 +156,7 @@ export default function StickyHeadTable({ props }) {
       let obj = {
         tray: isCheck,
         user_name: chargingPerson,
-        sort_id:"Send for charging"
+        sort_id: "Send for charging",
       };
       let res = await axiosMisUser.post("/wht-sendTo-wharehouse", obj);
       if (res.status === 200) {
@@ -157,7 +172,6 @@ export default function StickyHeadTable({ props }) {
       }
     }
   };
-  console.log(chargingPerson);
   return (
     <>
       <BootstrapDialog

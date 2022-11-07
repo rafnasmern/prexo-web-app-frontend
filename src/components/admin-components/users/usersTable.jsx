@@ -9,6 +9,7 @@ import {
   TableRow,
   Box,
   Button,
+  Container,
 } from "@mui/material";
 import { axiosSuperAdminPrexo } from "../../../axios";
 import Swal from "sweetalert2";
@@ -16,16 +17,21 @@ import Swal from "sweetalert2";
 import $ from "jquery";
 import "datatables.net";
 import { useNavigate } from "react-router-dom";
+import CircularProgress from "@mui/material/CircularProgress";
+
 /***************************************************************** */
 export default function StickyHeadTable({ props }) {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     props.setRefresh(false);
     try {
       const fetchData = async () => {
+        setLoading(false);
         let response = await axiosSuperAdminPrexo.get("/getUsers");
         if (response.status === 200) {
+          setLoading(true);
           props.setUsersData(response.data.data.user);
           dataTableFun();
         }
@@ -40,6 +46,8 @@ export default function StickyHeadTable({ props }) {
     $("#example").DataTable({
       destroy: true,
       scrollX: true,
+      fixedHeader: true,
+      
     });
   }
   //api for delete a employee
@@ -116,119 +124,145 @@ export default function StickyHeadTable({ props }) {
             justifyContent: "center",
           }}
         >
-          <Paper sx={{ width: "100%", overflow: "auto" }}>
-            <TableContainer>
-              <Table
-                id="example"
-                style={{ width: "100%" }}
-                stickyHeader
-                aria-label="sticky table"
+          {loading == false ? (
+            <Container>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  flexDirection: "column",
+                }}
               >
-                <TableHead >
-                  <TableRow style={{backgroundColor:"#228C23"}}>
-                    <TableCell>Record.NO</TableCell>
-                    <TableCell>Profile</TableCell>
-                    <TableCell>Created Time</TableCell>
-                    <TableCell>Name</TableCell>
-                    <TableCell>Contact No</TableCell>
-                    <TableCell>Email</TableCell>
-                    <TableCell>User Name </TableCell>
-                    <TableCell>Location</TableCell>
-                    <TableCell>User Type</TableCell>
-                    <TableCell>Device Name</TableCell>
-                    <TableCell>Device Id</TableCell>
-                    <TableCell>Status</TableCell>
-                    <TableCell>Actions</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {props.usersData.map((data, index) => (
-                    <TableRow
-                      key={data._id}
-                      hover
-                      role="checkbox"
-                      tabIndex={-1}
-                    >
-                      <TableCell>{index + 1}</TableCell>
-                      <TableCell>
-                        {" "}
-                        <img height="80px" width="100%" src={data.profile} />
-                      </TableCell>
-                      <TableCell>
-                        {new Date(data.creation_date).toLocaleString("en-GB", {
-                          hour12: true,
-                        })}
-                      </TableCell>
-                      <TableCell>{data.name}</TableCell>
-                      <TableCell>{data.contact}</TableCell>
-                      <TableCell>{data?.email}</TableCell>
-                      <TableCell>{data.user_name}</TableCell>
-                      <TableCell>{data.cpc}</TableCell>
-                      <TableCell>{data.user_type}</TableCell>
-                      {/* <TableCell>{data.warehouse}</TableCell>
+                <CircularProgress />
+                <p style={{ paddingTop: "10px" }}>Loading...</p>
+              </Box>
+            </Container>
+          ) : (
+            <Paper sx={{ width: "100%", overflow: "hidden" }}>
+              <TableContainer>
+                <Table
+                  id="example"
+                  // style={{ width: "100%" }}
+                  stickyHeader
+                  aria-label="sticky table"
+                >
+                  <TableHead stickyHeader>
+                    <TableRow style={{ backgroundColor: "#228C23" }}>
+                      <TableCell>Record.NO</TableCell>
+                      <TableCell>Profile</TableCell>
+                      <TableCell>Created Time</TableCell>
+                      <TableCell>Name</TableCell>
+                      <TableCell>Contact No</TableCell>
+                      <TableCell>Email</TableCell>
+                      <TableCell>User Name </TableCell>
+                      <TableCell>Location</TableCell>
+                      <TableCell>User Type</TableCell>
+                      <TableCell>Device Name</TableCell>
+                      <TableCell>Device Id</TableCell>
+                      <TableCell>Status</TableCell>
+                      <TableCell>Actions</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {props.usersData.map((data, index) => (
+                      <TableRow
+                        key={data._id}
+                        hover
+                        role="checkbox"
+                        tabIndex={-1}
+                      >
+                        <TableCell>{index + 1}</TableCell>
+                        <TableCell>
+                          {" "}
+                          <img height="80px" width="100%" src={data.profile} />
+                        </TableCell>
+                        <TableCell>
+                          {new Date(data.creation_date).toLocaleString(
+                            "en-GB",
+                            {
+                              hour12: true,
+                            }
+                          )}
+                        </TableCell>
+                        <TableCell>{data.name}</TableCell>
+                        <TableCell>{data.contact}</TableCell>
+                        <TableCell>{data?.email}</TableCell>
+                        <TableCell>{data.user_name}</TableCell>
+                        <TableCell>{data.cpc}</TableCell>
+                        <TableCell>{data.user_type}</TableCell>
+                        {/* <TableCell>{data.warehouse}</TableCell>
                       <TableCell>{data.department}</TableCell>
                       <TableCell>{data.store}</TableCell>
                       <TableCell>{data.designation}</TableCell>
                       <TableCell>{data.reporting_manager}</TableCell> */}
-                      <TableCell>{data.device_name}</TableCell>
-                      <TableCell>{data.device_id}</TableCell>
-                      {/* <TableCell>{data.is_super_admin}</TableCell> */}
-                      <TableCell>{data.status}</TableCell>
+                        <TableCell>{data.device_name}</TableCell>
+                        <TableCell>{data.device_id}</TableCell>
+                        {/* <TableCell>{data.is_super_admin}</TableCell> */}
+                        <TableCell
+                          style={
+                            data.status === "Active"
+                              ? { color: "green" }
+                              : { color: "red" }
+                          }
+                        >
+                          {data.status}
+                        </TableCell>
 
-                      <TableCell>
-                        <Button
-                          variant="contained"
-                          onClick={() => props.editUser(data._id)}
-                          style={{ backgroundColor: "#206CE2" }}
-                          component="span"
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          sx={{
-                            mt: 1,
-                          }}
-                          type="submit"
-                          variant="contained"
-                          style={{ backgroundColor: "green" }}
-                          onClick={(e) => {
-                            handleUsersHistory(e, data.user_name);
-                          }}
-                        >
-                          History
-                        </Button>
-                        {data.status == "Active" ? (
+                        <TableCell>
+                          <Button
+                            variant="contained"
+                            onClick={() => props.editUser(data._id)}
+                            style={{ backgroundColor: "#206CE2" }}
+                            component="span"
+                          >
+                            Edit
+                          </Button>
                           <Button
                             sx={{
                               mt: 1,
                             }}
+                            type="submit"
                             variant="contained"
-                            style={{ backgroundColor: "red" }}
-                            component="span"
-                            onClick={() => handelDeactive(data._id)}
-                          >
-                            Deactivate
-                          </Button>
-                        ) : (
-                          <Button
-                            sx={{
-                              mt: 1,
+                            style={{ backgroundColor: "#0088CC" }}
+                            onClick={(e) => {
+                              handleUsersHistory(e, data.user_name);
                             }}
-                            variant="contained"
-                            style={{ backgroundColor: "red" }}
-                            component="span"
-                            onClick={() => handelActive(data._id)}
                           >
-                            Activate
+                            History
                           </Button>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Paper>
+                          {data.status == "Active" ? (
+                            <Button
+                              sx={{
+                                mt: 1,
+                              }}
+                              variant="contained"
+                              style={{ backgroundColor: "red" }}
+                              component="span"
+                              onClick={() => handelDeactive(data._id)}
+                            >
+                              Deactivate
+                            </Button>
+                          ) : (
+                            <Button
+                              sx={{
+                                mt: 1,
+                              }}
+                              variant="contained"
+                              style={{ backgroundColor: "green" }}
+                              component="span"
+                              onClick={() => handelActive(data._id)}
+                            >
+                              Activate
+                            </Button>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Paper>
+          )}
         </Box>
       </Box>
     </>

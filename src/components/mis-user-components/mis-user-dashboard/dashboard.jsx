@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { FormLabel, Box, Link } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { axiosMisUser } from "../../../axios";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
+// import jwt from "jsonwebtoken"
+import jwt_decode from "jwt-decode";
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const [dashboardData, setDashboardData] = useState({});
+  useEffect(() => {
+    let admin = localStorage.getItem("prexo-authentication");
+    if (admin == null) {
+      navigate("/");
+    }
+  }, []);
   const handelOrders = (e) => {
     e.preventDefault();
     navigate("/orders");
@@ -39,6 +45,10 @@ export default function Dashboard() {
     e.preventDefault();
     navigate("/assign-to-bqc");
   };
+  const handelAssignToAudti = (e) => {
+    e.preventDefault();
+    navigate("/assign-to-audit");
+  };
   return (
     <div>
       <h4 style={{ marginTop: "100px", marginLeft: "27px", color: "#495057" }}>
@@ -50,7 +60,7 @@ export default function Dashboard() {
           m: 3,
           width: 300,
           boxShadow: 2,
-          height: "552px",
+          height: "615px",
           backgroundColor: "#FFFFFF",
         }}
       >
@@ -219,6 +229,26 @@ export default function Dashboard() {
               }}
             >
               Assign for BQC
+            </Link>
+          </Box>
+          <hr />
+          <Box
+            style={{ marginBottom: "12px", marginTop: "20" }}
+            sx={{ display: "flex", flexDirection: "start" }}
+          >
+            <ArrowRightIcon sx={{ marginTop: "4px" }} />
+            <Link
+              style={{
+                textDecoration: "none",
+                color: "black",
+                fontSize: "20px",
+                marginLeft: "5px",
+              }}
+              onClick={(e) => {
+                handelAssignToAudti(e);
+              }}
+            >
+              Assign for Audit
             </Link>
           </Box>
           <hr />

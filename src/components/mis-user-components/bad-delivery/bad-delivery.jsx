@@ -95,7 +95,6 @@ export default function Home() {
       if (isCheck.length == 0) {
         alert("Please Select Atleast One Data");
       } else {
-        console.log(isCheck);
         let res = await axiosMisUser.post("/deleteBadDelivery", isCheck);
         if (res.status == 200) {
           alert(res.data.message);
@@ -214,25 +213,27 @@ export default function Home() {
   /*****************************************SEARCH Delivery*************************************************** */
   const searchDelivery = async (e) => {
     e.preventDefault();
-    let admin = localStorage.getItem("prexo-authentication");
-    let { location } = jwt_decode(admin);
 
     try {
-      if (e.target.value == "") {
-        setRefresh((refresh) => !refresh);
-      } else if (search.type == "") {
-        alert("Please add input");
-      } else {
-        let obj = {
-          location: location,
-          type: search.type,
-          searchData: e.target.value,
-        };
-        let res = await axiosMisUser.post("/searchBadDelivery", obj);
-        if (res.status == 200) {
-          setRowsPerPage(10);
-          setPage(0);
-          setItem(res.data.data);
+      let admin = localStorage.getItem("prexo-authentication");
+      if (admin) {
+        let { location } = jwt_decode(admin);
+        if (e.target.value == "") {
+          setRefresh((refresh) => !refresh);
+        } else if (search.type == "") {
+          alert("Please add input");
+        } else {
+          let obj = {
+            location: location,
+            type: search.type,
+            searchData: e.target.value,
+          };
+          let res = await axiosMisUser.post("/searchBadDelivery", obj);
+          if (res.status == 200) {
+            setRowsPerPage(10);
+            setPage(0);
+            setItem(res.data.data);
+          }
         }
       }
     } catch (error) {

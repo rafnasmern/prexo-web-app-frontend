@@ -165,7 +165,7 @@ export default function DialogBox() {
         let res = await axiosWarehouseIn.post("/close-pick-list/" + picklistId);
         if (res.status == 200) {
           alert(res.data.message);
-          navigate("/picklist-request");
+          navigate(-1);
         }
       } else {
         alert("Please Verify Actual Data");

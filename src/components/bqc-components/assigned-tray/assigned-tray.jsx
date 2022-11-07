@@ -19,7 +19,7 @@ import {
   Grid,
   CloseIcon,
 } from "@mui/material";
-import { axiosCharging } from "../../../axios";
+import { axiosBqc, axiosCharging } from "../../../axios";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 // import jwt from "jsonwebtoken"
@@ -42,7 +42,7 @@ export default function StickyHeadTable({ props }) {
       if (token) {
         const { user_name } = jwt_decode(token);
         const fetchData = async () => {
-          let res = await axiosCharging.post("/assigned-tray/" + user_name);
+          let res = await axiosBqc.post("/assigned-tray/" + user_name);
           if (res.status == 200) {
             setInfraData(res.data.data);
             dataTableFun();
@@ -65,15 +65,14 @@ export default function StickyHeadTable({ props }) {
       scrollX: true,
     });
   }
-  const handelViewTray = (e, id) => {
+  const handelBqcIn = (e, id) => {
     e.preventDefault();
-    navigate("/charging-view-tray-details/" + id);
+    navigate("/bqc-in/" + id);
   };
-  const handelChargingDone = (e, id) => {
+  const handelBqcDone = (e, id) => {
     e.preventDefault();
-    navigate("/charging-out/" + id);
+    navigate("/bqc-out/" + id);
   };
-
   return (
     <>
       <Box>
@@ -127,17 +126,17 @@ export default function StickyHeadTable({ props }) {
                         })}
                       </TableCell>
                       <TableCell>
-                        {data.sort_id == "Issued" ? (
+                        {data.sort_id == "Issued to BQC" ? (
                           <Button
                             sx={{ m: 1 }}
                             type="submit"
                             variant="contained"
                             style={{ backgroundColor: "#206CE2" }}
                             onClick={(e) => {
-                              handelViewTray(e, data.code);
+                              handelBqcIn(e, data.code);
                             }}
                           >
-                            Charging IN
+                            BQC IN
                           </Button>
                         ) : (
                           <Button
@@ -146,10 +145,10 @@ export default function StickyHeadTable({ props }) {
                             variant="contained"
                             style={{ backgroundColor: "green" }}
                             onClick={(e) => {
-                              handelChargingDone(e, data.code);
+                              handelBqcDone(e, data.code);
                             }}
                           >
-                            Charging Done
+                            BQC Done
                           </Button>
                         )}
                       </TableCell>

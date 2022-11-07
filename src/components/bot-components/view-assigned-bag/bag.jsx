@@ -37,7 +37,6 @@ import Swal from "sweetalert2";
 import Checkbox from "@mui/material/Checkbox";
 // import jwt from "jsonwebtoken"
 import jwt_decode from "jwt-decode";
-
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
     padding: theme.spacing(2),
@@ -91,16 +90,20 @@ export default function DialogBox() {
   const [stickerFour, setStickerFour] = useState("");
   const [loading, setLoading] = useState(false);
   const [awbn, setAwbn] = useState("");
-  const [bodyDamage, setBodyDamage] = useState("");
+  const [bodyDamage, setBodyDamage] = useState("NO");
   let admin = localStorage.getItem("prexo-authentication");
-  let { user_name } = jwt_decode(admin);
+  let user_name1;
+  if (admin) {
+    let { user_name } = jwt_decode(admin);
+    user_name1 = user_name;
+  }
   useEffect(() => {
     const fetchData = async () => {
       setCount(0);
       try {
         let obj = {
           bagId: bagId,
-          username: user_name,
+          username: user_name1,
         };
         let response = await axiosBot.post("/getAssignedBagItems", obj);
         if (response.status === 200) {
@@ -118,12 +121,16 @@ export default function DialogBox() {
       for (let x of employeeData?.[1]?.tray) {
         setCount(
           (count) =>
-            count + x?.items.filter((data) => data.bag_id == bagId).length
+            count +
+            x?.items.filter(
+              (data) =>
+                data.bag_id == bagId &&
+                data.bag_assigned_date == employeeData[0]?.assigned_date
+            ).length
         );
       }
     }
   }, [employeeData]);
-  console.log(employeeData?.[1]?.tray);
   const handleClose = () => {
     setOpen(false);
   };
@@ -133,7 +140,7 @@ export default function DialogBox() {
     setStickerThree("");
     setStickerFour("");
     setOpneProductMisMatch(false);
-    setBodyDamage("");
+    setBodyDamage("NO");
   };
   const handleCloseApprove = () => {
     setStickerOne("");
@@ -141,7 +148,7 @@ export default function DialogBox() {
     setStickerThree("");
     setStickerFour("");
     setOpenApprove(false);
-    setBodyDamage("");
+    setBodyDamage("NO");
   };
   const handleCloseModelMisMatch = () => {
     setStickerOne("");
@@ -149,7 +156,7 @@ export default function DialogBox() {
     setStickerThree("");
     setStickerFour("");
     setModelMisMatch(false);
-    setBodyDamage("");
+    setBodyDamage("NO");
   };
   /***************************************************************************************** */
   // BAG AND BOT TRAY CLOSE
@@ -185,7 +192,7 @@ export default function DialogBox() {
         let obj = {
           bagId: bagId,
           awbn_number: e.target.value,
-          username: user_name,
+          username: user_name1,
         };
         let res = await axiosBot.post("/awbnScanning", obj);
         if (res.status == 200) {
@@ -207,7 +214,6 @@ export default function DialogBox() {
   /************************************************************************** */
   const handelDelete = async (trayId, id, awbn) => {
     try {
-      console.log(trayId);
       let obj = {
         id: id,
         trayId: trayId,
@@ -259,12 +265,12 @@ export default function DialogBox() {
             status: awabnDetails?.[0].status,
             tray_id: tray[0].code,
             bag_id: bagId,
-            user_name: user_name,
+            user_name: user_name1,
+            bag_assigned_date: employeeData[0]?.assigned_date,
             uic:
               awabnDetails?.[0]?.uic_code?.code == undefined
                 ? "PENDING"
                 : awabnDetails?.[0]?.uic_code?.code,
-            body_damage: bodyDamage,
           };
           let res = await axiosBot.post("/traySegregation", obj);
           if (res.status == 200) {
@@ -275,7 +281,7 @@ export default function DialogBox() {
             setStickerTwo("");
             setStickerThree("");
             setStickerFour("");
-            setBodyDamage("");
+            setBodyDamage("NO");
             setModelMisMatch(false);
           }
         }
@@ -312,12 +318,13 @@ export default function DialogBox() {
             status: awabnDetails?.[0].status,
             tray_id: tray[0].code,
             bag_id: bagId,
-            body_damage: bodyDamage,
-            user_name: user_name,
+            bag_assigned_date: employeeData[0]?.assigned_date,
+            user_name: user_name1,
             uic:
               awabnDetails?.[0]?.uic_code?.code == undefined
                 ? "PENDING"
                 : awabnDetails?.[0]?.uic_code?.code,
+            body_damage: bodyDamage,
           };
           let res = await axiosBot.post("/traySegregation", obj);
           if (res.status == 200) {
@@ -329,7 +336,7 @@ export default function DialogBox() {
             setStickerThree("");
             setStickerFour("");
             setOpenApprove(false);
-            setBodyDamage("");
+            setBodyDamage("NO");
             setOpneProductMisMatch(false);
           }
         }
@@ -341,7 +348,7 @@ export default function DialogBox() {
         setStickerFour("");
         setOpenApprove(false);
         setModelMisMatch(false);
-        setBodyDamage("");
+        setBodyDamage("NO");
         setOpneProductMisMatch(false);
         setLoading(false);
       }
@@ -456,7 +463,7 @@ export default function DialogBox() {
                   alt="No product image"
                   src={
                     awabnDetails?.[0]?.products.image == undefined
-                      ? "http://prexo-v1-dev-api.dealsdray.com/product/image/" +
+                      ? "https://prexo-v1-dev-api.dealsdray.com/product/image/" +
                         awabnDetails?.[0]?.products.vendor_sku_id +
                         ".jpg"
                       : awabnDetails?.[0]?.products.image
@@ -538,18 +545,25 @@ export default function DialogBox() {
               <RadioGroup
                 aria-labelledby="demo-radio-buttons-group-label"
                 defaultValue="NO"
-                onClick={(e) => {
-                  setBodyDamage(e.target.value);
-                }}
                 name="radio-buttons-group"
               >
                 <Box>
                   <FormControlLabel
                     value="YES"
+                    onClick={(e) => {
+                      setBodyDamage("YES");
+                    }}
                     control={<Radio />}
                     label="YES"
                   />
-                  <FormControlLabel value="NO" control={<Radio />} label="NO" />
+                  <FormControlLabel
+                    value="NO"
+                    control={<Radio />}
+                    onClick={(e) => {
+                      setBodyDamage("NO");
+                    }}
+                    label="NO"
+                  />
                 </Box>
               </RadioGroup>
             </FormControl>
@@ -807,7 +821,7 @@ export default function DialogBox() {
                   />
                 </Box>
 
-                <Box
+                {/* <Box
                   sx={{
                     ml: 4,
                   }}
@@ -820,7 +834,7 @@ export default function DialogBox() {
                       }).length
                     }
                   </p>
-                </Box>
+                </Box> */}
                 <Box
                   sx={{
                     ml: 4,
@@ -1018,7 +1032,7 @@ export default function DialogBox() {
               style={{ backgroundColor: "red" }}
               component="span"
               onClick={(e) => {
-                if (window.confirm("You Want to Close?")) {
+                if (window.confirm("You want to Close?")) {
                   handelClosebag(e);
                 }
               }}

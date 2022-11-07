@@ -493,7 +493,7 @@ export default function DialogBox() {
           <Button
             type="submit"
             variant="contained"
-            style={{ backgroundColor: "#206CE2" }}
+            style={{ backgroundColor: "#008000" }}
             onClick={handleClickOpen}
           >
             Add user

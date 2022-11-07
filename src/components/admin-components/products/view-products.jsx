@@ -6,26 +6,28 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  TablePagination,
+  Container,
   TableRow,
   Box,
   Button,
 } from "@mui/material";
 import { axiosSuperAdminPrexo } from "../../../axios";
-import Skeleton from '@mui/material/Skeleton';
+import CircularProgress from "@mui/material/CircularProgress";
 import Swal from "sweetalert2";
 //Datatable Modules
 import $ from "jquery";
 import "datatables.net";
 
 export default function StickyHeadTable({ props }) {
-  const [employeeData, setEmployeeData] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(false);
         let response = await axiosSuperAdminPrexo.post("/getAllProducts");
         if (response.status === 200) {
+          setLoading(true);
           props.setProductsData(response.data.data);
           dataTableFun();
         }
@@ -100,10 +102,24 @@ export default function StickyHeadTable({ props }) {
             flexDirection: "cloumn",
           }}
         >
+          {
+            loading == false ? 
+            <Container>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                flexDirection: "column",
+              }}
+            >
+              <CircularProgress />
+              <p style={{ paddingTop: "10px" }}>Loading...</p>
+            </Box>
+          </Container>
+          :
+
           <Paper sx={{ width: "100%" }}>
             <TableContainer>
-
-          
               <Table style={{ width: "100%" }} id="example">
                 <TableHead>
                   <TableRow>
@@ -128,7 +144,7 @@ export default function StickyHeadTable({ props }) {
                           width="80px"
                           src={
                             data.image == undefined
-                              ? "http://prexo-v1-dev-api.dealsdray.com/product/image/" +
+                              ? "https://prexo-v1-dev-api.dealsdray.com/product/image/" +
                                 data.vendor_sku_id +
                                 ".jpg"
                               : data.image
@@ -183,6 +199,7 @@ export default function StickyHeadTable({ props }) {
               </Table>
             </TableContainer>
           </Paper>
+          }
         </Box>
       </Box>
     </>

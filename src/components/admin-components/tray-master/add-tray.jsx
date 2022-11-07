@@ -71,6 +71,7 @@ export default function DialogBox() {
   const [allBrand, setAllBrand] = useState([]);
   const [allModel, setAllModel] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [cpc, setCpc] = useState([]);
 
 
   useEffect(() => {
@@ -81,7 +82,14 @@ export default function DialogBox() {
           setAllBrand(res.data.data);
         }
       };
+      const fetchCpc = async () => {
+        let response = await axiosSuperAdminPrexo.get("/getCpc");
+        if (response.status == 200) {
+          setCpc(response.data.data.data);
+        }
+      };
       fetchData();
+      fetchCpc();
     } catch (error) {
       alert(error);
     }
@@ -149,16 +157,19 @@ export default function DialogBox() {
       .nullable(),
     type_taxanomy: Yup.string().required("Required*").nullable(),
     warehouse: Yup.string().required("Required*").nullable(),
-    limit: Yup.string().required("Required").nullable(),
+    limit:  Yup
+    .number("Must be number")
+    .required("Required*")
+    .positive()
+    .integer()
+    .min(1, "Minimum is 1")
+    .nullable(),
     brand: Yup.string()
       .required("Required*")
       .matches(/^.*((?=.*[aA-zZ\s]){1}).*$/, "Please enter valid brand")
       .max(100)
       .nullable(),
-    model: Yup.string()
-      .required("Required*")
-      .max(100)
-      .nullable(),
+    model: Yup.string().required("Required*").max(100).nullable(),
     display: Yup.string()
       .required("Required*")
       .matches(/^.*((?=.*[aA-zZ\s]){1}).*$/, "Please enter valid display name")
@@ -225,6 +236,7 @@ export default function DialogBox() {
         model: response.data.data.model,
         brand: response.data.data.brand,
         warehouse: response.data.data.warehouse,
+        cpc:response.data.data.cpc
       });
       setId(response.data.data._id);
       setEditCall(true);
@@ -237,6 +249,21 @@ export default function DialogBox() {
       }
     }
   };
+  // Get Cpc data from server
+  async function getCpcData(data) {
+    try {
+      let obj = {
+        name: data,
+      };
+      let response = await axiosSuperAdminPrexo.post(
+        "/getWarehouseByLocation",
+        obj
+      );
+      if (response.status == 200) {
+        setWarehouse(response.data.data.warehouse);
+      }
+    } catch (error) {}
+  }
   const handelEdit = async (data) => {
     data._id = id;
     try {
@@ -295,7 +322,6 @@ export default function DialogBox() {
       />
     );
   }, [trayData]);
-
   return (
     <>
       <BootstrapDialog
@@ -344,6 +370,30 @@ export default function DialogBox() {
                   : getValues("code")
               }
             />
+            <FormControl fullWidth>
+              <InputLabel sx={{ pt: 2 }} id="demo-simple-select-label">
+                CPC
+              </InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                label="Cpc"
+                fullWidth
+                {...register("cpc")}
+                defaultValue={getValues("cpc")}
+                error={errors.cpc ? true : false}
+                helperText={errors.cpc?.message}
+                sx={{ mt: 2 }}
+              >
+                {cpc.map((data) => (
+                  <MenuItem
+                    value={data.code}
+                    onClick={() => getCpcData(data.name)}
+                  >
+                    {data.code}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
             <FormControl fullWidth>
               <InputLabel sx={{ pt: 2 }} id="demo-simple-select-label">
                 Warehouse
@@ -496,6 +546,7 @@ export default function DialogBox() {
               label="Limit"
               variant="outlined"
               fullWidth
+              inputProps={{ maxLength: 2 }}
               onPaste={(e) => {
                 e.preventDefault();
                 return false;

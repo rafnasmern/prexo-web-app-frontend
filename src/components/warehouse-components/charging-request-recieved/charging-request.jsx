@@ -12,10 +12,10 @@ import {
   Button,
 } from "@mui/material";
 import {
-  axiosMisUser,
-  axiosSuperAdminPrexo,
   axiosWarehouseIn,
 } from "../../../axios";
+// import jwt from "jsonwebtoken"
+import jwt_decode from "jwt-decode";
 //Datatable Modules
 import $ from "jquery";
 import "datatables.net";
@@ -28,10 +28,17 @@ export default function StickyHeadTable({ props }) {
   useEffect(() => {
     try {
       const fetchData = async () => {
-        let res = await axiosWarehouseIn.post("/request-for-assign/" + "Send_for_charging");
-        if (res.status == 200) {
-          setChargingRequest(res.data.data);
-          dataTableFun();
+        let admin = localStorage.getItem("prexo-authentication");
+        if(admin){
+          let { location } = jwt_decode(admin);
+          let res = await axiosWarehouseIn.post("/request-for-assign/" + "Send_for_charging/" +  location);
+          if (res.status == 200) {
+            setChargingRequest(res.data.data);
+            dataTableFun();
+          }
+        }
+        else{
+          navigate("/")
         }
       };
       fetchData();

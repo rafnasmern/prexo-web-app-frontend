@@ -12,7 +12,6 @@ import {
   Button,
 } from "@mui/material";
 import { axiosSuperAdminPrexo, axiosWarehouseIn } from "../../../axios";
-import Swal from "sweetalert2";
 //Datatable Modules
 import Checkbox from "@mui/material/Checkbox";
 import $ from "jquery";
@@ -20,7 +19,7 @@ import "datatables.net";
 import { useNavigate, useParams } from "react-router-dom";
 
 export default function StickyHeadTable({ props }) {
-  const [whtTray, setWhtTray] = useState({});
+  const [whtTray, setWhtTray] = useState([]);
   const { trayId } = useParams();
   const navigate = useNavigate();
 
@@ -29,7 +28,11 @@ export default function StickyHeadTable({ props }) {
       try {
         let response = await axiosWarehouseIn.post("/getWhtTrayItem/" + trayId);
         if (response.status === 200) {
-          setWhtTray(response.data.data);
+          if (response.data.data?.items?.length == 0) {
+            setWhtTray(response.data.data.actual_items);
+          } else {
+            setWhtTray(response.data.data.items);
+          }
           dataTableFun();
         }
       } catch (error) {
@@ -72,7 +75,6 @@ export default function StickyHeadTable({ props }) {
               >
                 <TableHead>
                   <TableRow>
-                   
                     <TableCell>Record.NO</TableCell>
                     <TableCell>UIC</TableCell>
                     <TableCell>MUIC</TableCell>
@@ -85,7 +87,7 @@ export default function StickyHeadTable({ props }) {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {whtTray?.items?.map((data, index) => (
+                  {whtTray?.map((data, index) => (
                     <TableRow hover role="checkbox" tabIndex={-1}>
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>{data.uic}</TableCell>

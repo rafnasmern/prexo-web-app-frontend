@@ -66,7 +66,7 @@ export default function Home() {
         const wb = XLSX.read(bufferArray, { cellDates: true });
         const wsname = wb.SheetNames[0];
         const ws = wb.Sheets[wsname];
-        const data = XLSX.utils.sheet_to_json(ws);
+        const data = XLSX.utils.sheet_to_json(ws, { raw: false });
         resolve(data);
       };
       filReader.onerror = (error) => {
@@ -94,22 +94,23 @@ export default function Home() {
       return accumulator;
     }, {});
   }
-
   // Validate the data
   const handelValidate = async (e) => {
     try {
       setLoading(true);
       let admin = localStorage.getItem("prexo-authentication");
-      let { location } = jwt_decode(admin);
-      let obj = {
-        item: pagination.item,
-        location: location,
-      };
-      let res = await axiosMisUser.post("/bulkOrdersValidation", obj);
-      if (res.status == 200) {
-        setValidate(true);
-        setLoading(false);
-        alert(res.data.message);
+      if (admin) {
+        let { location } = jwt_decode(admin);
+        let obj = {
+          item: pagination.item,
+          location: location,
+        };
+        let res = await axiosMisUser.post("/bulkOrdersValidation", obj);
+        if (res.status == 200) {
+          setValidate(true);
+          setLoading(false);
+          alert(res.data.message);
+        }
       }
     } catch (error) {
       if (error.response.status == 400) {
@@ -325,6 +326,7 @@ export default function Home() {
             }}
           >
             <CircularProgress />
+            <p style={{ paddingTop: "10px" }}>Please wait...</p>
           </Box>
         ) : (
           ""
@@ -1119,6 +1121,7 @@ export default function Home() {
             }}
           >
             <CircularProgress />
+            <p style={{ paddingTop: "10px" }}>Please wait...</p>
           </Box>
         </Container>
       ) : null}

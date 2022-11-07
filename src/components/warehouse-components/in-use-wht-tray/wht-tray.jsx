@@ -12,7 +12,8 @@ import {
   Button,
 } from "@mui/material";
 import { axiosSuperAdminPrexo, axiosWarehouseIn } from "../../../axios";
-import Checkbox from "@mui/material/Checkbox";
+// import jwt from "jsonwebtoken"
+import jwt_decode from "jwt-decode";
 //Datatable Modules
 import $ from "jquery";
 import "datatables.net";
@@ -29,10 +30,18 @@ export default function StickyHeadTable({ props }) {
     const fetchData = async () => {
       try {
         $("#example").DataTable().destroy();
-        let response = await axiosWarehouseIn.post("/wht-tray/" + "Inuse");
-        if (response.status === 200) {
-          setWhtTray(response.data.data);
-          dataTableFun();
+        let admin = localStorage.getItem("prexo-authentication");
+        if (admin) {
+          let { location } = jwt_decode(admin);
+          let response = await axiosWarehouseIn.post(
+            "/wht-tray/" + "Inuse/" + location
+          );
+          if (response.status === 200) {
+            setWhtTray(response.data.data);
+            dataTableFun();
+          }
+        } else {
+          navigate("/");
         }
       } catch (error) {
         alert(error);
@@ -92,7 +101,6 @@ export default function StickyHeadTable({ props }) {
 
   return (
     <>
-     
       <Box>
         <Box
           sx={{
@@ -114,7 +122,6 @@ export default function StickyHeadTable({ props }) {
               >
                 <TableHead>
                   <TableRow>
-                   
                     <TableCell>Record.NO</TableCell>
                     <TableCell>Tray Id</TableCell>
                     <TableCell>Warehouse</TableCell>
@@ -132,7 +139,6 @@ export default function StickyHeadTable({ props }) {
                 <TableBody>
                   {whtTray.map((data, index) => (
                     <TableRow hover role="checkbox" tabIndex={-1}>
-                     
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>{data.code}</TableCell>
                       <TableCell>{data.warehouse}</TableCell>

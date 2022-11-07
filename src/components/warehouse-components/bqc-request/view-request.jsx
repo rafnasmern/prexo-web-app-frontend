@@ -14,14 +14,12 @@ import {
   MenuItem,
   Menu,
 } from "@mui/material";
-import {
-  axiosMisUser,
-  axiosSuperAdminPrexo,
-  axiosWarehouseIn,
-} from "../../../axios";
+import { axiosWarehouseIn } from "../../../axios";
 //Datatable Modules
 import $ from "jquery";
 import "datatables.net";
+// import jwt from "jsonwebtoken"
+import jwt_decode from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 export default function StickyHeadTable({ props }) {
   const [charginRequest, setChargingRequest] = useState([]);
@@ -31,10 +29,18 @@ export default function StickyHeadTable({ props }) {
   useEffect(() => {
     try {
       const fetchData = async () => {
-        let res = await axiosWarehouseIn.post("/request-for-assign/" + "send_for_bqc");
-        if (res.status == 200) {
-          setChargingRequest(res.data.data);
-          dataTableFun();
+        let admin = localStorage.getItem("prexo-authentication");
+        if (admin) {
+          let { location } = jwt_decode(admin);
+          let res = await axiosWarehouseIn.post(
+            "/request-for-assign/" + "send_for_bqc/" + location
+          );
+          if (res.status == 200) {
+            setChargingRequest(res.data.data);
+            dataTableFun();
+          }
+        } else {
+          navigate("/");
         }
       };
       fetchData();
@@ -42,16 +48,9 @@ export default function StickyHeadTable({ props }) {
       alert(error);
     }
   }, []);
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
 
   //api for delete a employee
 
- 
   function dataTableFun() {
     $("#example").DataTable({
       destroy: true,

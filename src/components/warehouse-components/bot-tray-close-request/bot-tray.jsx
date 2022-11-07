@@ -24,8 +24,6 @@ import {
   InputAdornment,
 } from "@mui/material";
 import {
-  axiosMisUser,
-  axiosSuperAdminPrexo,
   axiosWarehouseIn,
 } from "../../../axios";
 import PropTypes from "prop-types";
@@ -38,6 +36,8 @@ import SearchIcon from "@mui/icons-material/Search";
 //Datatable Modules
 import $ from "jquery";
 import "datatables.net";
+// import jwt from "jsonwebtoken"
+import jwt_decode from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -127,14 +127,22 @@ export default function StickyHeadTable({ props }) {
   };
   useEffect(() => {
     try {
-      const fetchData = async () => {
-        let botTray = await axiosWarehouseIn.post("/closeBotTray");
-        if (botTray.status == 200) {
-          setBot(botTray.data.data);
-          dataTableFun2();
-        }
-      };
-      fetchData();
+      let admin = localStorage.getItem("prexo-authentication");
+      if (admin) {
+        let { location } = jwt_decode(admin);
+        const fetchData = async () => {
+          let botTray = await axiosWarehouseIn.post(
+            "/closeBotTray/" + location
+          );
+          if (botTray.status == 200) {
+            setBot(botTray.data.data);
+            dataTableFun2();
+          }
+        };
+        fetchData();
+      } else {
+        navigate("/");
+      }
     } catch (error) {
       alert(error);
     }
@@ -541,7 +549,7 @@ export default function StickyHeadTable({ props }) {
                         >
                           View
                         </Button>
-                        {data.sort_id != "Received" ? (
+                        {data.sort_id != "Received From BOT" ? (
                           <Button
                             sx={{
                               m: 1,

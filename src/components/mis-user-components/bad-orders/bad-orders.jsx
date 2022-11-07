@@ -19,7 +19,7 @@ import {
   Button,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { axiosMisUser, axiosSuperAdminPrexo } from "../../../axios";
+import { axiosMisUser, } from "../../../axios";
 import * as FileSaver from "file-saver";
 import IconButton from "@mui/material/IconButton";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
@@ -40,7 +40,6 @@ export default function Home() {
   const fileType =
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
   const fileExtension = ".xlsx";
-  let { userType } = useParams();
   const [isCheckAll, setIsCheckAll] = useState(false);
   const [data, setData] = useState([]);
   const [page, setPage] = React.useState(0);
@@ -140,25 +139,25 @@ export default function Home() {
   /*****************************************SEARCH ORDERS*************************************************** */
   const searchOrders = async (e) => {
     e.preventDefault();
-    let admin = localStorage.getItem("prexo-authentication");
-    let { location } = jwt_decode(admin);
 
     try {
-      if (e.target.value == "") {
-        setRefresh((refresh) => !refresh);
-      } else if (search.type == "") {
-        alert("Please add input");
-      } else {
-        let obj = {
-          location: location,
-          type: search.type,
-          searchData: e.target.value,
-        };
-        let res = await axiosMisUser.post("/badOrdersSearch", obj);
-        if (res.status == 200) {
-          setRowsPerPage(10);
-          setPage(0);
-          setItem(res.data.data);
+      let admin = localStorage.getItem("prexo-authentication");
+      if (admin) {
+        let { location } = jwt_decode(admin);
+        if (e.target.value == "") {
+          setRefresh((refresh) => !refresh);
+        }  else {
+          let obj = {
+            location: location,
+            type: search.type,
+            searchData: e.target.value,
+          };
+          let res = await axiosMisUser.post("/badOrdersSearch", obj);
+          if (res.status == 200) {
+            setRowsPerPage(10);
+            setPage(0);
+            setItem(res.data.data);
+          }
         }
       }
     } catch (error) {
@@ -289,6 +288,7 @@ export default function Home() {
               }}
               label="Search"
               variant="outlined"
+              disabled={search.type == "" ? true : false}
               fullWidth
               sx={{ m: 2 }}
             />
@@ -328,9 +328,9 @@ export default function Home() {
         </Box>
       </Box>
       <Container maxWidth="xs"></Container>
-      <Paper sx={{ width: "100%", overflow: "hidden", mt: 10 }}>
-        <TableContainer>
-          <Table id="example">
+      <Paper sx={{ width: "100%", overflow: "hidden", mt: 1 }}>
+        <TableContainer sx={{ maxHeight: 1000, }} >
+          <Table   stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
                 <TableCell>Record.NO</TableCell>

@@ -9,7 +9,7 @@ export default function Dashboard() {
   const [dashboardData, setDashboardData] = useState({});
   const handelViewAssignedTray = (e) => {
     e.preventDefault();
-    navigate("/view-assigned-tray-charging");
+    navigate("/view-assigned-tray-bqc");
   };
   return (
     <div>
@@ -31,7 +31,7 @@ export default function Dashboard() {
             style={{
               color: "#FFFFFF",
               margin: "10px",
-              
+
               textAlign: "center",
               paddingTop: "2px",
             }}

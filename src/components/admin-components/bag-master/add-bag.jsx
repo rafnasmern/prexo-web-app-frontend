@@ -70,43 +70,62 @@ export default function DialogBox() {
   const [warehouse, setWarehouse] = useState([]);
   const [bagData, setBagData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [cpc, setCpc] = useState([]);
 
   useEffect(() => {
     try {
-      const fetchData = async () => {
-        let res = await axiosSuperAdminPrexo.post(
-          "/getMasterHighest/" + "bag-master"
-        );
-        if (res.status == 200) {
-          setBrandCount(res.data.data);
+      // const fetchData = async () => {
+      //   let res = await axiosSuperAdminPrexo.post(
+      //     "/getMasterHighest/" + "bag-master"
+      //   );
+      //   if (res.status == 200) {
+      //     setBrandCount(res.data.data);
+      //   }
+      // };
+      const fetchCpc = async () => {
+        let response = await axiosSuperAdminPrexo.get("/getCpc");
+        if (response.status == 200) {
+          setCpc(response.data.data.data);
         }
       };
-      fetchData();
+      // fetchData();
+      fetchCpc();
     } catch (error) {
       alert(error);
     }
   }, [refresh]);
-  useEffect(() => {
+  // Get Cpc data from server
+  async function getCpcData(data, cpc) {
     try {
-      const fetchData = async () => {
-        let res = await axiosSuperAdminPrexo.post("/getWarehouse");
+      if (cpc == "Gurgaon_122016") {
+        let res = await axiosSuperAdminPrexo.post("/getMasterHighest/" + cpc);
         if (res.status == 200) {
-          setWarehouse(res.data.data);
+          setBrandCount("DDB-GGN-" + res.data.data);
         }
+      } else if (cpc == "Bangalore_560067") {
+        let res = await axiosSuperAdminPrexo.post("/getMasterHighest/" + cpc);
+        if (res.status == 200) {
+          setBrandCount("DDB-BLR-" + res.data.data);
+        }
+      }
+      let obj = {
+        name: data,
       };
-      fetchData();
+      let response = await axiosSuperAdminPrexo.post(
+        "/getWarehouseByLocation",
+        obj
+      );
+      if (response.status == 200) {
+        setWarehouse(response.data.data.warehouse);
+      }
     } catch (error) {
       alert(error);
     }
-  }, []);
+  }
   const handleClickOpen = () => {
-    reset({
-      // brand_id: null,
-      // brand_name: null,
-    });
-    if (brandCount != 0) {
-      setOpen(true);
-    }
+
+    reset({});
+    setOpen(true);
   };
   const handelBulk = (e) => {
     e.preventDefault();
@@ -115,8 +134,10 @@ export default function DialogBox() {
   const handleClose = () => {
     setOpen(false);
     setEditCall(false);
+    setBrandCount(0);
   };
   const schema = Yup.object().shape({
+    cpc: Yup.string().required("Required*").nullable(),
     name: Yup.string()
       .required("Required*")
       .matches(/^.*((?=.*[aA-zZ\s]){1}).*$/, "Please enter valid name")
@@ -127,7 +148,12 @@ export default function DialogBox() {
       .matches(/^.*((?=.*[aA-zZ\s]){1}).*$/, "Please enter valid category")
       .max(100)
       .nullable(),
-    limit: Yup.string().required("Required*").nullable(),
+    limit: Yup.number("Must be number")
+      .required("Required*")
+      .positive()
+      .integer()
+      .min(1, "Minimum is 1")
+      .nullable(),
     warehouse: Yup.string().required("Required*").nullable(),
     display: Yup.string()
       .required("Required*")
@@ -149,7 +175,7 @@ export default function DialogBox() {
     data.prefix = "bag-master";
     data.sort_id = "No Status";
     data.created_at = Date.now();
-
+    data.code = brandCount;
     try {
       let response = await axiosSuperAdminPrexo.post("/createMasters", data);
       if (response.status == 200) {
@@ -194,6 +220,7 @@ export default function DialogBox() {
         limit: response.data.data.limit,
         display: response.data.data.display,
         warehouse: response.data.data.warehouse,
+        cpc: response.data.data.cpc,
       });
       setId(response.data.data._id);
       setEditCall(true);
@@ -290,15 +317,39 @@ export default function DialogBox() {
               variant="outlined"
               fullWidth
               sx={{ mt: 2 }}
+              InputLabelProps={{ shrink: true }}
               value={
                 getValues("code") == null
-                  ? "B0" + brandCount
+                  ? brandCount === 0
+                    ? null
+                    : brandCount
                   : getValues("code")
               }
-              {...register("code")}
-              error={errors.code ? true : false}
-              helperText={errors.code ? errors.code.message : ""}
             />
+            <FormControl fullWidth>
+              <InputLabel sx={{ pt: 2 }} id="demo-simple-select-label">
+                CPC
+              </InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                label="Cpc"
+                fullWidth
+                defaultValue={getValues("cpc")}
+                {...register("cpc")}
+                error={errors.cpc ? true : false}
+                helperText={errors.cpc?.message}
+                sx={{ mt: 2 }}
+              >
+                {cpc.map((data) => (
+                  <MenuItem
+                    value={data.code}
+                    onClick={() => getCpcData(data.name, data.code)}
+                  >
+                    {data.code}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
             <FormControl fullWidth>
               <InputLabel sx={{ pt: 2 }} id="demo-simple-select-label">
                 Warehouse
@@ -333,9 +384,9 @@ export default function DialogBox() {
                 sx={{ mt: 2 }}
               >
                 <MenuItem value="BOT">BOT</MenuItem>
-                <MenuItem value="PMT">PMT</MenuItem>
+                {/* <MenuItem value="PMT">PMT</MenuItem>
                 <MenuItem value="MMT">MMT</MenuItem>
-                <MenuItem value="WHT">WHT</MenuItem>
+                <MenuItem value="WHT">WHT</MenuItem> */}
               </Select>
             </FormControl>
             <TextField
@@ -351,6 +402,7 @@ export default function DialogBox() {
               label="Bag Limit"
               variant="outlined"
               fullWidth
+              inputProps={{ maxLength: 2 }}
               onPaste={(e) => {
                 e.preventDefault();
                 return false;

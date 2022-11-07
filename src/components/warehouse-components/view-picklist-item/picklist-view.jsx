@@ -1,7 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { styled, alpha } from "@mui/material/styles";
-import Button from "@mui/material/Button";
-import Menu from "@mui/material/Menu";
+import React, { useState, useEffect } from "react";
 import {
   TableCell,
   Paper,
@@ -10,36 +7,24 @@ import {
   TableHead,
   TableRow,
   TableBody,
-  Box,
-  TextField,
 } from "@mui/material";
-import Checkbox from "@mui/material/Checkbox";
-import * as XLSX from "xlsx";
-import * as FileSaver from "file-saver";
 import { useNavigate, useParams } from "react-router-dom";
-import { axiosMisUser, axiosWarehouseIn } from "../../../axios";
-import moment from "moment";
-import jwt_decode from "jwt-decode";
+import {  axiosWarehouseIn } from "../../../axios";
 //Datatable Modules
 import $ from "jquery";
 import "datatables.net";
 
 export default function CustomizedMenus() {
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
   const [item, setItem] = useState({});
-  const [sortDate, setSortDate] = useState("");
-  const [noOrders, setNoOrders] = useState(false);
   const navigate = useNavigate();
   const { pickListId } = useParams();
-
   useEffect(() => {
     let admin = localStorage.getItem("prexo-authentication");
     if (admin) {
       const fetchData = async () => {
         try {
           let res = await axiosWarehouseIn.post("/getPickList/" + pickListId);
-          if (res.status == 200) {
+          if (res.status === 200) {
             setItem(res.data.data);
             dataTableFun();
           }

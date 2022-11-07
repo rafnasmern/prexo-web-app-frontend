@@ -2,11 +2,6 @@ import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
-  Dialog,
-  DialogContent,
-  DialogActions,
-  DialogTitle,
-  IconButton,
   TextField,
   Paper,
   Table,
@@ -17,32 +12,24 @@ import {
   TableRow,
   Grid,
 } from "@mui/material";
-import PropTypes from "prop-types";
 import { useParams } from "react-router-dom";
 import "yup-phone";
-import CloseIcon from "@mui/icons-material/Close";
-import { styled, alpha } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import { axiosWarehouseIn } from "../../../axios";
-import Swal from "sweetalert2";
 import Checkbox from "@mui/material/Checkbox";
+// import jwt from "jsonwebtoken"
+import jwt_decode from "jwt-decode";
 
 export default function DialogBox() {
-  const [open, setOpen] = React.useState(false);
-  const [editCall, setEditCall] = useState(false);
   const navigate = useNavigate();
   const [employeeData, setEmployeeData] = useState([]);
   const { trayId } = useParams();
   /**************************************************************************** */
   const [awbn, setAwbn] = useState("");
   const [awbnSuccess, setAwbnSuccess] = useState(false);
-  const [uic, setUic] = useState(false);
   const [bagReuse, setBagReuse] = useState(false);
   const [description, setDescription] = useState([]);
-  /*********************************************************** */
-  const [botTray, setBotTray] = useState("");
-  const [pmtTray, setPmtTray] = useState("");
-  const [mmtTray, setMmtTray] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -77,13 +64,13 @@ export default function DialogBox() {
     }
   };
   const handelAwbn = async (e) => {
-    if (e.target.value.length === 12) {
+    if (e.target.value.length === 11) {
       try {
         let obj = {
-          awbn: e.target.value,
-          id: trayId,
+          uic: e.target.value,
+          trayId: trayId,
         };
-        let res = await axiosWarehouseIn.post("/actualCheckAwbn", obj);
+        let res = await axiosWarehouseIn.post("/check-uic", obj);
         if (res?.status == 200) {
           setAwbnSuccess(true);
           addActualitem(res.data.data);
@@ -101,7 +88,7 @@ export default function DialogBox() {
     }
   };
   /************************************************************************** */
-  const addActualitem = async (awbn) => {
+  const addActualitem = async (uic) => {
     if (
       employeeData[0]?.actual_items?.filter(function (item) {
         return item.status == "Valid";
@@ -114,14 +101,15 @@ export default function DialogBox() {
       alert("Bag Is Full");
     } else {
       let data = employeeData[0]?.items?.filter(function (item) {
-        return item.awbn_number == awbn.tracking_id;
+        return item.awbn_number == uic.awbn_number;
       });
       try {
         let obj = {
           bag_id: trayId,
-          awbn_number: awbn.tracking_id,
-          order_id: awbn.order_id,
-          order_date: awbn.order_timestamp,
+          awbn_number: uic.awbn_number,
+          order_id: uic.order_id,
+          order_date: uic.order_date,
+          uic: uic.uic,
           stock_in: new Date(),
           status: data[0].status,
         };
@@ -135,45 +123,58 @@ export default function DialogBox() {
       }
     }
   };
-  console.log(employeeData[0]?.type_taxanomy);
-  console.log(bagReuse);
   /************************************************************************** */
   const handelIssue = async (e, bagId) => {
     e.preventDefault();
+    setLoading(true);
+    let admin = localStorage.getItem("prexo-authentication");
     try {
-      if (description == "") {
-        alert("Please Add Description");
-      } else if (employeeData[0]?.type_taxanomy == "BOT" && bagReuse == false) {
-        alert("Please confirm bag release");
-      } else if (
-        employeeData[0]?.actual_items?.filter(function (item) {
-          return item.status == "Duplicate";
-        })?.length != 0
-      ) {
-        alert("Please Remove Duplicate Items");
-      } else if (
-        employeeData[0]?.actual_items?.length == employeeData[0]?.items?.length
-      ) {
-        let obj = {
-          trayId: trayId,
-          description: description,
-          bagId: bagId,
-        };
-        if (employeeData?.[0]?.type_taxanomy != "BOT") {
-          let res = await axiosWarehouseIn.post("/trayclose", obj);
-          if (res.status == 200) {
-            alert(res.data.message);
-            navigate("/tray-close-request");
+      if (admin) {
+        let { location } = jwt_decode(admin);
+        if (description == "") {
+          alert("Please Add Description");
+          setLoading(false);
+        } else if (
+          employeeData[0]?.type_taxanomy == "BOT" &&
+          bagReuse == false
+        ) {
+          alert("Please confirm bag release");
+          setLoading(false);
+        } else if (
+          employeeData[0]?.actual_items?.filter(function (item) {
+            return item.status == "Duplicate";
+          })?.length != 0
+        ) {
+          alert("Please Remove Duplicate Items");
+          setLoading(false);
+        } else if (
+          employeeData[0]?.actual_items?.length ==
+          employeeData[0]?.items?.length
+        ) {
+          let obj = {
+            trayId: trayId,
+            description: description,
+            bagId: bagId,
+            location: location,
+          };
+          if (employeeData?.[0]?.type_taxanomy != "BOT") {
+            let res = await axiosWarehouseIn.post("/trayclose", obj);
+            if (res.status == 200) {
+              alert(res.data.message);
+              setLoading(false);
+              navigate("/tray-close-request");
+            }
+          } else {
+            let res = await axiosWarehouseIn.post("/traycloseBot", obj);
+            if (res.status == 200) {
+              alert(res.data.message);
+              setLoading(false);
+              navigate("/bot-tray-close");
+            }
           }
         } else {
-          let res = await axiosWarehouseIn.post("/traycloseBot", obj);
-          if (res.status == 200) {
-            alert(res.data.message);
-            navigate("/tray-close-request");
-          }
+          alert("Please Verify Actual Data");
         }
-      } else {
-        alert("Please Verify Actual Data");
       }
     } catch (error) {
       alert(error);
@@ -317,22 +318,6 @@ export default function DialogBox() {
                   </p>
                 </Box>
               </Box>{" "}
-              <Box
-                sx={{
-                  m: 2,
-                }}
-              >
-                <Box sx={{}}>
-                  <h5>Duplicate</h5>
-                  <p style={{ marginLeft: "34px", fontSize: "24px" }}>
-                    {
-                      employeeData[0]?.items?.filter(function (item) {
-                        return item.status == "Duplicate";
-                      }).length
-                    }
-                  </p>
-                </Box>
-              </Box>
             </Box>
             <TableContainer>
               <Table
@@ -344,8 +329,9 @@ export default function DialogBox() {
                 <TableHead>
                   <TableRow>
                     <TableCell>S.NO</TableCell>
+                    <TableCell>UIC</TableCell>
                     <TableCell>Bag Id</TableCell>
-                    <TableCell>AWBN Number</TableCell>
+                    {/* <TableCell>AWBN Number</TableCell> */}
                     <TableCell>Order ID</TableCell>
                     <TableCell>Order Date</TableCell>
                     <TableCell>Status</TableCell>
@@ -355,8 +341,9 @@ export default function DialogBox() {
                   {employeeData[0]?.items?.map((data, index) => (
                     <TableRow hover role="checkbox" tabIndex={-1}>
                       <TableCell>{index + 1}</TableCell>
+                      <TableCell>{data?.uic}</TableCell>
                       <TableCell>{data?.bag_id}</TableCell>
-                      <TableCell>{data?.awbn_number}</TableCell>
+                      {/* <TableCell>{data?.awbn_number}</TableCell> */}
                       <TableCell>{data?.order_id}</TableCell>
                       <TableCell>
                         {new Date(data?.order_date).toLocaleString("en-GB", {
@@ -406,7 +393,7 @@ export default function DialogBox() {
               id="outlined-password-input"
               type="text"
               name="doorsteps_diagnostics"
-              label="Please Enter AWB"
+              label="Please Enter UIC"
               value={awbn}
               // onChange={(e) => setAwbn(e.target.value)}
               onChange={(e) => {
@@ -475,22 +462,6 @@ export default function DialogBox() {
                   </p>
                 </Box>
               </Box>{" "}
-              <Box
-                sx={{
-                  m: 2,
-                }}
-              >
-                <Box sx={{}}>
-                  <h5>Duplicate</h5>
-                  <p style={{ marginLeft: "39px", fontSize: "24px" }}>
-                    {
-                      employeeData[0]?.actual_items?.filter(function (item) {
-                        return item.status == "Duplicate";
-                      }).length
-                    }
-                  </p>
-                </Box>
-              </Box>
             </Box>
             <TableContainer>
               <Table
@@ -502,22 +473,27 @@ export default function DialogBox() {
                 <TableHead>
                   <TableRow>
                     <TableCell>S.NO</TableCell>
-                    <TableCell>AWBN Number</TableCell>
+                    <TableCell>UIC</TableCell>
+                    <TableCell>Bag Id</TableCell>
+                    {/* <TableCell>AWBN Number</TableCell> */}
                     <TableCell>Order ID</TableCell>
                     <TableCell>Order Date</TableCell>
                     <TableCell>Status</TableCell>
                   </TableRow>
                 </TableHead>
-
                 <TableBody>
                   {employeeData[0]?.actual_items?.map((data, index) => (
                     <TableRow hover role="checkbox" tabIndex={-1}>
                       <TableCell>{index + 1}</TableCell>
-                      <TableCell>{data?.awbn_number}</TableCell>
+                      <TableCell>{data?.uic}</TableCell>
+                      <TableCell>{data?.bag_id}</TableCell>
+                      {/* <TableCell>{data?.awbn_number}</TableCell> */}
                       <TableCell>{data?.order_id}</TableCell>
                       <TableCell>
                         {new Date(data?.order_date).toLocaleString("en-GB", {
-                          hour12: true,
+                          year: "numeric",
+                          month: "2-digit",
+                          day: "2-digit",
                         })}
                       </TableCell>
                       <TableCell
@@ -589,6 +565,7 @@ export default function DialogBox() {
           sx={{ m: 3, mb: 9 }}
           variant="contained"
           style={{ backgroundColor: "green" }}
+          disabled={loading == true ? true : false}
           onClick={(e) => {
             handelIssue(e, employeeData[0]?.items[0]?.bag_id);
           }}

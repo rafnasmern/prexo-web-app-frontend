@@ -28,16 +28,13 @@ import $ from "jquery";
 import "datatables.net";
 
 export default function Home() {
-  const [page, setPage] = React.useState(0);
   const [item, setItem] = useState([]);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const navigate = useNavigate();
   const { bagId } = useParams();
   const [isCheckAll, setIsCheckAll] = useState(false);
   const [isCheck, setIsCheck] = useState([]);
   const [found, setFound] = useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
   const [refresh, setRefresh] = useState(false);
   useEffect(() => {
     let admin = localStorage.getItem("prexo-authentication");
@@ -60,7 +57,11 @@ export default function Home() {
     }
   }, [refresh]);
   let token = localStorage.getItem("prexo-authentication");
-  const { user_name } = jwt_decode(token);
+  let user_name1;
+  if (token) {
+    const { user_name } = jwt_decode(token);
+    user_name1 = user_name;
+  }
   const handelUicGen = (e) => {
     e.preventDefault();
     if (isCheck.length == 0) {
@@ -77,7 +78,7 @@ export default function Home() {
           try {
             let obj = {
               _id: item?.[0]?.delivery?.[isCheck[i]]._id,
-              email: user_name,
+              email: user_name1,
               created_at: Date.now(),
             };
             let res = await axiosMisUser.post("/addUicCode", obj);
@@ -97,9 +98,7 @@ export default function Home() {
       addUic();
     }
   };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+ 
 
   const fileType =
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
@@ -133,10 +132,9 @@ export default function Home() {
                 /[^a-zA-Z0-9 ]/g,
                 ""
               ),
-              Model: item?.[0]?.delivery?.[isCheck[i]]?.order_old_item_detail?.replace(
-                /[^a-zA-Z0-9 ]/g,
-                " "
-              ),
+              Model: item?.[0]?.delivery?.[
+                isCheck[i]
+              ]?.order_old_item_detail?.replace(/[^a-zA-Z0-9 ]/g, " "),
             };
 
             arr.push(obj);
@@ -221,78 +219,6 @@ export default function Home() {
     },
   }));
 
-  const handelUicAll = async () => {
-    try {
-      $("#example").DataTable().destroy();
-      let admin = localStorage.getItem("prexo-authentication");
-      let { location } = jwt_decode(admin);
-      let res = await axiosMisUser.post("/getDeliveredOrders/" + location);
-      if (res.status == 200) {
-        setItem(res.data.data);
-        dataTableFun();
-      }
-    } catch (error) {
-      alert(error);
-    }
-  };
-  const handelUicGenerated = async () => {
-    try {
-      let admin = localStorage.getItem("prexo-authentication");
-      let { location } = jwt_decode(admin);
-      $("#example").DataTable().destroy();
-      let obj = {
-        status: "Created",
-        location: location,
-      };
-      let res = await axiosMisUser.post("/uicGeneratedRecon", obj);
-      if (res.status == 200) {
-        setItem(res.data.data);
-        dataTableFun();
-      }
-    } catch (error) {
-      alert(error);
-    }
-  };
-  const handelUicNotGenrated = async () => {
-    try {
-      let admin = localStorage.getItem("prexo-authentication");
-      let { location } = jwt_decode(admin);
-      $("#example").DataTable().destroy();
-      let obj = {
-        status: "Pending",
-        location: location,
-      };
-      let res = await axiosMisUser.post("/uicGeneratedRecon", obj);
-      if (res.status == 200) {
-        setItem(res.data.data);
-        dataTableFun();
-      }
-    } catch (error) {
-      alert(error);
-    }
-  };
-  const handelUicDownloaded = async () => {
-    try {
-      let admin = localStorage.getItem("prexo-authentication");
-      let { location } = jwt_decode(admin);
-      $("#example").DataTable().destroy();
-      let obj = {
-        status: "Printed",
-        location: location,
-      };
-      let res = await axiosMisUser.post("/uicGeneratedRecon", obj);
-      if (res.status == 200) {
-        setItem(res.data.data);
-        dataTableFun();
-      }
-    } catch (error) {
-      alert(error);
-    }
-  };
-  const handleOptions = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  console.log(item?.[0]?.items);
   const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
   const tabelData = useMemo(() => {
@@ -383,20 +309,15 @@ export default function Home() {
                 })}
               </TableCell>
               <TableCell>
-                {new Date(data.order_order_date).toLocaleString(
-                  "en-GB",
-                  {
-                    year: "numeric",
-                    month: "2-digit",
-                    day: "2-digit",
-                  }
-                )}
+                {new Date(data.order_order_date).toLocaleString("en-GB", {
+                  year: "numeric",
+                  month: "2-digit",
+                  day: "2-digit",
+                })}
               </TableCell>
               <TableCell>{data.imei?.toString()}</TableCell>
               <TableCell>{data.item_id?.toString()}</TableCell>
-              <TableCell>
-                {data.order_old_item_detail?.toString()}
-              </TableCell>
+              <TableCell>{data.order_old_item_detail?.toString()}</TableCell>
             </TableRow>
           ))}
         </TableBody>

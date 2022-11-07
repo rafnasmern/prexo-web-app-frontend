@@ -18,6 +18,7 @@ import {
   Box,
   TablePagination,
   TextField,
+  Container
 } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { useNavigate } from "react-router-dom";
@@ -29,6 +30,8 @@ import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import LastPageIcon from "@mui/icons-material/LastPage";
 import PropTypes from "prop-types";
 import { useTheme } from "@mui/material/styles";
+import CircularProgress from "@mui/material/CircularProgress";
+
 // import jwt from "jsonwebtoken"
 import jwt_decode from "jwt-decode";
 //Datatable Modules
@@ -89,6 +92,7 @@ export default function CustomizedMenus() {
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [data, setData] = useState([]);
   const [refresh, setRefresh] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [page, setPage] = React.useState(0);
   const [search, setSearch] = useState({
     type: "",
@@ -104,9 +108,8 @@ export default function CustomizedMenus() {
 
   useEffect(() => {
     let admin = localStorage.getItem("prexo-authentication");
-    let { location } = jwt_decode(admin);
-
     if (admin) {
+      let { location } = jwt_decode(admin);
     } else {
       navigate("/");
     }
@@ -124,13 +127,19 @@ export default function CustomizedMenus() {
   }, [page, item, rowsPerPage]);
 
   let admin = localStorage.getItem("prexo-authentication");
-  let { location } = jwt_decode(admin);
+  let location1;
+  if (admin) {
+    let { location } = jwt_decode(admin);
+    location1 = location;
+  }
   const handelAllOrders = async () => {
     try {
       // $("#example").DataTable().destroy();
-      let res = await axiosMisUser.post("/getOrders/" + location);
+      setLoading(true);
+      let res = await axiosMisUser.post("/getOrders/" + location1);
       if (res.status == 200) {
         setDeliveredOrders(false);
+        setLoading(false);
         setAllOrders(true);
         setItem(res.data.data);
         // dataTableFun();
@@ -142,7 +151,7 @@ export default function CustomizedMenus() {
   const handeNewOrders = async () => {
     try {
       // $("#example").DataTable().destroy();
-      let res = await axiosMisUser.post("/newOrders/" + location);
+      let res = await axiosMisUser.post("/newOrders/" + location1);
       if (res.status == 200) {
         setDeliveredBut(false);
         setNoOrders(false);
@@ -157,9 +166,11 @@ export default function CustomizedMenus() {
   const handelDeliverdOrders = async () => {
     try {
       // $("#example").DataTable().destroy();
-      let res = await axiosMisUser.post("/getDeliveredOrders/" + location);
+      setLoading(true);
+      let res = await axiosMisUser.post("/getDeliveredOrders/" + location1);
       if (res.status == 200) {
         setAllOrders(false);
+        setLoading(false);
         setDeliveredOrders(true);
         setItem(res.data.data);
         // dataTableFun();
@@ -171,9 +182,11 @@ export default function CustomizedMenus() {
   const handelNotDelivered = async () => {
     try {
       // $("#example").DataTable().destroy();
-      let res = await axiosMisUser.post("/notDeliveredOrders/" + location);
+      setLoading(true);
+      let res = await axiosMisUser.post("/notDeliveredOrders/" + location1);
       if (res.status == 200) {
         setDeliveredOrders(false);
+        setLoading(false);
         setAllOrders(false);
         setItem(res.data.data);
         // dataTableFun();
@@ -185,7 +198,7 @@ export default function CustomizedMenus() {
   const handelDeliveredNoOrders = async () => {
     try {
       // $("#example").DataTable().destroy();
-      let res = await axiosMisUser.post("/deliveredNoOrderId/" + location);
+      let res = await axiosMisUser.post("/deliveredNoOrderId/" + location1);
       if (res.status == 200) {
         setDeliveredBut(false);
         setItem(res.data.data);
@@ -280,51 +293,51 @@ export default function CustomizedMenus() {
   /*****************************************SEARCH ORDERS*************************************************** */
   const searchOrders = async (e) => {
     e.preventDefault();
-    let admin = localStorage.getItem("prexo-authentication");
-    let { location } = jwt_decode(admin);
     try {
-      if (e.target.value == "") {
-        if (deliveredOrders) {
-          handelDeliverdOrders();
-        } else if (allOrders) {
-          handelAllOrders();
-        } else {
-          handelNotDelivered();
-        }
-      } else if (search.type == "") {
-        alert("Please add input");
-      } else {
-        let obj = {
-          location: location,
-          type: search.type,
-          searchData: e.target.value,
-        };
-        if (allOrders) {
-          let res = await axiosMisUser.post("/ordersSearch", obj);
-          setRowsPerPage(10);
-          setPage(0);
-          if (res.status == 200 && res.data.data?.length !== 0) {
-            setItem(res.data.data);
+      let admin = localStorage.getItem("prexo-authentication");
+      if (admin) {
+        let { location } = jwt_decode(admin);
+        if (e.target.value == "") {
+          if (deliveredOrders) {
+            handelDeliverdOrders();
+          } else if (allOrders) {
+            handelAllOrders();
           } else {
-            alert("No data found");
-          }
-        } else if (deliveredOrders) {
-          let res = await axiosMisUser.post("/searchDeliveredOrders", obj);
-          setRowsPerPage(10);
-          setPage(0);
-          if (res.status == 200 && res.data.data?.length !== 0) {
-            setItem(res.data.data);
-          } else {
-            alert("No data found");
+            handelNotDelivered();
           }
         } else {
-          let res = await axiosMisUser.post("/ordersSearch", obj);
-          setRowsPerPage(10);
-          setPage(0);
-          if (res.status == 200 && res.data.data?.length !== 0) {
-            setItem(res.data.data);
+          let obj = {
+            location: location,
+            type: search.type,
+            searchData: e.target.value,
+          };
+          if (allOrders) {
+            let res = await axiosMisUser.post("/ordersSearch", obj);
+            setRowsPerPage(10);
+            setPage(0);
+            if (res.status == 200 && res.data.data?.length !== 0) {
+              setItem(res.data.data);
+            } else {
+              alert("No data found");
+            }
+          } else if (deliveredOrders) {
+            let res = await axiosMisUser.post("/searchDeliveredOrders", obj);
+            setRowsPerPage(10);
+            setPage(0);
+            if (res.status == 200 && res.data.data?.length !== 0) {
+              setItem(res.data.data);
+            } else {
+              alert("No data found");
+            }
           } else {
-            alert("No data found");
+            let res = await axiosMisUser.post("/ordersSearch", obj);
+            setRowsPerPage(10);
+            setPage(0);
+            if (res.status == 200 && res.data.data?.length !== 0) {
+              setItem(res.data.data);
+            } else {
+              alert("No data found");
+            }
           }
         }
       }
@@ -336,7 +349,7 @@ export default function CustomizedMenus() {
     return (
       <>
         {" "}
-        <Table>
+        <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
               <TableCell>Record.NO</TableCell>
@@ -522,7 +535,7 @@ export default function CustomizedMenus() {
     );
   }, [item, data]);
   return (
-    <div style={{ marginTop: "100px", marginLeft: "20px" }}>
+    <div style={{ marginTop: "100px", }}>
       <Box>
         <Box
           sx={{
@@ -563,6 +576,7 @@ export default function CustomizedMenus() {
                 onChange={(e) => {
                   searchOrders(e);
                 }}
+                disabled={search.type == "" ? true : false}
                 label="Search"
                 variant="outlined"
                 fullWidth
@@ -616,8 +630,25 @@ export default function CustomizedMenus() {
           </StyledMenu>
         </Box>
       </Box>
+      {
+        loading === true ? 
+          <Container>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                flexDirection: "column",
+                pt: 30,
+              }}
+            >
+              <CircularProgress />
+              <p style={{ paddingTop: "10px" }}>Loading...</p>
+            </Box>
+          </Container>
+          :
+
       <Paper sx={{ width: "100%", overflow: "hidden", mt: 3 }}>
-        <TableContainer>
+        <TableContainer sx={{ maxHeight: 1000 }}>
           {" "}
           {tableData}
           <TableFooter>
@@ -640,6 +671,7 @@ export default function CustomizedMenus() {
           </TableFooter>
         </TableContainer>
       </Paper>
+      }
     </div>
   );
 }

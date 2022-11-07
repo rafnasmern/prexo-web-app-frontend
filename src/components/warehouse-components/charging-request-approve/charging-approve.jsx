@@ -29,6 +29,7 @@ export default function DialogBox() {
   const navigate = useNavigate();
   const [trayData, setTrayData] = useState([]);
   const { trayId } = useParams();
+  const [loading, setLoading] = useState(false);
   /**************************************************************************** */
   const [uic, setUic] = useState("");
   const [description, setDescription] = useState([]);
@@ -42,8 +43,6 @@ export default function DialogBox() {
         if (response.status === 200) {
           setTrayData(response.data.data);
           //   dataTableFun()
-        } else {
-          navigate("/bag-issue-request");
         }
       } catch (error) {
         alert(error);
@@ -75,7 +74,6 @@ export default function DialogBox() {
   };
   /************************************************************************** */
   const addActualitem = async (obj) => {
-    console.log(obj);
     if (trayData.limit <= trayData?.actual_items?.length) {
       alert("All Items Scanned");
     } else {
@@ -95,26 +93,31 @@ export default function DialogBox() {
     }
   };
   /************************************************************************** */
-  const handelIssue = async (e) => {
+  const handelIssue = async (e, sortId) => {
     try {
+      setLoading(true);
       if (description == "") {
         alert("Please Add Description");
+        setLoading(false);
       } else if (trayData?.actual_items?.length == trayData?.items?.length) {
         let obj = {
           trayId: trayId,
           description: description,
+          sortId: trayData?.sort_id,
         };
-
         let res = await axiosWarehouseIn.post("/issue-to-agent-wht", obj);
         if (res.status == 200) {
           alert(res.data.message);
           if (trayData?.sort_id == "Send for BQC") {
+            setLoading(false);
             navigate("/bqc-request");
           } else {
+            setLoading(false);
             navigate("/charging-request");
           }
         }
       } else {
+        setLoading(false);
         alert("Please Verify Actual Data");
       }
     } catch (error) {
@@ -311,7 +314,6 @@ export default function DialogBox() {
           </Paper>
         </Grid>
       </Grid>
-
       <Box sx={{ float: "right" }}>
         <textarea
           onChange={(e) => {
@@ -323,10 +325,11 @@ export default function DialogBox() {
         <Button
           sx={{ m: 3, mb: 9 }}
           variant="contained"
-          style={{ backgroundColor: "#206CE2" }}
-          onClick={() => {
+          disabled={loading == true ? true : false}
+          style={{ backgroundColor: "green" }}
+          onClick={(e) => {
             if (window.confirm("You Want to Issue?")) {
-              handelIssue();
+              handelIssue(e);
             }
           }}
         >

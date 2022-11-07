@@ -68,7 +68,8 @@ export default function Dashboard() {
           width: 300,
           boxShadow: 2,
           height: "554px",
-          backgroundColor: "#FFFFFF",
+          backgroundColor: "#FFFF",
+          mb: 2,
         }}
       >
         <Box style={{ background: "#495057", height: "52px" }}>

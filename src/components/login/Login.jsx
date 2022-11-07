@@ -91,7 +91,6 @@ export default function Login() {
     let admin = localStorage.getItem("prexo-authentication");
     if (admin) {
       let { user_type } = jwt_decode(admin);
-      console.log(user_type);
       if (user_type == "super-admin") {
         navigate("/admin");
       } else if (user_type == "MIS") {

@@ -111,13 +111,12 @@ export default function DialogBox() {
       if (description == "") {
         alert("Please Add Description");
       } else if (
-        trayData[0]?.actual_items?.length == trayData[0]?.items?.length
+        trayData?.actual_items?.length == trayData?.items?.length
       ) {
         let obj = {
           trayId: trayId,
           description: description,
         };
-
         let res = await axiosCharging.post("/charge-in", obj);
         if (res.status == 200) {
           alert(res.data.message);
@@ -301,7 +300,7 @@ export default function DialogBox() {
                     <TableCell>MUIC</TableCell>
                     <TableCell>BOT Tray</TableCell>
                     <TableCell>BOT Agent</TableCell>
-                    <TableCell>Remark</TableCell>
+                 
                   </TableRow>
                 </TableHead>
 
@@ -313,7 +312,7 @@ export default function DialogBox() {
                       <TableCell>{data?.muic}</TableCell>
                       <TableCell>{data?.tray_id}</TableCell>
                       <TableCell>{data?.bot_agent}</TableCell>
-                      <TableCell>{data?.remark}</TableCell>
+                      
                     </TableRow>
                   ))}
                 </TableBody>

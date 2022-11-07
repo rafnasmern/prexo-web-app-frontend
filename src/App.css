@@ -1,0 +1,16 @@
+.Footer{
+    margin-top: auto; 
+   height: 50px;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   font-size: 13px;
+   padding: 25px;
+   background-color: #fff;
+   color: black;
+}
+.App{
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}

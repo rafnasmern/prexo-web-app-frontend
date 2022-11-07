@@ -35,15 +35,17 @@ export default function StickyHeadTable({ props }) {
   useEffect(() => {
     try {
       let token = localStorage.getItem("prexo-authentication");
-      const { user_name } = jwt_decode(token);
-      const fetchData = async () => {
-        let res = await axiosBot.post("/getAssignedBag/" + user_name);
-        if (res.status == 200) {
-          setInfraData(res.data.data);
-          dataTableFun();
-        }
-      };
-      fetchData();
+      if(token){
+        const { user_name } = jwt_decode(token);
+        const fetchData = async () => {
+          let res = await axiosBot.post("/getAssignedBag/" + user_name);
+          if (res.status == 200) {
+            setInfraData(res.data.data);
+            dataTableFun();
+          }
+        };
+        fetchData();
+      }
     } catch (error) {
       alert(error);
     }

@@ -2,11 +2,6 @@ import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
-  Dialog,
-  DialogContent,
-  DialogActions,
-  DialogTitle,
-  IconButton,
   TextField,
   Paper,
   Table,
@@ -16,13 +11,10 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-import PropTypes from "prop-types";
 import "yup-phone";
 // import jwt from "jsonwebtoken"
 import jwt_decode from "jwt-decode";
 import { axiosWarehouseIn } from "../../axios";
-import Swal from "sweetalert2";
-
 import Checkbox from "@mui/material/Checkbox";
 import { useNavigate } from "react-router-dom";
 
@@ -36,6 +28,7 @@ export default function DialogBox() {
   const [uic, setUic] = useState(false);
   const [sleaves, setSleaves] = useState(false);
   const [valid, setValid] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   /***************************************************************************************** */
@@ -46,12 +39,12 @@ export default function DialogBox() {
       try {
         let admin = localStorage.getItem("prexo-authentication");
         if (admin) {
-          let { warehouse } = jwt_decode(admin);
-          // let obj={
-          //   warehouse:warehouse,
-          //   bagId:bagId
-          // }
-          let res = await axiosWarehouseIn.post("/checkBagId/" + bagId);
+          let { location } = jwt_decode(admin);
+          let obj = {
+            location: location,
+            bagId: bagId,
+          };
+          let res = await axiosWarehouseIn.post("/checkBagId", obj);
           if (res.status == 200) {
             alert(res.data.message);
             getitem();
@@ -86,26 +79,30 @@ export default function DialogBox() {
         alert("Please Fill The Input");
       } else {
         try {
-          let obj = {
-            awbn: e.target.value,
-            bagId: bagId,
-          };
-          let res = await axiosWarehouseIn.post("/checkAwbn", obj);
-          if (res.status == 200) {
-            setAwbnSuccess(true);
-            if (res.data.message == "AWBN Number Is Invalid") {
-              setValid("Invalid");
-              setAwbn("");
-              console.log(res.data.data);
-              handelSubmitStock(res.data.data, "Invalid");
-            } else if (res.data.message == "AWBN Number Is Duplicate") {
-              setValid("Duplicate");
-              setAwbn("");
-              handelSubmitStock(res.data.data, "Duplicate");
-            } else {
-              setValid("Valid");
-              setAwbn("");
-              handelSubmitStock(res.data.data, "Valid");
+          let admin = localStorage.getItem("prexo-authentication");
+          if (admin) {
+            let { location } = jwt_decode(admin);
+            let obj = {
+              awbn: e.target.value,
+              bagId: bagId,
+              location: location,
+            };
+            let res = await axiosWarehouseIn.post("/checkAwbn", obj);
+            if (res.status == 200) {
+              setAwbnSuccess(true);
+              if (res.data.message == "AWBN Number Is Invalid") {
+                setValid("Invalid");
+                setAwbn("");
+                handelSubmitStock(res.data.data, "Invalid");
+              } else if (res.data.message == "AWBN Number Is Duplicate") {
+                setValid("Duplicate");
+                setAwbn("");
+                handelSubmitStock(res.data.data, "Duplicate");
+              } else {
+                setValid("Valid");
+                setAwbn("");
+                handelSubmitStock(res.data.data, "Valid");
+              }
             }
           }
         } catch (error) {
@@ -116,7 +113,6 @@ export default function DialogBox() {
     }
   };
   const handelSubmitStock = async (awbn, status) => {
-    console.log(awbn);
     if (bagId == "") {
       alert("Please Fill the Input");
     } else if (employeeData[0]?.items != undefined) {
@@ -134,8 +130,8 @@ export default function DialogBox() {
             order_id: awbn.order_id,
             order_date: awbn.order_date,
             status: status,
+            sotckin_date:Date.now()
           };
-          console.log(obj);
           let res = await axiosWarehouseIn.post("/stockInToWarehouse", obj);
           if (res.status == 200) {
             setAwbnSuccess(false);
@@ -164,12 +160,14 @@ export default function DialogBox() {
   };
   const handelClose = async (e) => {
     try {
+      setLoading(true);
       if (
         employeeData[0]?.items.filter(function (item) {
           return item.status == "Duplicate";
         }).length != 0
       ) {
         alert("Please Remove Duplicate Items");
+        setLoading(false);
       } else if (employeeData[0]?.items.length == employeeData[0]?.limit) {
         let obj = {
           bagId: bagId,
@@ -180,6 +178,7 @@ export default function DialogBox() {
         let res = await axiosWarehouseIn.post("/bagClosing", obj);
         if (res.status == 200) {
           alert(res.data.message);
+          setLoading(false);
           window.location.reload(false);
         }
       } else {
@@ -192,6 +191,7 @@ export default function DialogBox() {
         let res = await axiosWarehouseIn.post("/bagClosing", obj);
         if (res.status == 200) {
           alert("Bag going to Pre-closure");
+          setLoading(false);
           window.location.reload(false);
         }
       }
@@ -431,7 +431,7 @@ export default function DialogBox() {
                             style={{ backgroundColor: "red" }}
                             component="span"
                             onClick={() => {
-                              if (window.confirm("Delete the item?")) {
+                              if (window.confirm("You want to Remove?")) {
                                 handelDelete(
                                   data._id,
                                   data?.awbn_number,
@@ -482,8 +482,9 @@ export default function DialogBox() {
                 variant="contained"
                 style={{ backgroundColor: "red" }}
                 component="span"
+                disabled={loading == true ? true : false}
                 onClick={(e) => {
-                  if (window.confirm("You Want to Close?")) {
+                  if (window.confirm("You want to Close?")) {
                     handelClose(e);
                   }
                 }}

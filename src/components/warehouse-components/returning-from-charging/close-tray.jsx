@@ -34,7 +34,7 @@ export default function DialogBox() {
   /**************************************************************************** */
   const [refresh, setRefresh] = useState(false);
   const [uic, setUic] = useState("");
-  const [bagReuse, setBagReuse] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [description, setDescription] = useState([]);
   /*********************************************************** */
 
@@ -60,7 +60,6 @@ export default function DialogBox() {
 
   /************************************************************************** */
   const addActualitem = async (obj) => {
-    alert();
     if (trayData?.limit <= trayData?.items?.length) {
       alert("All Items are Verified");
     } else {
@@ -87,20 +86,28 @@ export default function DialogBox() {
   const handelIssue = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true)
       if (description == "") {
         alert("Please Add Description");
+        setLoading(false)
       } else {
         let obj = {
           trayId: trayId,
           description: description,
+          type:"Ready to bqc"
         };
-        let res = await axiosWarehouseIn.post("/close-wht-tray-ready-to-bqc", obj);
+        let res = await axiosWarehouseIn.post(
+          "/close-wht-tray-ready-to-next",
+          obj
+        );
         if (res.status == 200) {
           alert(res.data.message);
+          setLoading(false)
           navigate("/tray-return-from-charging");
         }
       }
     } catch (error) {
+      setLoading(false)
       alert(error);
     }
   };
@@ -331,31 +338,12 @@ export default function DialogBox() {
           style={{ width: "400px" }}
           placeholder="Description"
         ></textarea>
-        {trayData[0]?.type_taxanomy == "BOT" ? (
-          <>
-            <Checkbox
-              checked={bagReuse}
-              onClick={(e) => {
-                if (
-                  window.confirm(
-                    bagReuse ? "Already Added" : "You Want to Release Bag ?"
-                  )
-                ) {
-                  setBagReuse(true);
-                }
-              }}
-              {...label}
-            />
-            <label>Bag Release</label>
-          </>
-        ) : (
-          ""
-        )}
+
         <Button
           sx={{ m: 3, mb: 9 }}
           variant="contained"
           disabled={
-            trayData?.items?.length == trayData?.actual_items?.length
+            trayData?.items?.length == trayData?.actual_items?.length || loading == false 
               ? false
               : true
           }

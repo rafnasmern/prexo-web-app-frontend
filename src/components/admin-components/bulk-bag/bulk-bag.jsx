@@ -93,20 +93,40 @@ export default function Home() {
     }));
     setLoading(false);
   };
+
   function toLowerKeys(obj, count, id) {
     return Object.keys(obj).reduce((accumulator, key) => {
       accumulator.created_at = Date.now();
       accumulator.prefix = "bag-master";
       accumulator.sort_id = "No Status";
-      accumulator.bag_id = "B0" + (count + id);
       accumulator[key.toLowerCase().split("-").join("_")] = obj[key];
       return accumulator;
     }, {});
   }
   const validateData = async (e) => {
     try {
+      let count1 = 0;
+      let count2 = 0;
+      let check = true;
       setLoading(true);
-      let res = await axiosSuperAdminPrexo.post("/bulkValidationBag", pagination.item);
+      for (let x of pagination.item) {
+        if (x.bag_id == undefined) {
+          if (x.cpc == "Gurgaon_122016") {
+            x.bag_id = "DDB-GGN-" + (brandCount.bagGurgaon + count1);
+            count1++;
+          } else {
+            x.bag_id = "DDB-BLR-" + (brandCount.bagBanglore + count2);
+            count2++;
+          }
+        } else {
+          check = false;
+          break;
+        }
+      }
+      let res = await axiosSuperAdminPrexo.post(
+        "/bulkValidationBag",
+        pagination.item
+      );
       if (res.status == 200) {
         setValidateState(true);
         alert(res.data.message);
@@ -123,7 +143,10 @@ export default function Home() {
   const handelSubmit = async (e) => {
     try {
       setLoading(true);
-      let res = await axiosSuperAdminPrexo.post("/createBulkBag", pagination.item);
+      let res = await axiosSuperAdminPrexo.post(
+        "/createBulkBag",
+        pagination.item
+      );
       if (res.status == 200) {
         alert(res.data.message);
         setLoading(false);
@@ -140,7 +163,7 @@ export default function Home() {
     setPagination((p) => ({
       ...p,
       item: pagination.item.map((data, i) => {
-        if (data.bag_id === bag_id) {
+        if (data.id === bag_id) {
           return { ...data, [e.target.name]: e.target.value };
         } else {
           return data;
@@ -246,7 +269,7 @@ export default function Home() {
               <TableHead>
                 <TableRow>
                   <TableCell>S.NO</TableCell>
-                  {/* <TableCell>Bag Id</TableCell> */}
+                  <TableCell>CPC</TableCell>
                   <TableCell>Warehouse</TableCell>
                   <TableCell>Bag Category</TableCell>
                   <TableCell>Display Name</TableCell>
@@ -260,15 +283,40 @@ export default function Home() {
                     <TableCell>{data.id}</TableCell>
                     <TableCell>
                       <TextField
-                        onChange={updateFieldChanged(data.bag_id)}
+                        onChange={updateFieldChanged(data.id)}
+                        id="outlined-password-input"
+                        type="text"
+                        name="cpc"
+                        value={data.cpc}
+                      />
+                      {err?.cpc?.includes(data.cpc) ||
+                      (Object.keys(err).length != 0 && data.cpc == undefined) ||
+                      (Object.keys(err).length != 0 && data.cpc == "") ? (
+                        <ClearIcon style={{ color: "red" }} />
+                      ) : Object.keys(err).length != 0 ? (
+                        <DoneIcon style={{ color: "green" }} />
+                      ) : (
+                        ""
+                      )}
+                      {err?.cpc?.includes(data.cpc) ? (
+                        <p style={{ color: "red" }}>Cpc Does Not Exist</p>
+                      ) : (Object.keys(err).length != 0 &&
+                          data.cpc == undefined) ||
+                        (Object.keys(err).length != 0 && data.cpc == "") ? (
+                        <p style={{ color: "red" }}>Cpc Does Not Exist</p>
+                      ) : (
+                        ""
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <TextField
+                        onChange={updateFieldChanged(data.id)}
                         id="outlined-password-input"
                         type="text"
                         name="warehouse"
                         value={data.warehouse}
                       />
-                      {err?.warehouse_does_not_exist?.includes(
-                        data.warehouse
-                      ) ||
+                      {err?.warehouse_does_not_exist?.includes(data.bag_id) ||
                       (Object.keys(err).length != 0 &&
                         data.warehouse == undefined) ||
                       (Object.keys(err).length != 0 && data.warehouse == "") ? (
@@ -278,9 +326,7 @@ export default function Home() {
                       ) : (
                         ""
                       )}
-                      {err?.warehouse_does_not_exist?.includes(
-                        data.warehouse
-                      ) ? (
+                      {err?.warehouse_does_not_exist?.includes(data.bag_id) ? (
                         <p style={{ color: "red" }}>Warehouse Does Not Exist</p>
                       ) : (Object.keys(err).length != 0 &&
                           data.warehouse == undefined) ||
@@ -293,7 +339,7 @@ export default function Home() {
                     </TableCell>
                     <TableCell>
                       <TextField
-                        onChange={updateFieldChanged(data.bag_id)}
+                        onChange={updateFieldChanged(data.id)}
                         id="outlined-password-input"
                         type="text"
                         name="bag_category"
@@ -302,7 +348,7 @@ export default function Home() {
                     </TableCell>
                     <TableCell>
                       <TextField
-                        onChange={updateFieldChanged(data.bag_id)}
+                        onChange={updateFieldChanged(data.id)}
                         id="outlined-password-input"
                         type="text"
                         name="bag_display_name"
@@ -340,24 +386,34 @@ export default function Home() {
                     </TableCell>
                     <TableCell>
                       <TextField
-                        onChange={updateFieldChanged(data.bag_id)}
+                        onChange={updateFieldChanged(data.id)}
                         id="outlined-password-input"
                         type="text"
                         name="bag_limit"
                         value={data.bag_limit}
                       />
+                      {err?.limit?.includes(data.bag_id) ? (
+                        <ClearIcon style={{ color: "red" }} />
+                      ) : Object.keys(err).length != 0 ? (
+                        <DoneIcon style={{ color: "green" }} />
+                      ) : null}
+                      {err?.limit?.includes(data.bag_id) ? (
+                        <p style={{ color: "red" }}>Not Acceptable</p>
+                      ) : (
+                        ""
+                      )}
                     </TableCell>
 
                     <TableCell>
                       <TextField
-                        onChange={updateFieldChanged(data.bag_id)}
+                        onChange={updateFieldChanged(data.id)}
                         id="outlined-password-input"
                         type="text"
                         name="bag_display"
                         value={data.bag_display}
                       />
                       {err?.bag_display_is_duplicate?.includes(
-                        data.bag_display_is_duplicate
+                        data.bag_display
                       ) ||
                       (Object.keys(err).length != 0 &&
                         data.bag_display == undefined) ||
@@ -371,7 +427,7 @@ export default function Home() {
                       )}
 
                       {err?.bag_display_is_duplicate?.includes(
-                        data.bag_display_is_duplicate
+                        data.bag_display
                       ) ? (
                         <p style={{ color: "red" }}> Duplicate Bag Display</p>
                       ) : (Object.keys(err).length != 0 &&
@@ -385,6 +441,11 @@ export default function Home() {
                     </TableCell>
                     <TableCell>
                       {(Object.keys(err).length != 0 &&
+                        data.cpc == undefined) ||
+                      err?.limit?.includes(data.bag_id) ||
+                      (Object.keys(err).length != 0 && data.cpc == "") ||
+                      err?.cpc?.includes(data.cpc) == true ||
+                      (Object.keys(err).length != 0 &&
                         data.warehouse == undefined) ||
                       (Object.keys(err).length != 0 && data.warehouse == "") ||
                       (Object.keys(err).length != 0 &&
@@ -395,12 +456,9 @@ export default function Home() {
                         data.bag_display == undefined) ||
                       (Object.keys(err).length != 0 &&
                         data.bag_display == "") ||
-                      err?.warehouse_does_not_exist?.includes(
-                        data.warehouse_does_not_exist
-                      ) == true ||
-                      err?.bag_id_is_duplicate?.includes(
-                        data.bag_id
-                      ) == true ||
+                      err?.warehouse_does_not_exist?.includes(data.bag_id) ==
+                        true ||
+                      err?.bag_id_is_duplicate?.includes(data.bag_id) == true ||
                       err?.bag_display_name_is_duplicate?.includes(
                         data.bag_display_name
                       ) == true ||
@@ -442,6 +500,7 @@ export default function Home() {
             }}
           >
             <CircularProgress />
+            <p style={{ paddingTop: "10px" }}>Please wait...</p>
           </Box>
         </Container>
       ) : null}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Box,
   Container,
@@ -19,7 +19,7 @@ import {
   Select,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { axiosMisUser, axiosSuperAdminPrexo } from "../../../axios";
+import { axiosMisUser } from "../../../axios";
 import IconButton from "@mui/material/IconButton";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
@@ -32,6 +32,7 @@ import jwt_decode from "jwt-decode";
 //Datatable Modules
 import $ from "jquery";
 import "datatables.net";
+import CircularProgress from "@mui/material/CircularProgress";
 
 export default function Home() {
   const [page, setPage] = React.useState(0);
@@ -39,6 +40,7 @@ export default function Home() {
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [data, setData] = useState([]);
   const [refresh, setRefresh] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState({
     type: "",
     searchData: "",
@@ -51,8 +53,10 @@ export default function Home() {
       if (admin) {
         let { location } = jwt_decode(admin);
         const fetchData = async () => {
+          setLoading(false);
           let res = await axiosMisUser.post("/getAllDelivery/" + location);
           if (res.status == 200) {
+            setLoading(true);
             setItem(res.data.data);
             // dataTableFun();
           }
@@ -94,25 +98,25 @@ export default function Home() {
   /*****************************************SEARCH Delivery*************************************************** */
   const searchDelivery = async (e) => {
     e.preventDefault();
-    let admin = localStorage.getItem("prexo-authentication");
-    let { location } = jwt_decode(admin);
 
     try {
-      if (e.target.value == "") {
-        setRefresh((refresh) => !refresh);
-      } else if (search.type == "") {
-        alert("Please add input");
-      } else {
-        let obj = {
-          location: location,
-          type: search.type,
-          searchData: e.target.value,
-        };
-        let res = await axiosMisUser.post("/searchDelivery", obj);
-        if (res.status == 200) {
-          setRowsPerPage(10);
-          setPage(0);
-          setItem(res.data.data);
+      let admin = localStorage.getItem("prexo-authentication");
+      if (admin) {
+        let { location } = jwt_decode(admin);
+        if (e.target.value == "") {
+          setRefresh((refresh) => !refresh);
+        }  else {
+          let obj = {
+            location: location,
+            type: search.type,
+            searchData: e.target.value,
+          };
+          let res = await axiosMisUser.post("/searchDelivery", obj);
+          if (res.status == 200) {
+            setRowsPerPage(10);
+            setPage(0);
+            setItem(res.data.data);
+          }
         }
       }
     } catch (error) {
@@ -194,13 +198,101 @@ export default function Home() {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+  const tableData = useMemo(() => {
+    return (
+      <Table stickyHeader aria-label="sticky table">
+        <TableHead>
+          <TableRow>
+            <TableCell>Record.NO</TableCell>
+            <TableCell>Delivery Status</TableCell>
+            <TableCell>Delivery Imported Date</TableCell>
+            <TableCell>UIC Status</TableCell>
+            <TableCell>Tracking ID</TableCell>
+            <TableCell>Order ID</TableCell>
+            <TableCell>Order Date</TableCell>
+            <TableCell>Item ID</TableCell>
+            <TableCell>GEP Order</TableCell>
+            <TableCell>IMEI</TableCell>
+            <TableCell>Partner Purchase Price</TableCell>
+            <TableCell>Partner Shop</TableCell>
+            <TableCell>Base Discount</TableCell>
+            <TableCell>Diagnostics Discount</TableCell>
+            <TableCell>Storage Disscount</TableCell>
+            <TableCell>Buyback Category</TableCell>
+            <TableCell>Doorsteps Diagnostics</TableCell>
+            <TableCell>Actual Delivered Date</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {data.map((data, index) => (
+            <TableRow tabIndex={-1}>
+              <TableCell>{data.id}</TableCell>
+              <TableCell
+                style={
+                  data.result.length != 0
+                    ? { color: "green" }
+                    : { color: "red" }
+                }
+              >
+                {data.result.length != 0 ? "Match" : "Not Match"}
+              </TableCell>
+              <TableCell>
+                {new Date(data.created_at).toLocaleString("en-GB", {
+                  hour12: true,
+                })}
+              </TableCell>
+              <TableCell
+                style={
+                  data.uic_status == "Printed"
+                    ? { color: "green" }
+                    : data.uic_status == "Created"
+                    ? { color: "orange" }
+                    : { color: "red" }
+                }
+              >
+                {data.uic_status}
+              </TableCell>
+              <TableCell>{data.tracking_id?.toString()}</TableCell>
+              <TableCell>{data.order_id?.toString()}</TableCell>
+              <TableCell>
+                {data?.order_date == null
+                  ? ""
+                  : new Date(data?.order_date).toLocaleString("en-GB", {
+                      year: "numeric",
+                      month: "2-digit",
+                      day: "2-digit",
+                    })}
+              </TableCell>
+              <TableCell>{data.item_id?.toString()}</TableCell>
+              <TableCell>{data.gep_order?.toString()}</TableCell>
+              <TableCell>{data.imei?.toString()}</TableCell>
+              <TableCell>{data.partner_purchase_price?.toString()}</TableCell>
+              <TableCell>{data.partner_shop?.toString()}</TableCell>
+              <TableCell>{data.base_discount?.toString()}</TableCell>
+              <TableCell>{data.diagnostics_discount?.toString()}</TableCell>
+              <TableCell>{data.storage_disscount?.toString()}</TableCell>
+              <TableCell>{data.buyback_category?.toString()}</TableCell>
+              <TableCell>{data.doorsteps_diagnostics?.toString()}</TableCell>
+              <TableCell>
+                {new Date(data?.delivery_date).toLocaleString("en-GB", {
+                  year: "numeric",
+                  month: "2-digit",
+                  day: "2-digit",
+                })}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    );
+  }, [data, item]);
   return (
     <>
       <Box
         sx={{
           mt: 4,
           mr: 1,
-          ml: 1,
+       
         }}
       >
         <Box
@@ -213,6 +305,7 @@ export default function Home() {
               display: "flex",
               flexDirection: "start",
               mt: 6,
+            
             }}
           >
             <FormControl sx={{ m: 1 }} fullWidth>
@@ -241,22 +334,23 @@ export default function Home() {
                 searchDelivery(e);
               }}
               label="Search"
+              disabled={search.type == "" ? true : false}
               variant="outlined"
               fullWidth
               sx={{ m: 2 }}
             />
           </Box>
         </Box>
-        <Box sx={{ mt: 3, float: "right" }}>
+        <Box sx={{ mt: 4, float: "right",mr:2 }}>
           <Button
             variant="contained"
             sx={{ mt: 5 }}
-            style={{ backgroundColor: "#206CE2", float: "left" }}
+            style={{ backgroundColor: "green", float: "left" }}
             onClick={(e) => {
               handelDelivery(e);
             }}
           >
-            Add Delivery Data
+            Add Delivery 
           </Button>
           <Button
             variant="contained"
@@ -270,111 +364,47 @@ export default function Home() {
           </Button>
         </Box>
       </Box>
-      <Container maxWidth="xs"></Container>
-      <Paper sx={{ width: "100%", overflow: "hidden" }}>
-        <TableContainer>
-          <Table id="example">
-            <TableHead>
+      {loading === false ? (
+        <Container>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              flexDirection: "column",
+              pt: 30,
+            }}
+          >
+            <CircularProgress />
+            <p style={{ paddingTop: "10px" }}>Loading...</p>
+          </Box>
+        </Container>
+      ) : (
+        <Paper sx={{ width: "100%", overflow: "hidden",mt:2,mb:2 }}>
+          <TableContainer sx={{ maxHeight: 1000 }}>
+            {tableData}
+            <TableFooter>
               <TableRow>
-                <TableCell>Record.NO</TableCell>
-                <TableCell>Delivery Status</TableCell>
-                <TableCell>Delivery Imported Date</TableCell>
-                <TableCell>UIC Status</TableCell>
-                <TableCell>Tracking ID</TableCell>
-                <TableCell>Order ID</TableCell>
-                <TableCell>Order Date</TableCell>
-                <TableCell>Item ID</TableCell>
-                <TableCell>GEP Order</TableCell>
-                <TableCell>IMEI</TableCell>
-                <TableCell>Partner Purchase Price</TableCell>
-                <TableCell>Partner Shop</TableCell>
-                <TableCell>Base Discount</TableCell>
-                <TableCell>Diagnostics Discount</TableCell>
-                <TableCell>Storage Disscount</TableCell>
-                <TableCell>Buyback Category</TableCell>
-                <TableCell>Doorsteps Diagnostics</TableCell>
-                <TableCell>Actual Delivered Date</TableCell>
+                <TablePagination
+                  rowsPerPageOptions={[10, 50, 100]}
+                  colSpan={3}
+                  count={item.length}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  SelectProps={{
+                    inputProps: {
+                      "aria-label": "rows per page",
+                    },
+                    native: true,
+                  }}
+                  onPageChange={handleChangePage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                  ActionsComponent={TablePaginationActions}
+                />
               </TableRow>
-            </TableHead>
-            <TableBody>
-              {data.map((data, index) => (
-                <TableRow tabIndex={-1}>
-                  <TableCell>{data.id}</TableCell>
-                  <TableCell style={{ color: "green" }}>Delivered</TableCell>
-                  <TableCell>
-                    {new Date(data.created_at).toLocaleString("en-GB", {
-                      hour12: true,
-                    })}
-                  </TableCell>
-                  <TableCell
-                    style={
-                      data.uic_status == "Printed"
-                        ? { color: "green" }
-                        : data.uic_status == "Created"
-                        ? { color: "orange" }
-                        : { color: "red" }
-                    }
-                  >
-                    {data.uic_status}
-                  </TableCell>
-                  <TableCell>{data.tracking_id?.toString()}</TableCell>
-                  <TableCell>{data.order_id?.toString()}</TableCell>
-                  <TableCell>
-                    {data?.order_date == null
-                      ? ""
-                      : new Date(data?.order_date).toLocaleString("en-GB", {
-                          year: "numeric",
-                          month: "2-digit",
-                          day: "2-digit",
-                        })}
-                  </TableCell>
-                  <TableCell>{data.item_id?.toString()}</TableCell>
-                  <TableCell>{data.gep_order?.toString()}</TableCell>
-                  <TableCell>{data.imei?.toString()}</TableCell>
-                  <TableCell>
-                    {data.partner_purchase_price?.toString()}
-                  </TableCell>
-                  <TableCell>{data.partner_shop?.toString()}</TableCell>
-                  <TableCell>{data.base_discount?.toString()}</TableCell>
-                  <TableCell>{data.diagnostics_discount?.toString()}</TableCell>
-                  <TableCell>{data.storage_disscount?.toString()}</TableCell>
-                  <TableCell>{data.buyback_category?.toString()}</TableCell>
-                  <TableCell>
-                    {data.doorsteps_diagnostics?.toString()}
-                  </TableCell>
-                  <TableCell>
-                    {new Date(data?.delivery_date).toLocaleString("en-GB", {
-                      year: "numeric",
-                      month: "2-digit",
-                      day: "2-digit",
-                    })}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          <TableFooter>
-            <TableRow>
-              <TablePagination
-                rowsPerPageOptions={[10, 50, 100]}
-                colSpan={3}
-                count={item.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                SelectProps={{
-                  inputProps: {
-                    "aria-label": "rows per page",
-                  },
-                  native: true,
-                }}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-                ActionsComponent={TablePaginationActions}
-              />
-            </TableRow>
-          </TableFooter>
-        </TableContainer>
-      </Paper>
+            </TableFooter>
+          </TableContainer>
+        </Paper>
+      )}
     </>
   );
 }

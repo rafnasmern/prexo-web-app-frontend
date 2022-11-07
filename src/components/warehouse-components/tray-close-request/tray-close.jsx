@@ -23,11 +23,7 @@ import {
   TextField,
   InputAdornment,
 } from "@mui/material";
-import {
-  axiosMisUser,
-  axiosSuperAdminPrexo,
-  axiosWarehouseIn,
-} from "../../../axios";
+import { axiosWarehouseIn } from "../../../axios";
 import PropTypes from "prop-types";
 import CloseIcon from "@mui/icons-material/Close";
 import Checkbox from "@mui/material/Checkbox";
@@ -38,6 +34,8 @@ import SearchIcon from "@mui/icons-material/Search";
 //Datatable Modules
 import $ from "jquery";
 import "datatables.net";
+// import jwt from "jsonwebtoken"
+import jwt_decode from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -128,14 +126,22 @@ export default function StickyHeadTable({ props }) {
   };
   useEffect(() => {
     try {
-      const fetchData = async () => {
-        let res = await axiosWarehouseIn.post("/trayCloseRequest");
-        if (res.status == 200) {
-          setInfraData(res.data.data);
-          dataTableFun();
-        }
-      };
-      fetchData();
+      let admin = localStorage.getItem("prexo-authentication");
+      if (admin) {
+        let { location } = jwt_decode(admin);
+        const fetchData = async () => {
+          let res = await axiosWarehouseIn.post(
+            "/trayCloseRequest/" + location
+          );
+          if (res.status == 200) {
+            setInfraData(res.data.data);
+            dataTableFun();
+          }
+        };
+        fetchData();
+      } else {
+        navigate("/");
+      }
     } catch (error) {
       alert(error);
     }
@@ -216,25 +222,35 @@ export default function StickyHeadTable({ props }) {
   };
   const handelTrayId = async (e) => {
     try {
-      if (getValues("user_name") === "" || getValues("tray_type") === "") {
-        alert("Please select user and tray type");
-      } else if (trayIdCheck == "") {
-        alert("Please add tray id");
-      } else {
-        if (getValues("tray_type") == "MMT") {
-          let res = await axiosWarehouseIn.post("/checkMmtTray/" + trayIdCheck);
-          if (res.status == 200) {
-            setTrayStatus(res.data.status);
-          }
-        } else if (getValues("tray_type") == "PMT") {
-          let res = await axiosWarehouseIn.post("/checkPmtTray/" + trayIdCheck);
-          if (res.status == 200) {
-            setTrayStatus(res.data.status);
-          }
+      let admin = localStorage.getItem("prexo-authentication");
+      if (admin) {
+        let { location } = jwt_decode(admin);
+        if (getValues("user_name") === "" || getValues("tray_type") === "") {
+          alert("Please select user and tray type");
+        } else if (trayIdCheck == "") {
+          alert("Please add tray id");
         } else {
-          let res = await axiosWarehouseIn.post("/checkBotTray/" + trayIdCheck);
-          if (res.status == 200) {
-            setTrayStatus(res.data.status);
+          if (getValues("tray_type") == "MMT") {
+            let res = await axiosWarehouseIn.post(
+              "/checkMmtTray/" + trayIdCheck + "/" + location
+            );
+            if (res.status == 200) {
+              setTrayStatus(res.data.status);
+            }
+          } else if (getValues("tray_type") == "PMT") {
+            let res = await axiosWarehouseIn.post(
+              "/checkPmtTray/" + trayIdCheck + "/" + location
+            );
+            if (res.status == 200) {
+              setTrayStatus(res.data.status);
+            }
+          } else {
+            let res = await axiosWarehouseIn.post(
+              "/checkBotTray/" + trayIdCheck + "/" + location
+            );
+            if (res.status == 200) {
+              setTrayStatus(res.data.status);
+            }
           }
         }
       }
@@ -511,7 +527,7 @@ export default function StickyHeadTable({ props }) {
                         >
                           View
                         </Button>
-                        {data.sort_id != "Received" ? (
+                        {data.sort_id != "Received From BOT" ? (
                           <Button
                             sx={{
                               m: 1,

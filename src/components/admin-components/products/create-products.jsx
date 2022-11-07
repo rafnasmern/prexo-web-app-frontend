@@ -151,6 +151,7 @@ export default function DialogBox() {
     }
     try {
       data.muic = muis_code;
+      data.created_at = Date.now();
       let formdata = new FormData();
       formdata.append("image", profileFile);
       for (let [key, value] of Object.entries(data)) {
@@ -229,7 +230,6 @@ export default function DialogBox() {
     data._id = id;
     try {
       let response = await axiosSuperAdminPrexo.put("/editProduct", data);
-      console.log(response);
       if (response.status == 200) {
         setOpen(false);
         Swal.fire({

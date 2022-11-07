@@ -22,22 +22,29 @@ import {
 //Datatable Modules
 import $ from "jquery";
 import "datatables.net";
+// import jwt from "jsonwebtoken"
+import jwt_decode from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 export default function StickyHeadTable({ props }) {
   const [infraData, setInfraData] = useState([]);
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
   const navigate = useNavigate();
   useEffect(() => {
     try {
-      const fetchData = async () => {
-        let res = await axiosWarehouseIn.post("/getRequests");
-        if (res.status == 200) {
-          setInfraData(res.data.data);
-          dataTableFun();
-        }
-      };
-      fetchData();
+      let admin = localStorage.getItem("prexo-authentication");
+      if (admin) {
+        let { location } = jwt_decode(admin);
+        const fetchData = async () => {
+          let res = await axiosWarehouseIn.post("/getRequests/" + location);
+          if (res.status == 200) {
+            setInfraData(res.data.data);
+            dataTableFun();
+          }
+        };
+        fetchData();
+      } else {
+        navigate("/");
+      }
     } catch (error) {
       alert(error);
     }

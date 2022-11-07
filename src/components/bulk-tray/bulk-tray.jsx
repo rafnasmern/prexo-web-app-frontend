@@ -178,12 +178,12 @@ export default function Home() {
     }
   };
   // ----------------------------------------------------------------------------------------------------------------------------
-  const updateFieldChanged = (tray_id) => (e) => {
+  const updateFieldChanged = (id) => (e) => {
     setValidateState(false);
     setPagination((p) => ({
       ...p,
       item: pagination.item.map((data, i) => {
-        if (data.tray_id === tray_id) {
+        if (data.id === id) {
           return { ...data, [e.target.name]: e.target.value };
         } else {
           return data;
@@ -220,7 +220,6 @@ export default function Home() {
       }));
     }
   };
-
   // ----------------------------------------------------------------------------------------------------------------------------
   return (
     <>
@@ -318,6 +317,7 @@ export default function Home() {
                   ) : (
                     ""
                   )}
+                  <TableCell>CPC</TableCell>
                   <TableCell>Warehouse</TableCell>
                   <TableCell>Tray Category</TableCell>
                   <TableCell>Tray Brand</TableCell>
@@ -356,18 +356,43 @@ export default function Home() {
                     ) : (
                       ""
                     )}
+                    <TableCell>
+                      <TextField
+                        onChange={updateFieldChanged(data.id)}
+                        id="outlined-password-input"
+                        type="text"
+                        name="cpc"
+                        value={data.cpc}
+                      />
+                      {err?.cpc?.includes(data.cpc) ||
+                      (Object.keys(err).length != 0 && data.cpc == undefined) ||
+                      (Object.keys(err).length != 0 && data.cpc == "") ? (
+                        <ClearIcon style={{ color: "red" }} />
+                      ) : Object.keys(err).length != 0 ? (
+                        <DoneIcon style={{ color: "green" }} />
+                      ) : (
+                        ""
+                      )}
+                      {err?.cpc?.includes(data.cpc) ? (
+                        <p style={{ color: "red" }}>Cpc Does Not Exist</p>
+                      ) : (Object.keys(err).length != 0 &&
+                          data.cpc == undefined) ||
+                        (Object.keys(err).length != 0 && data.cpc == "") ? (
+                        <p style={{ color: "red" }}>Cpc Does Not Exist</p>
+                      ) : (
+                        ""
+                      )}
+                    </TableCell>
 
                     <TableCell>
                       <TextField
-                        onChange={updateFieldChanged(data.tray_id)}
+                        onChange={updateFieldChanged(data.id)}
                         id="outlined-password-input"
                         type="text"
                         name="warehouse"
                         value={data.warehouse?.toString()}
                       />
-                      {err?.warehouse_does_not_exist?.includes(
-                        data.warehouse
-                      ) ||
+                      {err?.warehouse_does_not_exist?.includes(data.tray_id) ||
                       (Object.keys(err).length != 0 &&
                         data.warehouse == undefined) ||
                       (Object.keys(err).length != 0 && data.warehouse == "") ? (
@@ -378,9 +403,7 @@ export default function Home() {
                         ""
                       )}
 
-                      {err?.warehouse_does_not_exist?.includes(
-                        data.warehouse
-                      ) ? (
+                      {err?.warehouse_does_not_exist?.includes(data.tray_id) ? (
                         <p style={{ color: "red" }}>Warehouse Does Not Exist</p>
                       ) : (Object.keys(err).length != 0 &&
                           data.warehouse == undefined) ||
@@ -393,7 +416,7 @@ export default function Home() {
                     </TableCell>
                     <TableCell>
                       <TextField
-                        onChange={updateFieldChanged(data.tray_id)}
+                        onChange={updateFieldChanged(data.id)}
                         id="outlined-password-input"
                         type="text"
                         name="tray_category"
@@ -402,7 +425,7 @@ export default function Home() {
                     </TableCell>
                     <TableCell>
                       <TextField
-                        onChange={updateFieldChanged(data.tray_id)}
+                        onChange={updateFieldChanged(data.id)}
                         id="outlined-password-input"
                         type="text"
                         name="tray_brand"
@@ -419,7 +442,7 @@ export default function Home() {
                     </TableCell>
                     <TableCell>
                       <TextField
-                        onChange={updateFieldChanged(data.tray_id)}
+                        onChange={updateFieldChanged(data.id)}
                         id="outlined-password-input"
                         type="text"
                         name="tray_model"
@@ -436,7 +459,7 @@ export default function Home() {
                     </TableCell>
                     <TableCell>
                       <TextField
-                        onChange={updateFieldChanged(data.tray_id)}
+                        onChange={updateFieldChanged(data.id)}
                         id="outlined-password-input"
                         type="text"
                         name="tray_name"
@@ -470,16 +493,26 @@ export default function Home() {
                     </TableCell>
                     <TableCell>
                       <TextField
-                        onChange={updateFieldChanged(data.tray_id)}
+                        onChange={updateFieldChanged(data.id)}
                         id="outlined-password-input"
                         type="text"
                         name="tray_limit"
                         value={data.tray_limit?.toString()}
                       />
+                      {err?.trayLimit?.includes(data.tray_id) ? (
+                        <ClearIcon style={{ color: "red" }} />
+                      ) : Object.keys(err).length != 0 ? (
+                        <DoneIcon style={{ color: "green" }} />
+                      ) : null}
+                      {err?.trayLimit?.includes(data.tray_id) ? (
+                        <p style={{ color: "red" }}>Not Acceptable</p>
+                      ) : (
+                        ""
+                      )}
                     </TableCell>
                     <TableCell>
                       <TextField
-                        onChange={updateFieldChanged(data.tray_id)}
+                        onChange={updateFieldChanged(data.id)}
                         id="outlined-password-input"
                         type="text"
                         name="tray_display"
@@ -517,6 +550,11 @@ export default function Home() {
 
                     <TableCell>
                       {(Object.keys(err).length != 0 &&
+                        data.cpc == undefined) ||
+                      err?.trayLimit?.includes(data.tray_id) ||
+                      (Object.keys(err).length != 0 && data.cpc == "") ||
+                      err?.cpc?.includes(data.cpc) == true ||
+                      (Object.keys(err).length != 0 &&
                         data.tray_id == undefined) ||
                       err?.model?.includes(data.tray_model) ||
                       err?.model?.includes(data.tray_brand) ||
@@ -532,7 +570,7 @@ export default function Home() {
                         data.tray_display == undefined) ||
                       (Object.keys(err).length != 0 &&
                         data.tray_display == "") ||
-                      err?.warehouse_does_not_exist?.includes(data.warehouse) ||
+                      err?.warehouse_does_not_exist?.includes(data.tray_id) ||
                       err?.trya_id_is_duplicate?.includes(data.tray_display) ==
                         true ||
                       err?.tray_display_name_duplicate?.includes(
@@ -576,6 +614,7 @@ export default function Home() {
             }}
           >
             <CircularProgress />
+            <p style={{ paddingTop: "10px" }}>Please wait...</p>
           </Box>
         </Container>
       ) : null}

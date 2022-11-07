@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { styled, alpha } from "@mui/material/styles";
 import {
   Paper,
   Table,
@@ -9,44 +8,24 @@ import {
   TableHead,
   TableRow,
   Box,
-  Button,
-  MenuItem,
-  Menu,
-  Dialog,
 } from "@mui/material";
-import {
-  axiosMisUser,
-  axiosSuperAdminPrexo,
-  axiosWarehouseIn,
-} from "../../../axios";
+import { axiosWarehouseIn } from "../../../axios";
 //Datatable Modules
 import $ from "jquery";
 import "datatables.net";
-import { useNavigate, useParams } from "react-router-dom";
-const BootstrapDialog = styled(Dialog)(({ theme }) => ({
-  "& .MuiDialogContent-root": {
-    padding: theme.spacing(2),
-  },
-  "& .MuiDialogActions-root": {
-    padding: theme.spacing(1),
-  },
-}));
-
+import { useParams } from "react-router-dom";
 export default function StickyHeadTable({ props }) {
-  const [open, setOpen] = React.useState(false);
-  const [assingNewTray, setAssignNewTray] = useState(false);
-  const [infraData, setInfraData] = useState([]);
   const [item, setItem] = useState([]);
-  const navigate = useNavigate();
-  const { vendor_sku_id } = useParams();
-
+  const { vendor_sku_id, id } = useParams();
   useEffect(() => {
     try {
       const fetchData = async () => {
-        let botTray = await axiosWarehouseIn.post(
-          "/viewModelClub/" + vendor_sku_id
-        );
-        if (botTray.status == 200) {
+        let obj = {
+          listId: id,
+          vendor_sku_id: vendor_sku_id,
+        };
+        let botTray = await axiosWarehouseIn.post("/viewModelClub/", obj);
+        if (botTray.status === 200) {
           setItem(botTray.data.data);
           dataTableFun();
         }
@@ -63,8 +42,6 @@ export default function StickyHeadTable({ props }) {
       scrollX: true,
     });
   }
-  const label = { inputProps: { "aria-label": "Checkbox demo" } };
-
   return (
     <>
       <Box
@@ -113,9 +90,13 @@ export default function StickyHeadTable({ props }) {
                   {item?.[0]?.item?.map((data, index) => (
                     <TableRow hover role="checkbox" tabIndex={-1}>
                       <TableCell>{index + 1}</TableCell>
-                      <TableCell>{item?.[0]?.muic}</TableCell>
-                      <TableCell>{item?.[0]?.brand_name}</TableCell>
-                      <TableCell>{item?.[0].model_name}</TableCell>
+                      <TableCell>{item?.[0].product?.[0]?.muic}</TableCell>
+                      <TableCell>
+                        {item?.[0].product?.[0]?.brand_name}
+                      </TableCell>
+                      <TableCell>
+                        {item?.[0].product?.[0]?.model_name}
+                      </TableCell>
                       <TableCell>{data.uic}</TableCell>
                       <TableCell>{data.tray_id}</TableCell>
                       <TableCell>{data.bot_agent}</TableCell>

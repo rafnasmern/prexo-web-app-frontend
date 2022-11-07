@@ -127,7 +127,7 @@ export default function StickyHeadTable({ props }) {
                         })}
                       </TableCell>
                       <TableCell>
-                        {data.sort_id == "Issued" ? (
+                        {data.sort_id == "Issued to Charging" ? (
                           <Button
                             sx={{ m: 1 }}
                             type="submit"

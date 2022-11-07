@@ -6,7 +6,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  TablePagination,
+  Container,
   TableRow,
   Box,
   Button,
@@ -17,15 +17,16 @@ import Swal from "sweetalert2";
 import $ from "jquery";
 import "datatables.net";
 import { useNavigate } from "react-router-dom";
+import CircularProgress from "@mui/material/CircularProgress";
+
 
 export default function StickyHeadTable({ props }) {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(2);
-  const [employeeData, setEmployeeData] = useState([]);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(false);
       props.setRefresh(false);
       try {
         let obj = {
@@ -33,6 +34,7 @@ export default function StickyHeadTable({ props }) {
         };
         let response = await axiosSuperAdminPrexo.post("/getMasters", obj);
         if (response.status === 200) {
+          setLoading(true);
           props.setBagData(response.data.data);
           dataTableFun();
         }
@@ -103,6 +105,21 @@ export default function StickyHeadTable({ props }) {
             justifyContent: "center",
           }}
         >
+          {
+            loading == false ?
+            <Container>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                flexDirection: "column",
+              }}
+            >
+              <CircularProgress />
+              <p style={{ paddingTop: "10px" }}>Loading...</p>
+            </Box>
+          </Container>
+          :
           <Paper sx={{ width: "100%", overflow: "hidden" }}>
             <TableContainer>
               <Table
@@ -115,6 +132,7 @@ export default function StickyHeadTable({ props }) {
                   <TableRow>
                     <TableCell>Record.NO</TableCell>
                     <TableCell>Bag Id</TableCell>
+                    <TableCell>Location</TableCell>
                     <TableCell>Warehouse</TableCell>
                     <TableCell>Bag Category</TableCell>
                     <TableCell>Bag Display Name</TableCell>
@@ -130,6 +148,7 @@ export default function StickyHeadTable({ props }) {
                     <TableRow hover role="checkbox" tabIndex={-1}>
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>{data.code}</TableCell>
+                      <TableCell>{data.cpc}</TableCell>
                       <TableCell>{data.warehouse}</TableCell>
                       <TableCell>{data.type_taxanomy}</TableCell>
                       <TableCell>{data.name}</TableCell>
@@ -182,6 +201,7 @@ export default function StickyHeadTable({ props }) {
               </Table>
             </TableContainer>
           </Paper>
+          }
         </Box>
       </Box>
     </>

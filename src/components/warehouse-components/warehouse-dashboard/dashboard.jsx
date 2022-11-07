@@ -1,25 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { FormLabel, Box, Link } from "@mui/material";
+import React from "react";
+import { Box, Link } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { axiosWarehouseIn } from "../../../axios";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const [dashboardData, setDashboardData] = useState({});
-  useEffect(() => {
-    try {
-      const fetchData = async () => {
-        let res = await axiosWarehouseIn.get("/dashboard");
-        if (res.status == 200) {
-          setDashboardData(res.data.data);
-        }
-      };
-      fetchData();
-    } catch (error) {
-      alert(error);
-    }
-  }, []);
+
   const handelSearch = (e) => {
     e.preventDefault();
     navigate("/search");
@@ -76,9 +62,13 @@ export default function Dashboard() {
     e.preventDefault();
     navigate("/bqc-request");
   };
+  const handelReturnFromBqc = (e) => {
+    e.preventDefault();
+    navigate("/return-from-bqc");
+  };
   return (
-    <div>
-      <h4 style={{ marginTop: "100px", marginLeft: "22px", color: "#495057" }}>
+    <div style={{marginBottom:"20px"}}>
+      <h4 style={{ marginTop: "100px", marginLeft: "22px", color: "#495057", }}>
         Hi Warehouse Welcome to Prexo Dashboard
       </h4>
       <Box
@@ -89,6 +79,7 @@ export default function Dashboard() {
           width: "610px",
           marginTop: "19px",
         }}
+       
       >
         <h5
           style={{ color: "#FFFFFF", textAlign: "center", paddingTop: "2px" }}
@@ -281,7 +272,7 @@ export default function Dashboard() {
             ml: 1,
             width: 300,
             boxShadow: 2,
-            height: "374px",
+            height: "437px",
             backgroundColor: "#FFFFFF",
           }}
         >
@@ -404,6 +395,26 @@ export default function Dashboard() {
                 }}
               >
                 BQC Request Received
+              </Link>
+            </Box>
+            <hr />
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
+            >
+              <ArrowRightIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelReturnFromBqc(e);
+                }}
+              >
+                Return from BQC
               </Link>
             </Box>
             <hr />

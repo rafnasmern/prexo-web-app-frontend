@@ -12,7 +12,8 @@ import {
   Button,
 } from "@mui/material";
 import { axiosSuperAdminPrexo, axiosWarehouseIn } from "../../../axios";
-import Swal from "sweetalert2";
+// import jwt from "jsonwebtoken"
+import jwt_decode from "jwt-decode";
 //Datatable Modules
 import $ from "jquery";
 import "datatables.net";
@@ -26,10 +27,18 @@ export default function StickyHeadTable({ props }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        let response = await axiosWarehouseIn.post("/release-bot-tray");
-        if (response.status === 200) {
-          setWhtTray(response.data.data);
-          dataTableFun();
+        let admin = localStorage.getItem("prexo-authentication");
+        if (admin) {
+          let { location } = jwt_decode(admin);
+          let response = await axiosWarehouseIn.post(
+            "/release-bot-tray/" + location
+          );
+          if (response.status === 200) {
+            setWhtTray(response.data.data);
+            dataTableFun();
+          }
+        } else {
+          navigate("/");
         }
       } catch (error) {
         alert(error);

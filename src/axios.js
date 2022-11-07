@@ -11,15 +11,15 @@ export const axiosWarehouseIn = axios.create({
   baseURL: "http://localhost:8000/api/v1/warehouseIn",
   headers: { "x-access-token": localStorage.getItem("prexo-authentication") },
 });
-export const axiosWarehouseOut = axios.create({
-  baseURL: "http://localhost:8000/api/v1/warehouseOut",
-  headers: { "x-access-token": localStorage.getItem("prexo-authentication") },
-});
 export const axiosBot = axios.create({
   baseURL: "http://localhost:8000/api/v1/bot",
   headers: { "x-access-token": localStorage.getItem("prexo-authentication") },
 });
 export const axiosCharging = axios.create({
   baseURL: "http://localhost:8000/api/v1/charging",
+  headers: { "x-access-token": localStorage.getItem("prexo-authentication") },
+});
+export const axiosBqc = axios.create({
+  baseURL: "http://localhost:8000/api/v1/bqc",
   headers: { "x-access-token": localStorage.getItem("prexo-authentication") },
 });

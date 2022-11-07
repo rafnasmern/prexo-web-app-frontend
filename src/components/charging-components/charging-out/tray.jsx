@@ -83,17 +83,34 @@ export default function DialogBox() {
   const [open, setOpen] = useState(false);
   const [resDataUic, setResDataUic] = useState({});
   const [bodyDamage, setBodyDamage] = useState(false);
+  const [charge, setCharge] = useState("");
   const handleClose = () => {
     setOpen(false);
   };
   /************************************************************************** */
   const schema = Yup.object().shape({
-    battery_tatus: Yup.string().required("Required*").nullable(),
-    charge_percentage: Yup.string().required("Required*").nullable(),
+    battery_status: Yup.string().required("Required*").nullable(),
+    charge_percentage: Yup.string()
+      .when("battery_status", (battery_status, schema) => {
+        if (battery_status == "Charge" || battery_status == "Heat problem") {
+          return schema.required("Required");
+        }
+      })
+      .nullable(),
     body_condition: Yup.string().required("Required*").nullable(),
     display_condition: Yup.string().required("Required*").nullable(),
     lock_status: Yup.string().required("Required*").nullable(),
     charging_jack_type: Yup.string().required("Required*").nullable(),
+    cimei_1: Yup.string().required("Required*").min(15).nullable(),
+    cimei_2: Yup.string().required("Required*").min(15).nullable(),
+    boady_part_missing: Yup.string().required("Required*").nullable(),
+    part_name: Yup.string()
+      .when("boady_part_missing", (boady_part_missing, schema) => {
+        if (boady_part_missing == "YES") {
+          return schema.required("Required");
+        }
+      })
+      .nullable(),
   });
   const {
     register,
@@ -106,7 +123,11 @@ export default function DialogBox() {
   });
   /*********************************************************** */
   let admin = localStorage.getItem("prexo-authentication");
-  let { user_name } = jwt_decode(admin);
+  let user_name1;
+  if (admin) {
+    let { user_name } = jwt_decode(admin);
+    user_name1 = user_name;
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -148,6 +169,7 @@ export default function DialogBox() {
     }
   };
   const onSubmit = async (values) => {
+    values.charging_person = user_name1;
     if (trayData.limit <= trayData?.actual_items?.length) {
       alert("All Items Scanned");
     } else {
@@ -195,9 +217,7 @@ export default function DialogBox() {
     try {
       if (description == "") {
         alert("Please Add Description");
-      } else if (
-        trayData[0]?.actual_items?.length == trayData[0]?.items?.length
-      ) {
+      } else if (trayData?.actual_items?.length == trayData?.items?.length) {
         let obj = {
           trayId: trayId,
           description: description,
@@ -272,38 +292,58 @@ export default function DialogBox() {
                 labelId="demo-simple-select-label"
                 fullWidth
                 label="Battery Status"
-                value={getValues("battery_tatus")}
-                {...register("battery_tatus")}
-                error={errors.battery_tatus ? true : false}
-                helperText={errors.battery_tatus?.message}
+                value={getValues("battery_status")}
+                {...register("battery_status")}
+                error={errors.battery_status ? true : false}
+                helperText={errors.battery_status?.message}
                 sx={{ mt: 2 }}
               >
-                <MenuItem value="Charge">Charge</MenuItem>
-                <MenuItem value="Heat Problem">Heat Problem</MenuItem>
-                <MenuItem value="Battery Bulging">Battery Bulging</MenuItem>
-                <MenuItem value="Charging">Charging</MenuItem>
+                <MenuItem value="Charge failed" onClick={(e) => setCharge("")}>
+                  Charge failed
+                </MenuItem>
+                <MenuItem value="Charge" onClick={(e) => setCharge("Charge")}>
+                  Charge
+                </MenuItem>
+                <MenuItem
+                  value="Heat Problem"
+                  onClick={(e) => setCharge("Heat Problem")}
+                >
+                  Heat Problem
+                </MenuItem>
+                <MenuItem
+                  value="Battery Bulging"
+                  onClick={(e) => setCharge("")}
+                >
+                  Battery Bulging
+                </MenuItem>
+                <MenuItem value="No-battery" onClick={(e) => setCharge("")}>
+                  No-battery
+                </MenuItem>
               </Select>
             </FormControl>
-            <FormControl fullWidth>
-              <InputLabel sx={{ pt: 2 }} id="demo-simple-select-label">
-                Charge Percentage
-              </InputLabel>
-              <Select
-                labelId="demo-simple-select-label"
-                fullWidth
-                label="Charge Percentage"
-                value={getValues("charge_percentage")}
-                {...register("charge_percentage")}
-                error={errors.charge_percentage ? true : false}
-                helperText={errors.charge_percentage?.message}
-                sx={{ mt: 2 }}
-              >
-                <MenuItem value="1-10% Charged">1-10% Charged</MenuItem>
-                <MenuItem value="10-50% Charged">10-50% Charged</MenuItem>
-                <MenuItem value="50-80% Charged">50-80% Charged</MenuItem>
-                <MenuItem value="80%+ Charged">80%+ Charged</MenuItem>
-              </Select>
-            </FormControl>
+            {charge == "Charge" || charge == "Heat Problem" ? (
+              <FormControl fullWidth>
+                <InputLabel sx={{ pt: 2 }} id="demo-simple-select-label">
+                  Charge Percentage
+                </InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  fullWidth
+                  label="Charge Percentage"
+                  value={getValues("charge_percentage")}
+                  {...register("charge_percentage")}
+                  error={errors.charge_percentage ? true : false}
+                  helperText={errors.charge_percentage?.message}
+                  sx={{ mt: 2 }}
+                >
+                  <MenuItem value="1-10% Charged">1-10% Charged</MenuItem>
+                  <MenuItem value="10-50% Charged">10-50% Charged</MenuItem>
+                  <MenuItem value="50-80% Charged">50-80% Charged</MenuItem>
+                  <MenuItem value="80%+ Charged">80%+ Charged</MenuItem>
+                </Select>
+              </FormControl>
+            ) : null}
+
             <FormControl fullWidth>
               <InputLabel sx={{ pt: 2 }} id="demo-simple-select-label">
                 Body Condition
@@ -318,9 +358,7 @@ export default function DialogBox() {
                 helperText={errors.body_condition?.message}
                 sx={{ mt: 2 }}
               >
-                <MenuItem value="Body Condition Ok,">
-                  Body Condition Ok,
-                </MenuItem>
+                <MenuItem value="Body Condition Ok">Body Condition Ok</MenuItem>
                 <MenuItem value="Body Broken">Body Broken</MenuItem>
                 <MenuItem value="Body with minor scratches">
                   Body with minor scratches
@@ -354,6 +392,7 @@ export default function DialogBox() {
                 <MenuItem value="Display with major scratches">
                   Display with major scratches
                 </MenuItem>
+                <MenuItem value="Charge failed">Charge failed</MenuItem>
               </Select>
             </FormControl>
             <FormControl fullWidth>
@@ -403,18 +442,19 @@ export default function DialogBox() {
               <RadioGroup
                 aria-labelledby="demo-radio-buttons-group-label"
                 defaultValue="NO"
-                {...register("boady_part_missing")}
-                name="radio-buttons-group"
+                name="boady_part_missing"
               >
                 <Box>
                   <FormControlLabel
                     value="YES"
+                    {...register("boady_part_missing")}
                     onClick={(e) => setBodyDamage(true)}
                     control={<Radio />}
                     label="YES"
                   />
                   <FormControlLabel
                     onClick={(e) => setBodyDamage(false)}
+                    {...register("boady_part_missing")}
                     value="NO"
                     control={<Radio />}
                     label="NO"
@@ -428,11 +468,52 @@ export default function DialogBox() {
                 variant="outlined"
                 type="text"
                 {...register("part_name")}
+                error={errors.part_name ? true : false}
+                helperText={errors.part_name?.message}
                 fullWidth
+                sx={{ mt: 2 }}
               />
             ) : null}
-            <p>IMEI:-{resDataUic.imei}</p>
-            <p>Supervisor name:-{user_name}</p>
+            <TextField
+              label="CIMEI-1"
+              variant="outlined"
+              type="text"
+              {...register("cimei_1")}
+              inputProps={{ maxLength: 15 }}
+              onKeyPress={(event) => {
+                if (!/[0-9]/.test(event.key)) {
+                  event.preventDefault();
+                }
+              }}
+              error={errors.cimei_1 ? true : false}
+              helperText={errors.cimei_1?.message}
+              fullWidth
+              sx={{ mt: 2 }}
+            />
+            <TextField
+              label="CIMEI-2"
+              variant="outlined"
+              type="text"
+              {...register("cimei_2")}
+              inputProps={{ maxLength: 15 }}
+              onKeyPress={(event) => {
+                if (!/[0-9]/.test(event.key)) {
+                  event.preventDefault();
+                }
+              }}
+              error={errors.cimei_2 ? true : false}
+              helperText={errors.cimei_2?.message}
+              fullWidth
+              sx={{ mt: 2 }}
+            />
+            <TextField
+              label="Supervisor name"
+              variant="outlined"
+              type="text"
+              value={user_name1}
+              fullWidth
+              sx={{ mt: 2 }}
+            />
           </Box>
         </DialogContent>
         <DialogActions>
@@ -621,7 +702,6 @@ export default function DialogBox() {
           </Paper>
         </Grid>
       </Grid>
-
       <Box sx={{ float: "right" }}>
         <textarea
           onChange={(e) => {

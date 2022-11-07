@@ -322,6 +322,7 @@ export default function Home() {
             }}
           >
             <CircularProgress />
+            <p style={{paddingTop:"10px"}}>Please wait...</p>
           </Box>
         </Container>
       ) : null}

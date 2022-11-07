@@ -11,14 +11,13 @@ import {
   Box,
   Button,
 } from "@mui/material";
-import { axiosSuperAdminPrexo, axiosWarehouseIn } from "../../../axios";
-import Swal from "sweetalert2";
-import Checkbox from "@mui/material/Checkbox";
+import { axiosWarehouseIn } from "../../../axios";
+// import jwt from "jsonwebtoken"
+import jwt_decode from "jwt-decode";
 //Datatable Modules
 import $ from "jquery";
 import "datatables.net";
 import { useNavigate } from "react-router-dom";
-
 export default function StickyHeadTable({ props }) {
   const [whtTray, setWhtTray] = useState([]);
   const [isCheckAll, setIsCheckAll] = useState(false);
@@ -28,10 +27,16 @@ export default function StickyHeadTable({ props }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        let response = await axiosWarehouseIn.post("/whtTray");
-        if (response.status === 200) {
-          setWhtTray(response.data.data);
-          dataTableFun();
+        let admin = localStorage.getItem("prexo-authentication");
+        if (admin) {
+          let { location } = jwt_decode(admin);
+          let response = await axiosWarehouseIn.post("/whtTray/" + location);
+          if (response.status === 200) {
+            setWhtTray(response.data.data);
+            dataTableFun();
+          }
+        } else {
+          navigate("/");
         }
       } catch (error) {
         alert(error);
@@ -49,7 +54,7 @@ export default function StickyHeadTable({ props }) {
       scrollX: true,
     });
   }
-  
+
   return (
     <>
       <Box>
@@ -73,7 +78,6 @@ export default function StickyHeadTable({ props }) {
               >
                 <TableHead>
                   <TableRow>
-                   
                     <TableCell>Record.NO</TableCell>
                     <TableCell>Tray Id</TableCell>
                     <TableCell>Warehouse</TableCell>
@@ -100,7 +104,10 @@ export default function StickyHeadTable({ props }) {
                       <TableCell>{data.name}</TableCell>
                       <TableCell>
                         {" "}
-                        {data.items.length}/{data.limit}
+                        {data.items.length == 0
+                          ? data.actual_items.length
+                          : data.items.length}
+                        /{data.limit}
                       </TableCell>
                       <TableCell>{data.display}</TableCell>
                       <TableCell>{data.sort_id}</TableCell>

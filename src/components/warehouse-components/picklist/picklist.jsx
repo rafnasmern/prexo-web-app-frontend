@@ -13,7 +13,6 @@ import {
   Box,
   TextField,
 } from "@mui/material";
-import Checkbox from "@mui/material/Checkbox";
 import * as XLSX from "xlsx";
 import * as FileSaver from "file-saver";
 import { useNavigate } from "react-router-dom";
@@ -37,13 +36,12 @@ export default function CustomizedMenus() {
   useEffect(() => {
     let date = new Date(); // Today!
     setYesterDayDate(date.setDate(date.getDate() - 1));
-
     let admin = localStorage.getItem("prexo-authentication");
     if (admin) {
       const { location } = jwt_decode(admin);
       const fetchData = async () => {
         try {
-          let res = await axiosWarehouseIn.post("/picklist");
+          let res = await axiosWarehouseIn.post("/picklist/" + location);
           if (res.status == 200) {
             setItem(res.data.data);
             dataTableFun();
@@ -65,13 +63,12 @@ export default function CustomizedMenus() {
     });
   }
   /******************************PICK LIST VIEW DETAIL**************************************** */
-  const handelViewDetailClub = (e, id) => {
+  const handelViewDetailClub = (e, sku, id) => {
     e.preventDefault();
-    navigate("/picklist-view-detail/" + id);
+    navigate("/picklist-view-detail/" + sku + "/" + id);
   };
-  const handelAssignWht = (e, id) => {
-    e.preventDefault();
-    navigate("/wht-tray-assign/" + id);
+  const handelAssignWht = (e, id, sku) => {
+    navigate("/wht-tray-assign/" + sku + "/" + id);
   };
   /******************************************PRINT PICKLIST*********************************** */
   const handelPrintPicklist = async (e, muic, sku, model_name) => {
@@ -109,15 +106,20 @@ export default function CustomizedMenus() {
   const handelSort = async (e) => {
     e.preventDefault();
     try {
-      let obj = {
-        date: sortDate,
-      };
-      let res = await axiosWarehouseIn.post("/picklist-sort", obj);
-      $("#example").DataTable().destroy();
-      if (res.status == 200) {
-        setItem(res.data.data);
-        setSortData(true);
-        dataTableFun();
+      let admin = localStorage.getItem("prexo-authentication");
+      if (admin) {
+        const { location } = jwt_decode(admin);
+        let obj = {
+          date: sortDate,
+          location: location,
+        };
+        let res = await axiosWarehouseIn.post("/picklist-sort", obj);
+        $("#example").DataTable().destroy();
+        if (res.status == 200) {
+          setSortData(true);
+          setItem(res.data.data);
+          dataTableFun();
+        }
       }
     } catch (error) {
       alert(error);
@@ -159,9 +161,9 @@ export default function CustomizedMenus() {
               >
                 {data.pick_list_status}
               </TableCell>
-              <TableCell>{data.muic}</TableCell>
-              <TableCell>{data.brand_name}</TableCell>
-              <TableCell>{data.model_name}</TableCell>
+              <TableCell>{data.product[0].muic}</TableCell>
+              <TableCell>{data.product[0].brand_name}</TableCell>
+              <TableCell>{data.product[0].model_name}</TableCell>
               <TableCell>{data.item.length}</TableCell>
               {/* <TableCell>{}</TableCell> */}
               <TableCell>{data.pick_list_items}</TableCell>
@@ -175,7 +177,7 @@ export default function CustomizedMenus() {
                   variant="contained"
                   style={{ backgroundColor: "#206CE2" }}
                   onClick={(e) => {
-                    handelViewDetailClub(e, data.vendor_sku_id);
+                    handelViewDetailClub(e, data.vendor_sku_id, data._id);
                   }}
                 >
                   View Item
@@ -190,7 +192,7 @@ export default function CustomizedMenus() {
                     variant="contained"
                     style={{ backgroundColor: "green" }}
                     onClick={(e) => {
-                      handelAssignWht(e, data.vendor_sku_id);
+                      handelAssignWht(e, data._id, data.vendor_sku_id);
                     }}
                   >
                     Assign Tray

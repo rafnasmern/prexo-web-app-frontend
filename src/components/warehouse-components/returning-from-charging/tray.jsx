@@ -10,31 +10,21 @@ import {
   TableRow,
   Box,
   Button,
-  MenuItem,
-  Menu,
   Dialog,
   DialogTitle,
   IconButton,
   DialogContent,
   DialogActions,
-  FormControl,
-  InputLabel,
-  Select,
-  TextField,
-  InputAdornment,
 } from "@mui/material";
-import {
-  axiosMisUser,
-  axiosSuperAdminPrexo,
-  axiosWarehouseIn,
-} from "../../../axios";
+import { axiosWarehouseIn } from "../../../axios";
 import PropTypes from "prop-types";
 import CloseIcon from "@mui/icons-material/Close";
 import Checkbox from "@mui/material/Checkbox";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
-import SearchIcon from "@mui/icons-material/Search";
+// import jwt from "jsonwebtoken"
+import jwt_decode from "jwt-decode";
 //Datatable Modules
 import $ from "jquery";
 import "datatables.net";
@@ -119,10 +109,18 @@ export default function StickyHeadTable({ props }) {
   useEffect(() => {
     try {
       const fetchData = async () => {
-        let res = await axiosWarehouseIn.post("/wht-return-from-charging");
-        if (res.status == 200) {
-          setInfraData(res.data.data);
-          dataTableFun();
+        let admin = localStorage.getItem("prexo-authentication");
+        if (admin) {
+          let { location } = jwt_decode(admin);
+          let res = await axiosWarehouseIn.post(
+            "/wht-return-from-charging/" + location
+          );
+          if (res.status == 200) {
+            setInfraData(res.data.data);
+            dataTableFun();
+          }
+        } else {
+          navigate("/");
         }
       };
       fetchData();
@@ -158,6 +156,7 @@ export default function StickyHeadTable({ props }) {
         let obj = {
           trayId: trayId,
           check: receiveCheck,
+          type:"charging"
         };
         let res = await axiosWarehouseIn.post("/receivedTray", obj);
         if (res.status == 200) {
@@ -294,7 +293,7 @@ export default function StickyHeadTable({ props }) {
                     <TableCell>Quantity</TableCell>
                     <TableCell>Tray Type</TableCell>
                     <TableCell>Status</TableCell>
-                    <TableCell>Assigned Date</TableCell>
+                    <TableCell>Charging Done Date</TableCell>
                     <TableCell>Agent Name</TableCell>
                     <TableCell>Action</TableCell>
                   </TableRow>
@@ -305,7 +304,7 @@ export default function StickyHeadTable({ props }) {
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>{data.code}</TableCell>
                       <TableCell>
-                        {data?.items?.length + "/" + data.limit}
+                        {data?.actual_items?.length + "/" + data.limit}
                       </TableCell>
                       <TableCell>{data.type_taxanomy}</TableCell>
                       <TableCell>{data.sort_id}</TableCell>
@@ -330,7 +329,7 @@ export default function StickyHeadTable({ props }) {
                         >
                           View
                         </Button>
-                        {data.sort_id != "Received" ? (
+                        {data.sort_id != "Received From Charging" ? (
                           <Button
                             sx={{
                               m: 1,

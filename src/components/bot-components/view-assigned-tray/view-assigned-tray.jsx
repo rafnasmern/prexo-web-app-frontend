@@ -24,11 +24,8 @@ import jwt_decode from "jwt-decode";
 import $ from "jquery";
 import "datatables.net";
 export default function StickyHeadTable({ props }) {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(2);
   const [infraData, setInfraData] = useState([]);
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const [request, setRequest] = useState(false);
   const navigate = useNavigate();
 
   const open = Boolean(anchorEl);
@@ -65,22 +62,22 @@ export default function StickyHeadTable({ props }) {
     e.preventDefault();
     navigate("/tray-details/" + id);
   };
-    // TRAY CLOSE
-    const handelCloseTray = async (trayid) => {
-      try {
-        let res = await axiosBot.post("/trayClose/" + trayid);
-        if (res.status == 200) {
-          alert(res.data.message);
-          window.location.reload(false)
-        }
-      } catch (error) {
-        if (error.response.status == 403) {
-          alert(error.response.data.message);
-        } else {
-          alert(error);
-        }
+  // TRAY CLOSE
+  const handelCloseTray = async (trayid) => {
+    try {
+      let res = await axiosBot.post("/trayClose/" + trayid);
+      if (res.status == 200) {
+        alert(res.data.message);
+        window.location.reload(false);
       }
-    };
+    } catch (error) {
+      if (error.response.status == 403) {
+        alert(error.response.data.message);
+      } else {
+        alert(error);
+      }
+    }
+  };
 
   return (
     <>
@@ -133,7 +130,7 @@ export default function StickyHeadTable({ props }) {
                       </TableCell>
                       <TableCell>
                         <Button
-                        sx={{m:1}}
+                          sx={{ m: 1 }}
                           type="submit"
                           variant="contained"
                           style={{ backgroundColor: "#206CE2" }}
@@ -144,7 +141,7 @@ export default function StickyHeadTable({ props }) {
                           View
                         </Button>
                         <Button
-                        sx={{m:1}}
+                          sx={{ m: 1 }}
                           type="submit"
                           variant="contained"
                           style={{ backgroundColor: "red" }}

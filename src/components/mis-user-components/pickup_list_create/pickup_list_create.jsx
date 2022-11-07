@@ -104,7 +104,6 @@ export default function CustomizedMenus() {
   const handleSelectAll = (e) => {
     setIsCheckAll(!isCheckAll);
     setIsCheck(item.map((data, index) => data.tracking_id.toString()));
-    console.log(isCheckAll);
     if (isCheckAll) {
       setIsCheck([]);
     }

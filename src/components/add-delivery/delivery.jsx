@@ -73,11 +73,10 @@ export default function Home() {
       filReader.readAsArrayBuffer(file);
       filReader.onload = (e) => {
         const bufferArray = e.target.result;
-
         const wb = XLSX.read(bufferArray, { type: "buffer", cellDates: true });
         const wsname = wb.SheetNames[0];
         const ws = wb.Sheets[wsname];
-        const data = XLSX.utils.sheet_to_json(ws);
+        const data = XLSX.utils.sheet_to_json(ws, { raw: false });
         resolve(data);
       };
       filReader.onerror = (error) => {
@@ -95,7 +94,6 @@ export default function Home() {
   };
   function toLowerKeys(obj, id) {
     return Object.keys(obj).reduce((accumulator, key) => {
-      accumulator.delivery_date = deliveryData;
       accumulator.created_at = Date.now();
       accumulator[key.toLowerCase().split(" ").join("_")] = obj[key];
       accumulator.delet_id = id;
@@ -111,8 +109,8 @@ export default function Home() {
         invalidItem: [],
       };
       pagination.item.forEach((data) => {
+        data.delivery_date = deliveryData;
         data.order_date = moment(data.order_date, "DD-MM-YYYY HH:mm").toDate();
-        console.log(data.order_date);
         if (
           err?.delivery_date?.includes(data?.order_date) ||
           data?.order_date == undefined ||
@@ -167,17 +165,19 @@ export default function Home() {
       } else {
         setLoading(true);
         let admin = localStorage.getItem("prexo-authentication");
-        let { location } = jwt_decode(admin);
-        let obj = {
-          item: pagination.item,
-          location: location,
-        };
+        if (admin) {
+          let { location } = jwt_decode(admin);
+          let obj = {
+            item: pagination.item,
+            location: location,
+          };
 
-        let res = await axiosMisUser.post("/bulkValidationDelivery", obj);
-        if (res.status == 200) {
-          alert(res.data.message);
-          setLoading(false);
-          setValidate(true);
+          let res = await axiosMisUser.post("/bulkValidationDelivery", obj);
+          if (res.status == 200) {
+            alert(res.data.message);
+            setLoading(false);
+            setValidate(true);
+          }
         }
       }
     } catch (error) {
@@ -669,6 +669,7 @@ export default function Home() {
             }}
           >
             <CircularProgress />
+            <p style={{ paddingTop: "10px" }}>Please wait...</p>
           </Box>
         </Container>
       ) : null}

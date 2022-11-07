@@ -24,6 +24,8 @@ import {
 import { axiosMisUser, axiosWarehouseIn } from "../../../axios";
 import Checkbox from "@mui/material/Checkbox";
 import PropTypes from "prop-types";
+// import jwt from "jsonwebtoken"
+import jwt_decode from "jwt-decode";
 //Datatable Modules
 import $ from "jquery";
 import "datatables.net";
@@ -81,12 +83,18 @@ export default function StickyHeadTable({ props }) {
     const fetchData = async () => {
       try {
         $("#example").DataTable().destroy();
-        let response = await axiosWarehouseIn.post(
-          "/wht-tray/" + "Ready to BQC"
-        );
-        if (response.status === 200) {
-          setWhtTray(response.data.data);
-          dataTableFun();
+        let admin = localStorage.getItem("prexo-authentication");
+        if (admin) {
+          let { location } = jwt_decode(admin);
+          let response = await axiosWarehouseIn.post(
+            "/wht-tray/" + "Ready to BQC/" + location
+          );
+          if (response.status === 200) {
+            setWhtTray(response.data.data);
+            dataTableFun();
+          }
+        } else {
+          navigate("/");
         }
       } catch (error) {
         alert(error);
@@ -98,9 +106,17 @@ export default function StickyHeadTable({ props }) {
   useEffect(() => {
     try {
       const fetchData = async () => {
-        let res = await axiosMisUser.post("/get-charging-users/" + "BQC");
-        if (res.status == 200) {
-          setChrgingArr(res.data.data);
+        let admin = localStorage.getItem("prexo-authentication");
+        if (admin) {
+          let { location } = jwt_decode(admin);
+          let res = await axiosMisUser.post(
+            "/get-charging-users/" + "BQC/" + location
+          );
+          if (res.status == 200) {
+            setChrgingArr(res.data.data);
+          }
+        } else {
+          navigate("/");
         }
       };
       fetchData();
@@ -200,7 +216,7 @@ export default function StickyHeadTable({ props }) {
                   <MenuItem
                     value={data.user_name}
                     onClick={(e) => {
-                        setBqcPerson(data.user_name);
+                      setBqcPerson(data.user_name);
                     }}
                   >
                     {data.user_name}

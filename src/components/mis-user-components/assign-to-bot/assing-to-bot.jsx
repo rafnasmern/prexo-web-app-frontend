@@ -1,48 +1,95 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { styled, alpha } from "@mui/material/styles";
 import {
   Paper,
   Table,
   TableBody,
   TableCell,
+  Dialog,
   TableContainer,
   TableHead,
-  TablePagination,
+  DialogContent,
+  DialogActions,
+  DialogTitle,
+  IconButton,
   TableRow,
   Box,
   Button,
+  FormControl,
+  InputLabel,
+  Select,
   MenuItem,
   Menu,
 } from "@mui/material";
-import { axiosMisUser, axiosSuperAdminPrexo } from "../../../axios";
-import Swal from "sweetalert2";
+import { axiosMisUser } from "../../../axios";
+import CloseIcon from "@mui/icons-material/Close";
+import PropTypes from "prop-types";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 //Datatable Modules
 import $ from "jquery";
 import "datatables.net";
+// import jwt from "jsonwebtoken"
+import jwt_decode from "jwt-decode";
 import { useNavigate } from "react-router-dom";
+const BootstrapDialog = styled(Dialog)(({ theme }) => ({
+  "& .MuiDialogContent-root": {
+    padding: theme.spacing(2),
+  },
+  "& .MuiDialogActions-root": {
+    padding: theme.spacing(1),
+  },
+}));
+const BootstrapDialogTitle = (props) => {
+  const { children, onClose, ...other } = props;
+  return (
+    <DialogTitle sx={{ m: 0, p: 2 }} {...other}>
+      {children}
+      {onClose ? (
+        <IconButton
+          aria-label="close"
+          onClick={onClose}
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
+            color: (theme) => theme.palette.grey[500],
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+      ) : null}
+    </DialogTitle>
+  );
+};
+BootstrapDialogTitle.propTypes = {
+  children: PropTypes.node,
+  onClose: PropTypes.func.isRequired,
+};
 
 export default function StickyHeadTable({ props }) {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(2);
   const [infraData, setInfraData] = useState([]);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [request, setRequest] = useState("");
   const [botName, setBotName] = useState("");
+  const [bagId,setBagId]=useState("")
   const [botArr, setBotArr] = useState([]);
   const [clickState, setClickState] = useState(false);
+  const [open, setOpen] = useState(false);
   const navigate = useNavigate();
-  const open = Boolean(anchorEl);
   useEffect(() => {
     try {
-      const fetchData = async () => {
-        let res = await axiosMisUser.post("/getStockin");
-        if (res.status == 200) {
-          setInfraData(res.data.data);
-          dataTableFun();
-        }
-      };
-      fetchData();
+      let admin = localStorage.getItem("prexo-authentication");
+      if (admin) {
+        let { location } = jwt_decode(admin);
+        const fetchData = async () => {
+          let res = await axiosMisUser.post("/getStockin/" + location);
+          if (res.status == 200) {
+            setInfraData(res.data.data);
+            dataTableFun();
+          }
+        };
+        fetchData();
+      }
     } catch (error) {
       alert(error);
     }
@@ -50,9 +97,16 @@ export default function StickyHeadTable({ props }) {
   useEffect(() => {
     try {
       const fetchData = async () => {
-        let res = await axiosMisUser.post("/getBot");
-        if (res.status == 200) {
-          setBotArr(res.data.data);
+        let admin = localStorage.getItem("prexo-authentication");
+        if(admin){
+          let { location } = jwt_decode(admin);
+          let res = await axiosMisUser.post("/getBot/" + location);
+          if (res.status == 200) {
+            setBotArr(res.data.data);
+          }
+        }
+        else{
+          navigate('/')
         }
       };
       fetchData();
@@ -66,66 +120,22 @@ export default function StickyHeadTable({ props }) {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
-    setAnchorEl(null);
+    setOpen(false)
   };
-
-  //api for delete a employee
-  const StyledMenu = styled((props) => (
-    <Menu
-      elevation={0}
-      anchorOrigin={{
-        vertical: "bottom",
-        horizontal: "right",
-      }}
-      transformOrigin={{
-        vertical: "top",
-        horizontal: "right",
-      }}
-      {...props}
-    />
-  ))(({ theme }) => ({
-    "& .MuiPaper-root": {
-      borderRadius: 6,
-      marginTop: theme.spacing(1),
-      minWidth: 180,
-      color:
-        theme.palette.mode === "light"
-          ? "rgb(55, 65, 81)"
-          : theme.palette.grey[300],
-      boxShadow:
-        "rgb(255, 255, 255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px",
-      "& .MuiMenu-list": {
-        padding: "4px 0",
-      },
-      "& .MuiMenuItem-root": {
-        "& .MuiSvgIcon-root": {
-          fontSize: 18,
-          color: theme.palette.text.secondary,
-          marginRight: theme.spacing(1.5),
-        },
-        "&:active": {
-          backgroundColor: alpha(
-            theme.palette.primary.main,
-            theme.palette.action.selectedOpacity
-          ),
-        },
-      },
-    },
-  }));
   function dataTableFun() {
     $("#example").DataTable({
       destroy: true,
       scrollX: true,
     });
   }
-  const handelSendRequest = (botName) => {
-    setBotName(botName);
-    setClickState(true);
+  const handelClickOpen = (bagid) => {
+    setBagId(bagid)
+    setOpen(true)
   };
-  const handelSendRequestConfirm = async (e, id) => {
+  const handelSendRequestConfirm = async () => {
     try {
       let obj = {
-        bagId: id,
+        bagId: bagId,
         bot_name: botName,
       };
 
@@ -139,15 +149,83 @@ export default function StickyHeadTable({ props }) {
         alert(error.response.data.message);
         navigate("/uic-generate/" + error.response.data.bagId);
       }
-     
     }
   };
   const handelUicGen = (e, bagid) => {
     e.preventDefault();
     navigate("/uic-generate/" + bagid);
   };
+ 
   return (
     <>
+      <BootstrapDialog
+        aria-labelledby="customized-dialog-title"
+        open={open}
+        fullWidth
+        maxWidth="xs"
+      >
+        <BootstrapDialogTitle
+          id="customized-dialog-title"
+          onClose={handleClose}
+        >
+          Please select user
+        </BootstrapDialogTitle>
+        <DialogContent dividers>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "flex-start",
+              flexDirection: "column",
+              p: 1,
+              m: 1,
+              bgcolor: "background.paper",
+              borderRadius: 1,
+            }}
+          >
+            <FormControl fullWidth>
+              <InputLabel sx={{ pt: 2 }} id="demo-simple-select-label">
+                Select user
+              </InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                label="Cpc"
+                fullWidth
+                sx={{ mt: 2 }}
+              >
+                {botArr.map((data) => (
+                  <MenuItem
+                    value={data.user_name}
+                    onClick={(e) => {
+                      setBotName(data.user_name);
+                    }}
+                  >
+                    {data.user_name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            sx={{
+              ml: 2,
+            }}
+            fullwidth
+            variant="contained"
+            style={{ backgroundColor: "green" }}
+            disabled={botName == "" ? true : false}
+            component="span"
+            onClick={(e) => {
+              if (window.confirm("You Want to assign?")) {
+                handelSendRequestConfirm();
+              }
+            }}
+          >
+            Assign
+          </Button>
+        </DialogActions>
+      </BootstrapDialog>
       <Box>
         <Box
           sx={{
@@ -184,7 +262,12 @@ export default function StickyHeadTable({ props }) {
                 </TableHead>
                 <TableBody>
                   {infraData.map((data, index) => (
-                    <TableRow hover role="checkbox" tabIndex={-1}>
+                    <TableRow
+                      hover
+                      role="checkbox"
+                      tabIndex={-1}
+                      key={data._id}
+                    >
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>{data.code}</TableCell>
                       <TableCell>{data.sort_id}</TableCell>
@@ -218,39 +301,43 @@ export default function StickyHeadTable({ props }) {
                       </TableCell>
                       <TableCell>{data?.items?.length}</TableCell>
                       <TableCell>
-                        {request == data.code && clickState == true ? (
-                          <Button
-                            type="submit"
-                            variant="contained"
-                            style={{ backgroundColor: "#206CE2" }}
-                            onClick={(e) => {
-                              {
-                                if (window.confirm("You Want to Send Request?"))
-                                  handelSendRequestConfirm(e, data.code);
-                              }
-                            }}
-                          >
-                            Send Request
-                          </Button>
-                        ) : data.sort_id != "Requested to Warehouse" &&
-                          data.sort_id != "Issued" && data.sort_id != "Closed By Bot" ? (
+                        {
+                        // request == data.code && clickState == true ? (
+                        //   <Button
+                        //     type="submit"
+                        //     variant="contained"
+                        //     style={{ backgroundColor: "#206CE2" }}
+                        //     onClick={(e) => {
+                        //       {
+                        //         if (window.confirm("You Want to Send Request?"))
+                        //           handelSendRequestConfirm(e, data.code);
+                        //       }
+                        //     }}
+                        //   >
+                        //     Send Request
+                        //   </Button>
+                        // ) : 
+                        data.sort_id != "Requested to Warehouse" &&
+                          data.sort_id != "Issued" &&
+                          data.sort_id != "Closed By Bot" ? (
                           <>
                             <Button
                               variant="contained"
-                              aria-controls={open ? "basic-menu" : undefined}
-                              aria-haspopup="true"
-                              aria-expanded={open ? "true" : undefined}
-                              onClick={(e) => {
-                                handleClick(e, data.code);
-                              }}
+                              // aria-controls={open ? "basic-menu" : undefined}
+                              // aria-haspopup="true"
+                              // aria-expanded={open ? "true" : undefined}
+                              // onClick={(e) => {
+                              //   handleClick(e, data.code);
+                              // }}
                               disabled={
-                                data.sort_id == "Inprogress" ? true : false
+                                data.sort_id == "In Progress" ? true : false
                               }
-                              endIcon={<KeyboardArrowDownIcon />}
+                              // endIcon={<KeyboardArrowDownIcon />}
+                              onClick={(e)=>{ handelClickOpen(data.code)}}
                             >
                               Assign To BOT
                             </Button>
-                            <Menu
+                            {/* <Menu
                               id="basic-menu"
                               anchorEl={anchorEl}
                               open={open}
@@ -269,9 +356,10 @@ export default function StickyHeadTable({ props }) {
                                   {botData.user_name}
                                 </MenuItem>
                               ))}
-                            </Menu>
+                            </Menu> */}
                           </>
-                        ) : data.sort_id != "Issued" && data.sort_id != "Closed By Bot" ? (
+                        ) : data.sort_id != "Issued" &&
+                          data.sort_id != "Closed By Bot" ? (
                           <Button
                             variant="contained"
                             style={{ backgroundColor: "#206CE2" }}

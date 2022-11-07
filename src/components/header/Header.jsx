@@ -30,6 +30,7 @@ import Logout from "@mui/icons-material/Logout";
 import EmailIcon from "@mui/icons-material/Email";
 import HandshakeIcon from "@mui/icons-material/Handshake";
 import KeyIcon from "@mui/icons-material/Key";
+import { axiosSuperAdminPrexo } from "../../axios";
 
 const ResponsiveAppBar = () => {
   const [anchorElNav, setAnchorElNav] = useState(null);
@@ -46,6 +47,25 @@ const ResponsiveAppBar = () => {
   useEffect(() => {
     let admin = localStorage.getItem("prexo-authentication");
     if (admin) {
+      const fetchData = async () => {
+        try {
+          let { user_name, user_type } = jwt_decode(admin);
+          if (user_type !== "super-admin") {
+            let res = await axiosSuperAdminPrexo.post(
+              "/check-user-status/" + user_name
+            );
+            if (res.status === 200) {
+            }
+          }
+        } catch (error) {
+          if (error.response.status === 403) {
+            alert(error.response.data.message);
+            localStorage.removeItem("prexo-authentication");
+            navigate("/");
+          }
+        }
+      };
+      fetchData();
     } else {
       navigate("/");
     }
@@ -192,7 +212,13 @@ const ResponsiveAppBar = () => {
     },
   };
   let token = localStorage.getItem("prexo-authentication");
-  const { user_type, user_name, email, name } = jwt_decode(token);
+  let user_type1, email1, name1;
+  if (token) {
+    const { user_type, email, name } = jwt_decode(token);
+    user_type1 = user_type;
+    email1 = email;
+    name1 = name;
+  }
 
   // useEffect(() => {
   //   let token = localStorage.getItem("prexo-authentication");
@@ -200,7 +226,7 @@ const ResponsiveAppBar = () => {
   // }, []);
 
   return (
-    <AppBar position="fixed" style={{ backgroundColor: "#6AB187" }}>
+    <AppBar position="fixed" style={{ backgroundColor: "#228C23" }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Typography
@@ -262,7 +288,7 @@ const ResponsiveAppBar = () => {
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-            {user_type == "super-admin" ? (
+            {user_type1 == "super-admin" ? (
               <>
                 <Button
                   aria-owns={anchorEl ? "simple-menu" : undefined}
@@ -358,7 +384,7 @@ const ResponsiveAppBar = () => {
             ) : (
               ""
             )}
-            {user_type == "MIS" ? (
+            {user_type1 == "MIS" ? (
               <div>
                 <Button
                   aria-owns={anchorE2 ? "simple-menu2" : undefined}
@@ -413,7 +439,7 @@ const ResponsiveAppBar = () => {
             ) : (
               ""
             )}
-            {user_type == "Warehouse" ? (
+            {user_type1 == "Warehouse" ? (
               <>
                 <Button
                   aria-owns={anchorE2 ? "simple-menu3" : undefined}
@@ -453,7 +479,7 @@ const ResponsiveAppBar = () => {
             ) : (
               ""
             )}
-            {user_type == "Bag Opening" ? (
+            {user_type1 == "Bag Opening" ? (
               <>
                 <Button
                   // onClick={(e)=>{handelWarehouseDashboard(e)}}
@@ -486,7 +512,7 @@ const ResponsiveAppBar = () => {
             ) : (
               ""
             )}
-            {user_type == "Charging" ? (
+            {user_type1 == "Charging" ? (
               <>
                 <Button
                   endIcon={<KeyboardArrowDownIcon />}
@@ -519,7 +545,7 @@ const ResponsiveAppBar = () => {
             ) : (
               ""
             )}
-            {user_type == "BQC" ? (
+            {user_type1 == "BQC" ? (
               <>
                 <Button
                   endIcon={<KeyboardArrowDownIcon />}
@@ -570,7 +596,7 @@ const ResponsiveAppBar = () => {
             >
               Logout
             </Button> */}
-            <h6 style={{ marginTop: "8px", marginRight: "8px" }}>{name}</h6>
+            <h6 style={{ marginTop: "8px", marginRight: "8px" }}>{name1}</h6>
             <AccountCircleIcon
               style={{ fontSize: "45px" }}
               aria-haspopup="true"
@@ -625,7 +651,7 @@ const ResponsiveAppBar = () => {
                 <ListItemIcon>
                   <EmailIcon fontSize="small" />
                 </ListItemIcon>
-                {email}
+                {email1}
               </MenuItem>
               <MenuItem>
                 <ListItemIcon>
@@ -634,7 +660,7 @@ const ResponsiveAppBar = () => {
                 1613633867
               </MenuItem>
               <Divider />
-              {user_type != "super-admin" ? (
+              {user_type1 != "super-admin" ? (
                 <MenuItem
                   onClick={(e) => {
                     handelChangePassword(e);

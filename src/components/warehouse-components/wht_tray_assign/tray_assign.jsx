@@ -12,11 +12,9 @@ import {
   Grid,
   FormControl,
   MenuItem,
-  InputAdornment,
   InputLabel,
   Select,
 } from "@mui/material";
-import PropTypes from "prop-types";
 import { useParams } from "react-router-dom";
 import "yup-phone";
 import { useNavigate } from "react-router-dom";
@@ -28,22 +26,27 @@ import Checkbox from "@mui/material/Checkbox";
 import $ from "jquery";
 import "datatables.net";
 export default function DialogBox() {
-  const [open, setOpen] = React.useState(false);
   const [clubModel, setClubModel] = useState({});
   const navigate = useNavigate();
   const [whtTray, setWhtTray] = useState([]);
   const [assignedTray, setAssignedTray] = useState([]);
-  const { vendor_sku_id } = useParams();
+  const { vendor_sku_id, id } = useParams();
   const [refresh, setRefresh] = useState(false);
   const [currentstate, setCurrentState] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [laodingPickList, setLoadingPicklist] = useState(false);
+  const [trayDataCheck, setTrayDataCheck] = useState(false);
+
   /**************************************************************************** */
   useEffect(() => {
     const fetchData = async () => {
       try {
-        let response = await axiosWarehouseIn.post(
-          "/viewModelClub/" + vendor_sku_id
-        );
-        if (response.status == 200) {
+        let obj = {
+          listId: id,
+          vendor_sku_id: vendor_sku_id,
+        };
+        let response = await axiosWarehouseIn.post("/viewModelClub", obj);
+        if (response.status === 200) {
           setClubModel(response.data.data[0]);
 
           //   dataTableFun();
@@ -59,15 +62,20 @@ export default function DialogBox() {
   /******************************************USEEFFECT FOR ASSIGNED TRAY******************************/
   useEffect(() => {
     try {
-      $("#trayTable2").DataTable().destroy();
+      let admin = localStorage.getItem("prexo-authentication");
       const fetchData = async () => {
-        let res = await axiosWarehouseIn.post(
-          "/getAssignedTray/" + vendor_sku_id
-        );
-        if (res.status === 200) {
-          setAssignedTray(res.data.data);
+        if (admin) {
+          let { location } = jwt_decode(admin);
+          let res = await axiosWarehouseIn.post(
+            "/getAssignedTray/" + id + "/" + location
+          );
+          if (res.status === 200) {
+            setAssignedTray(res.data.data);
 
-          dataTableFun2();
+            dataTableFun2();
+          }
+        } else {
+          navigate("/");
         }
       };
       fetchData();
@@ -79,17 +87,26 @@ export default function DialogBox() {
   const handeTrayGet = async (type) => {
     try {
       setCurrentState(type);
-      $("#trayTable").DataTable().destroy();
-      let obj = {
-        vendor_sku_id: vendor_sku_id,
-        type: type,
-        brand_name: clubModel.brand_name,
-        model_name: clubModel.model_name,
-      };
-      let res = await axiosWarehouseIn.post("/getWhtTray", obj);
-      if (res.status === 200) {
-        setWhtTray(res.data.data);
-        dataTableFun();
+      let admin = localStorage.getItem("prexo-authentication");
+      if (admin) {
+        let { location } = jwt_decode(admin);
+        let obj = {
+          vendor_sku_id: vendor_sku_id,
+          type: type,
+          brand_name: clubModel.product?.[0]?.brand_name,
+          model_name: clubModel.product?.[0]?.model_name,
+          location: location,
+        };
+        let res = await axiosWarehouseIn.post("/getWhtTray", obj);
+        if (res.status === 200) {
+          if (res.data.data?.length === 0) {
+            setTrayDataCheck(true);
+          } else {
+            setTrayDataCheck(false);
+          }
+          setWhtTray(res.data.data);
+          dataTableFun();
+        }
       }
     } catch (error) {
       alert(error);
@@ -98,19 +115,22 @@ export default function DialogBox() {
   /****************************************SELECT TRAY*********************************************** */
   const handelSelect = async (trayId, trayLimit, trayQunatity) => {
     try {
+      setLoading(true);
       let obj = {
         wht_tray: trayId,
         item: [],
         sku: vendor_sku_id,
+        id: clubModel._id,
       };
       let i = 1;
       let count = trayLimit - trayQunatity;
       for (let x of clubModel.item) {
         if (x.wht_tray == null) {
           if (trayLimit >= i && count >= i) {
-            x.model_name = clubModel.model_name;
-            x.brand_name = clubModel.brand_name;
-            x.muic = clubModel.muic;
+            x.model_name = clubModel.product?.[0]?.model_name;
+            x.brand_name = clubModel.product?.[0]?.brand_name;
+            x.muic = clubModel.product?.[0]?.muic;
+            x.created = clubModel.created_at;
             obj.item.push(x);
           } else {
             break;
@@ -119,11 +139,12 @@ export default function DialogBox() {
         }
       }
       obj.count = Number(clubModel.count_assigned_tray + obj.item.length);
-      if (obj.item.length == 0) {
+      if (obj.item.length === 0) {
         alert("All Items Already Assigned");
       } else {
         let res = await axiosWarehouseIn.post("/itemAssignToWht", obj);
-        if (res.status == 200) {
+        if (res.status === 200) {
+          setLoading(false);
           setRefresh((refresh) => !refresh);
           handeTrayGet(currentstate);
           alert(res.data.message);
@@ -151,12 +172,13 @@ export default function DialogBox() {
   const handelRemoveTray = async (trayId) => {
     try {
       let obj = {
-        vendor_sku_id: vendor_sku_id,
+        itemClub: id,
         code: trayId,
+        created_at: clubModel.created_at,
       };
       let res = await axiosWarehouseIn.post("/removeItemWht", obj);
       if (res.status === 200) {
-        setRefresh((refresh) => !refresh);
+        window.location.reload(false);
         alert(res.data.message);
       }
     } catch (error) {
@@ -166,22 +188,26 @@ export default function DialogBox() {
   /******************************************CREATE PICKLIST******************************************** */
   const handelCreatePickList = async () => {
     try {
-      if (assignedTray?.length == 0) {
+      setLoadingPicklist(true);
+      if (assignedTray?.length === 0) {
+        setLoadingPicklist(false);
         alert("Please Assign Tray");
       } else {
         let token = localStorage.getItem("prexo-authentication");
         const { user_name } = jwt_decode(token);
         let obj = {
+          _id: clubModel._id,
           skuId: vendor_sku_id,
           user_name: user_name,
           picklist_items: clubModel.pick_list_items,
-          model_name: clubModel.model_name,
-          brand_name: clubModel.brand_name,
-          muic: clubModel.muic,
+          model_name: clubModel.product?.[0]?.model_name,
+          brand_name: clubModel.product?.[0]?.brand_name,
+          muic: clubModel.product?.[0]?.muic,
         };
         let res = await axiosWarehouseIn.post("/createPickList", obj);
         if (res.status === 200) {
           alert(res.data.message);
+          setLoadingPicklist(false);
           navigate("/picklist-request");
         }
       }
@@ -197,14 +223,17 @@ export default function DialogBox() {
     <Box
       sx={{
         mt: 14,
+        ml: 1,
       }}
     >
-      <Grid container spacing={2} sx={{ m: 1 }}>
+      <Grid container spacing={1}>
         <Grid itme xs={6}>
           <Box>
-            <h6 style={{ marginLeft: "13px" }}>MUIC - {clubModel.muic}</h6>
             <h6 style={{ marginLeft: "13px" }}>
-              Model Name - {clubModel.model_name}
+              MUIC - {clubModel.product?.[0]?.muic}
+            </h6>
+            <h6 style={{ marginLeft: "13px" }}>
+              Model Name - {clubModel.product?.[0]?.model_name}
             </h6>
             <FormControl sx={{ mt: 1, width: "300px" }}>
               <InputLabel sx={{ pt: 1 }} id="demo-simple-select-label">
@@ -239,7 +268,7 @@ export default function DialogBox() {
         <Grid xs={6}>
           <Box>
             <h6 style={{ marginLeft: "13px" }}>
-              Brand Name - {clubModel.brand_name}
+              Brand Name - {clubModel.product?.[0]?.brand_name}
             </h6>
             <h6 style={{ marginLeft: "13px" }}>
               Number of Pieces -{" "}
@@ -253,7 +282,7 @@ export default function DialogBox() {
             <TableContainer>
               <Table
                 style={{ width: "100%" }}
-                id="trayTable"
+                // id="trayTable"
                 stickyHeader
                 aria-label="sticky table"
               >
@@ -262,14 +291,15 @@ export default function DialogBox() {
                     <TableCell>S.NO</TableCell>
                     <TableCell>Tray Id</TableCell>
                     <TableCell>Qunatity</TableCell>
-                    {clubModel?.item?.filter((data) => data.wht_tray != null)
-                      .length != clubModel?.item?.length ? (
+                    {clubModel?.item?.filter((data) => data.wht_tray !== null)
+                      .length !== clubModel?.item?.length ? (
                       <TableCell>Select</TableCell>
                     ) : (
                       ""
                     )}
                   </TableRow>
                 </TableHead>
+
                 <TableBody>
                   {whtTray.map((data, index) => (
                     <TableRow hover role="checkbox" tabIndex={-1}>
@@ -278,11 +308,12 @@ export default function DialogBox() {
                       <TableCell>
                         {data?.items?.length} / {data?.limit}
                       </TableCell>
-                      {clubModel?.item?.filter((data) => data.wht_tray != null)
-                        .length != clubModel?.item?.length ? (
+                      {clubModel?.item?.filter((data) => data.wht_tray !== null)
+                        .length !== clubModel?.item?.length ? (
                         <TableCell>
                           <Checkbox
                             {...label}
+                            disabled={loading == true ? true : false}
                             onClick={(e) => {
                               clubModel?.wht_tray?.includes(data.code) &&
                               data?.items?.length == data.limit
@@ -313,6 +344,7 @@ export default function DialogBox() {
                 </TableBody>
               </Table>
             </TableContainer>
+            {trayDataCheck == true ? <p style={{textAlign:"center"}}>No data available in table</p> : null}
           </Paper>
         </Grid>
         <Grid xs={6}>
@@ -320,7 +352,7 @@ export default function DialogBox() {
             <TableContainer>
               <Table
                 style={{ width: "100%" }}
-                id="trayTable2"
+                // id="trayTable2"
                 stickyHeader
                 aria-label="sticky table"
               >
@@ -332,6 +364,7 @@ export default function DialogBox() {
                     <TableCell>Action</TableCell>
                   </TableRow>
                 </TableHead>
+
                 <TableBody>
                   {assignedTray.map((data, index) => (
                     <TableRow hover role="checkbox" tabIndex={-1}>
@@ -390,6 +423,7 @@ export default function DialogBox() {
           variant="contained"
           style={{ backgroundColor: "green" }}
           component="span"
+          disabled={laodingPickList == true ? true : false}
           onClick={() => {
             if (window.confirm("You Want to Create Picklist?")) {
               handelCreatePickList();

@@ -1,37 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { Box, Container, TextField } from "@mui/material";
-import * as XLSX from "xlsx";
-import { useParams } from "react-router-dom";
-import DownloadIcon from "@mui/icons-material/Download";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
-import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
-import Button from "@mui/material/Button";
-import { useNavigate } from "react-router-dom";
-import { axiosMisUser, axiosSuperAdminPrexo } from "../../axios";
+import { axiosSuperAdminPrexo } from "../../axios";
 //Datatable Modules
 import $ from "jquery";
 import "datatables.net";
-
 export default function Home() {
-  let { userType } = useParams();
-  const [page, setPage] = React.useState(0);
   const [item, setItem] = useState([]);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const navigate = useNavigate();
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
   useEffect(() => {
     try {
       const fetchData = async () => {
         let res = await axiosSuperAdminPrexo.post("/itemTracking");
-        if (res.status == 200) {
+        if (res.status === 200) {
           setItem(res.data.data);
           dataTableFun();
         }
@@ -41,14 +26,6 @@ export default function Home() {
       alert(error);
     }
   }, []);
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-  };
-  const handelOrders = (e) => {
-    e.preventDefault();
-    navigate("/orders-import");
-  };
   function dataTableFun() {
     $("#example").DataTable({
       destroy: true,

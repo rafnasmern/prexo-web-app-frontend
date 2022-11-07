@@ -40,6 +40,7 @@ import UicgerateBagwise from "./pages/mis-pages/uic-generate-bagwise";
 import TrackDeliveredItem from "./pages/mis-pages/track-delivered-item-page";
 import AssignToCharging from "./pages/mis-pages/assign-to-charging";
 import AssignToBqc from "./pages/mis-pages/assign-to-bqc";
+import AssigntoAudit from "./pages/mis-pages/assign-to-audit";
 /*--------------------------------------------------------------------------------------------
 BOT
 ---------------------------------------------------------------------------------------------- */
@@ -78,6 +79,8 @@ import TrayReturnedFromCharging from "./pages/warehouse-page/returning-from-char
 import ViewChargingDoneItem from "./pages/warehouse-page/view-charging-done-item";
 import ReturnChargeDoneClose from "./pages/warehouse-page/return-from-charging/close-tray";
 import ViewBqcRequest from "./pages/warehouse-page/bqc-request/view-page";
+import ReturnFromBqc from "./pages/warehouse-page/return-from-bqc/view-all-wht";
+import ReturnBqcClose from "./pages/warehouse-page/return-from-bqc/close-tray";
 /**********************************CHARGING PANEL************************************* */
 import ChargingPanelDashboard from "./pages/charging-pages/charging-dashboard";
 import ViewAssignedTrayCharging from "./pages/charging-pages/view-assigned-tray";
@@ -85,6 +88,9 @@ import ViewDetailsTrayCharging from "./pages/charging-pages/view-details-tray";
 import ChargingOut from "./pages/charging-pages/charging-out";
 /**********************************BQC PANEL************************************* */
 import BqcDashboard from "./pages/bqc-pages/dashboard";
+import AssignedTrayBqc from "./pages/bqc-pages/view-assigned-tray";
+import BqcIn from "./pages/bqc-pages/bqc-in";
+import BqcOut from "./pages/bqc-pages/bqc-out";
 /************************************************************************************** */
 import Login from "./pages/Login";
 import ChangePassword from "./pages/change-password";
@@ -166,11 +172,11 @@ function App() {
           <Route path="/picklist-request" element={<PickList />} />
 
           <Route
-            path="/picklist-view-detail/:vendor_sku_id"
+            path="/picklist-view-detail/:vendor_sku_id/:id"
             element={<ViewPickListModelItem />}
           />
           <Route
-            path="/wht-tray-assign/:vendor_sku_id"
+            path="/wht-tray-assign/:vendor_sku_id/:id"
             element={<WhtTrayAssign />}
           />
           <Route path="/wht-tray" element={<AllWhtTray />} />
@@ -227,6 +233,15 @@ function App() {
           <Route path="/assign-to-bqc" element={<AssignToBqc />} />
           <Route path="/bqc-dashboard" element={<BqcDashboard />} />
           <Route path="/bqc-request" element={<ViewBqcRequest />} />
+          <Route path="/view-assigned-tray-bqc" element={<AssignedTrayBqc />} />
+          <Route path="/bqc-in/:trayId" element={<BqcIn />} />
+          <Route path="/bqc-out/:trayId" element={<BqcOut />} />
+          <Route path="/return-from-bqc" element={<ReturnFromBqc />} />
+          <Route
+            path="/return-from-bqc-close/:trayId"
+            element={<ReturnBqcClose />}
+          />
+          <Route path="/assign-to-audit" element={<AssigntoAudit />} />
         </Routes>
       </BrowserRouter>
     </>

@@ -96,6 +96,7 @@ export default function Home() {
         muis_code += numbers.charAt(Math.floor(Math.random() * numbers.length));
       }
       accumulator.muic = muis_code;
+      accumulator.created_at = Date.now();
       accumulator[key.toLowerCase().split("-").join("_")] = obj[key];
       return accumulator;
     }, {});
@@ -386,6 +387,7 @@ export default function Home() {
             }}
           >
             <CircularProgress />
+            <p style={{paddingTop:"10px"}}>Please wait...</p>
           </Box>
         </Container>
       ) : null}
