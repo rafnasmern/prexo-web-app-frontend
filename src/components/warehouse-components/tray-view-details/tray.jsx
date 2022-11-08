@@ -532,8 +532,9 @@ export default function DialogBox() {
           </Paper>
         </Grid>
       </Grid>
+         <div style={{float:"right"}}>
 
-      <Box sx={{ float: "right" }}>
+      <Box  sx={{ float: "right"}}>
         <textarea
           onChange={(e) => {
             setDescription(e.target.value);
@@ -544,6 +545,7 @@ export default function DialogBox() {
         {employeeData[0]?.type_taxanomy == "BOT" ? (
           <>
             <Checkbox
+          
               checked={bagReuse}
               onClick={(e) => {
                 if (
@@ -573,6 +575,7 @@ export default function DialogBox() {
           Tray Close
         </Button>
       </Box>
+         </div>
     </>
   );
 }

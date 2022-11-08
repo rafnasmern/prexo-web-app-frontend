@@ -776,7 +776,7 @@ export default function DialogBox() {
         </DialogActions>
       </BootstrapDialog>
       <Box sx={{ mt: 13 }}>
-        <Box sx={{ mt: 10 }}>
+        <Box >
           <Grid container spacing={2}>
             <Grid item xs={4}>
               <h5 style={{ marginLeft: "10px" }}>Bag Id : -{bagId}</h5>

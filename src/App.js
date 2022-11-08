@@ -41,6 +41,10 @@ import TrackDeliveredItem from "./pages/mis-pages/track-delivered-item-page";
 import AssignToCharging from "./pages/mis-pages/assign-to-charging";
 import AssignToBqc from "./pages/mis-pages/assign-to-bqc";
 import AssigntoAudit from "./pages/mis-pages/assign-to-audit";
+import BotToWht from "./pages/mis-pages/bot-to-wht";
+import AssignForSorting from "./pages/mis-pages/assign-for-sorting";
+import ViewItemClubBot from "./pages/mis-pages/view-bot-item-club";
+import BotClubDataAssignToWht from "./pages/mis-pages/bot-club-to-wht";
 /*--------------------------------------------------------------------------------------------
 BOT
 ---------------------------------------------------------------------------------------------- */
@@ -53,7 +57,6 @@ import TrayDetails from "./pages/bot-page/tray-deails-page";
 WAREHOUSE
 ---------------------------------------------------------------------------------------------- */
 import OrdersSearch from "./pages/warehouse-page/orders-search";
-import PickuplistCreate from "./pages/warehouse-page/pickup_list_create";
 import RequestDetailPage from "./pages/warehouse-page/request-detail-page";
 import StockInWarehouse from "./pages/warehouse-page/stock-in-warehouse";
 import WarehouseInDashboard from "./pages/warehouse-page/warehouse-in-dashboard";
@@ -168,7 +171,6 @@ function App() {
             element={<TrackDeliveredItem />}
           />
           <Route path="/track-item" element={<ItemTracking />} />
-          <Route path="/create-pickup-list" element={<PickuplistCreate />} />
           <Route path="/picklist-request" element={<PickList />} />
 
           <Route
@@ -242,6 +244,19 @@ function App() {
             element={<ReturnBqcClose />}
           />
           <Route path="/assign-to-audit" element={<AssigntoAudit />} />
+          <Route path="/bot-to-wht" element={<BotToWht />} />
+          <Route
+            path="/assign-for-sorting/:trayId"
+            element={<AssignForSorting />}
+          />
+          <Route
+            path="/view-club-item-bot/:muic/:trayId"
+            element={<ViewItemClubBot />}
+          />
+          <Route
+            path="/bot-club-to-wht-assignment/:muic/:trayId"
+            element={<BotClubDataAssignToWht />}
+          />
         </Routes>
       </BrowserRouter>
     </>
