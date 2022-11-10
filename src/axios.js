@@ -23,3 +23,7 @@ export const axiosBqc = axios.create({
   baseURL: "http://localhost:8000/api/v1/bqc",
   headers: { "x-access-token": localStorage.getItem("prexo-authentication") },
 });
+export const axiosSortingAgent = axios.create({
+  baseURL: "http://localhost:8000/api/v1/sorting-agnet",
+  headers: { "x-access-token": localStorage.getItem("prexo-authentication") },
+});

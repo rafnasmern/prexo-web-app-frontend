@@ -419,6 +419,7 @@ export default function DialogBox() {
                 <MenuItem value="Charging">Charging</MenuItem>
                 <MenuItem value="BQC">BQC</MenuItem>
                 <MenuItem value="Audit">Audit</MenuItem>
+                <MenuItem value="Sorting Agent">Sorting Agent</MenuItem>
               </Select>
             </FormControl>
             <TextField

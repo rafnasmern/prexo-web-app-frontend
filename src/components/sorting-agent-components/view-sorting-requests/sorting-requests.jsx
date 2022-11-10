@@ -11,29 +11,32 @@ import {
   Box,
   Button,
 } from "@mui/material";
-import { axiosWarehouseIn } from "../../../axios";
+import {
+  axiosMisUser,
+  axiosSortingAgent,
+  axiosWarehouseIn,
+} from "../../../axios";
 // import jwt from "jsonwebtoken"
 import jwt_decode from "jwt-decode";
 //Datatable Modules
 import $ from "jquery";
 import "datatables.net";
-import { useNavigate,useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 export default function StickyHeadTable({ props }) {
-  const [whtTray, setWhtTray] = useState([]);
-  const [isCheckAll, setIsCheckAll] = useState(false);
-  const [isCheck, setIsCheck] = useState([]);
+  const [botTray, setBotTray] = useState([]);
   const navigate = useNavigate();
-  const {type}=useParams()
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         let admin = localStorage.getItem("prexo-authentication");
         if (admin) {
-          let { location } = jwt_decode(admin);
-          let response = await axiosWarehouseIn.post("/whtTray/" + location + "/" + type);
+          let { user_name } = jwt_decode(admin);
+          let response = await axiosSortingAgent.post(
+            "/get-assigned-sorting-tray/" + user_name
+          );
           if (response.status === 200) {
-            setWhtTray(response.data.data);
+            setBotTray(response.data.data);
             dataTableFun();
           }
         } else {
@@ -45,9 +48,13 @@ export default function StickyHeadTable({ props }) {
     };
     fetchData();
   }, []);
-
-  const handelViewItem = (id) => {
-    navigate("/wht-tray-item/" + id);
+  const handelViewItem = (e, code) => {
+    e.preventDefault();
+    navigate("/view-tray-for-sorting/" + code);
+  };
+  const handelStartSorting = (e, code) => {
+    e.preventDefault();
+    navigate("/start-sorting/" + code);
   };
   function dataTableFun() {
     $("#example").DataTable({
@@ -81,53 +88,68 @@ export default function StickyHeadTable({ props }) {
                   <TableRow>
                     <TableCell>Record.NO</TableCell>
                     <TableCell>Tray Id</TableCell>
-                    <TableCell>Warehouse</TableCell>
-                    <TableCell>Tray Category</TableCell>
-                    <TableCell>Tray Brand</TableCell>
-                    <TableCell>Tray Model</TableCell>
-                    <TableCell>Tray Name</TableCell>
+                    <TableCell>Sorting Agent</TableCell>
+                    <TableCell>Closure Date</TableCell>
+                    <TableCell>Assigned Date</TableCell>
                     <TableCell>Quantity</TableCell>
-                    <TableCell>Tray Display</TableCell>
-                    <TableCell>status</TableCell>
-                    <TableCell>Creation Time</TableCell>
+                    <TableCell>Status</TableCell>
                     <TableCell>Actions</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {whtTray.map((data, index) => (
+                  {botTray.map((data, index) => (
                     <TableRow hover role="checkbox" tabIndex={-1}>
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>{data.code}</TableCell>
-                      <TableCell>{data.warehouse}</TableCell>
-                      <TableCell>{data.type_taxanomy}</TableCell>
-                      <TableCell>{data.brand}</TableCell>
-                      <TableCell>{data.model}</TableCell>
-                      <TableCell>{data.name}</TableCell>
+                      <TableCell>{data.issued_user_name}</TableCell>
                       <TableCell>
                         {" "}
-                        {data.items.length == 0
-                          ? data.actual_items.length
-                          : data.items.length}
-                        /{data.limit}
-                      </TableCell>
-                      <TableCell>{data.display}</TableCell>
-                      <TableCell>{data.sort_id}</TableCell>
-                      <TableCell>
-                        {new Date(data.created_at).toLocaleString("en-GB", {
-                          hour12: true,
+                        {new Date(
+                          data.closed_time_wharehouse_from_bot
+                        ).toLocaleString("en-GB", {
+                          year: "numeric",
+                          month: "2-digit",
+                          day: "2-digit",
                         })}
                       </TableCell>
+                      <TableCell>
+                        {" "}
+                        {new Date(data.status_change_time).toLocaleString(
+                          "en-GB",
+                          {
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                          }
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {data.items.length}/{data.limit}
+                      </TableCell>
+                      <TableCell>{data.sort_id}</TableCell>
                       <TableCell>
                         <Button
                           sx={{
                             m: 1,
                           }}
                           variant="contained"
-                          onClick={() => handelViewItem(data.code)}
+                          onClick={(e) => handelViewItem(e, data.code)}
+                          style={{ backgroundColor: "#008CBA" }}
+                          component="span"
+                        >
+                          View Details
+                        </Button>
+
+                        <Button
+                          sx={{
+                            m: 1,
+                          }}
+                          variant="contained"
+                          onClick={(e) => handelStartSorting(e, data.code)}
                           style={{ backgroundColor: "green" }}
                           component="span"
                         >
-                          View
+                          Start Sorting
                         </Button>
                       </TableCell>
                     </TableRow>

@@ -65,9 +65,10 @@ export default function Login() {
           navigate("/bot-dashboard");
         } else if (response.data.data?.user_type == "Charging") {
           navigate("/charging-dashboard");
-        }
-        else if (response.data.data?.user_type == "BQC") {
+        } else if (response.data.data?.user_type == "BQC") {
           navigate("/bqc-dashboard");
+        } else if (response.data.data?.user_type == "Sorting Agent") {
+          navigate("/sorting-agent-dashboard");
         }
       }
     } catch (error) {
@@ -101,9 +102,10 @@ export default function Login() {
         navigate("/bot-dashboard");
       } else if (user_type == "Charging") {
         navigate("/charging-dashboard");
-      }
-      else if (user_type == "BQC") {
+      } else if (user_type == "BQC") {
         navigate("/bqc-dashboard");
+      } else if (user_type == "Sorting Agent") {
+        navigate("/sorting-agent-dashboard");
       }
     } else {
       navigate("/");

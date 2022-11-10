@@ -32,7 +32,15 @@ export default function Dashboard() {
   };
   const handelWhtTray = (e) => {
     e.preventDefault();
-    navigate("/wht-tray");
+    navigate("/wht-tray/" + "all-wht-tray");
+  };
+  const handelWhtTrayIssuedSorting = (e) => {
+    e.preventDefault();
+    navigate("/wht-tray/" + "issued-to-sorting");
+  };
+  const handelViewSortingRequests = (e) => {
+    e.preventDefault();
+    navigate("/sorting-requests");
   };
   const handelCreatedPickList = (e) => {
     e.preventDefault();
@@ -41,6 +49,10 @@ export default function Dashboard() {
   const handelInUseWhtTray = (e) => {
     e.preventDefault();
     navigate("/inuse-wht-tray");
+  };
+  const handelReturnFromSorting = (e) => {
+    e.preventDefault();
+    navigate("/return-from-sorting");
   };
   const handelBotRelease = (e) => {
     e.preventDefault();
@@ -67,8 +79,8 @@ export default function Dashboard() {
     navigate("/return-from-bqc");
   };
   return (
-    <div style={{marginBottom:"20px"}}>
-      <h4 style={{ marginTop: "100px", marginLeft: "22px", color: "#495057", }}>
+    <div style={{ marginBottom: "20px" }}>
+      <h4 style={{ marginTop: "100px", marginLeft: "22px", color: "#495057" }}>
         Hi Warehouse Welcome to Prexo Dashboard
       </h4>
       <Box
@@ -79,7 +91,6 @@ export default function Dashboard() {
           width: "610px",
           marginTop: "19px",
         }}
-       
       >
         <h5
           style={{ color: "#FFFFFF", textAlign: "center", paddingTop: "2px" }}
@@ -224,7 +235,7 @@ export default function Dashboard() {
               </Link>
             </Box>
             <hr />
-            <Box
+            {/* <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}
             >
@@ -243,8 +254,48 @@ export default function Dashboard() {
                 Bot to wht
               </Link>
             </Box>
+            <hr /> */}
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
+            >
+              <ArrowRightIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelViewSortingRequests(e);
+                }}
+              >
+                Sorting Request
+              </Link>
+            </Box>
             <hr />
             <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
+            >
+              <ArrowRightIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelWhtTrayIssuedSorting(e);
+                }}
+              >
+                WHT's Issued
+              </Link>
+            </Box>
+            <hr />
+            {/* <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}
             >
@@ -263,7 +314,7 @@ export default function Dashboard() {
                 Picklist
               </Link>
             </Box>
-            <hr />
+            <hr /> */}
           </div>
         </Box>
         <Box
@@ -272,7 +323,7 @@ export default function Dashboard() {
             ml: 1,
             width: 300,
             boxShadow: 2,
-            height: "437px",
+            height: "499px",
             backgroundColor: "#FFFFFF",
           }}
         >
@@ -295,6 +346,27 @@ export default function Dashboard() {
                 }}
               >
                 Inuse wht
+              </Link>
+            </Box>
+            <hr />
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
+            >
+              <ArrowRightIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelReturnFromSorting(e);
+                }}
+              >
+                Return from Sorting
               </Link>
             </Box>
             <hr />

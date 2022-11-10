@@ -114,11 +114,11 @@ export default function StickyHeadTable({ props }) {
       alert(error);
     }
   }, []);
-  const handleClick = (event, code) => {
-    setRequest(code);
-    setClickState(false);
-    setAnchorEl(event.currentTarget);
-  };
+  // const handleClick = (event, code) => {
+  //   setRequest(code);
+  //   setClickState(false);
+  //   setAnchorEl(event.currentTarget);
+  // };
   const handleClose = () => {
     setOpen(false)
   };

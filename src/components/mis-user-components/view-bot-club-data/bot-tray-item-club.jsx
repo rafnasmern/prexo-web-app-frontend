@@ -17,7 +17,7 @@ import "datatables.net";
 export default function CustomizedMenus() {
   const [item, setItem] = useState({});
   const navigate = useNavigate();
-  const { muic,trayId } = useParams();
+  const { muic, trayId } = useParams();
   useEffect(() => {
     let admin = localStorage.getItem("prexo-authentication");
     if (admin) {
@@ -47,8 +47,11 @@ export default function CustomizedMenus() {
     });
   }
 
+
   return (
-    <div style={{ marginTop: "100px", marginLeft: "20px",marginRight:"20px" }}>
+    <div
+      style={{ marginTop: "100px", marginLeft: "20px", marginRight: "20px" }}
+    >
       <Paper sx={{ width: "100%", overflow: "hidden", mt: 3 }}>
         <TableContainer>
           <Table
@@ -72,14 +75,14 @@ export default function CustomizedMenus() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {item[0]?.item?.map((data, index) => (
+              {item?.temp_array?.[0]?.item?.map((data, index) => (
                 <TableRow tabIndex={-1}>
                   <TableCell>{index + 1}</TableCell>
                   <TableCell>{data?.uic}</TableCell>
                   <TableCell>{data?.imei}</TableCell>
-                  <TableCell>{item[0].muic}</TableCell>
-                  <TableCell>{item[0].brand}</TableCell>
-                  <TableCell>{item[0].model}</TableCell>
+                  <TableCell>{item?.temp_array?.[0].muic}</TableCell>
+                  <TableCell>{item?.temp_array?.[0].brand}</TableCell>
+                  <TableCell>{item?.temp_array?.[0].model}</TableCell>
                   <TableCell>{data?.bag_id}</TableCell>
                   <TableCell>{data?.user_name}</TableCell>
                   <TableCell>{data?.tray_id}</TableCell>

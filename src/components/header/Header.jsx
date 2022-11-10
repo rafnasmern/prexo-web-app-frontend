@@ -168,6 +168,10 @@ const ResponsiveAppBar = () => {
     e.preventDefault();
     navigate("/bqc-dashboard");
   };
+  const handelSortingAgent = (e) => {
+    e.preventDefault();
+    navigate("/sorting-agent-dashboard");
+  };
 
   /************************************************************************* */
   const handelUsers = (e) => {
@@ -562,6 +566,38 @@ const ResponsiveAppBar = () => {
                   }}
                 >
                   BQC
+                </Button>
+                <Menu
+                  id="simple-menu5"
+                  anchorEl={anchorE5}
+                  open={Boolean(anchorE5)}
+                  onClose={handleClosea5}
+                  // MenuListProps={{ onMouseLeave: handleClosea5 }}
+                >
+                  {/* <MenuItem>Bags</MenuItem> */}
+                </Menu>
+              </>
+            ) : (
+              ""
+            )}
+            {user_type1 == "Sorting Agent" ? (
+              <>
+                <Button
+                  endIcon={<KeyboardArrowDownIcon />}
+                  aria-owns={anchorE5 ? "simple-menu5" : undefined}
+                  aria-haspopup="true"
+                  onClick={(e) => {
+                    handelSortingAgent(e);
+                  }}
+                  sx={{ my: 3, color: "white" }}
+                  style={{
+                    backgroundColor:
+                      location.pathname == "/sorting-agent-dashboard"
+                        ? "#495057"
+                        : "",
+                  }}
+                >
+                  Sorting Agent
                 </Button>
                 <Menu
                   id="simple-menu5"

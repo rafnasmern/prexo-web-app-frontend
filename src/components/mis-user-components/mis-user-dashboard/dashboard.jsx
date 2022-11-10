@@ -53,6 +53,10 @@ export default function Dashboard() {
     e.preventDefault();
     navigate("/bot-to-wht");
   };
+  const handelSortingRequests = (e) => {
+    e.preventDefault();
+    navigate("/view-sorting-requests");
+  };
   return (
     <div style={{ marginBottom: "20px" }}>
       <h4 style={{ marginTop: "100px", marginLeft: "27px", color: "#495057" }}>
@@ -224,10 +228,10 @@ export default function Dashboard() {
                   marginLeft: "5px",
                 }}
                 onClick={(e) => {
-                  handelTrackDeliveredItem(e);
+                  handelSortingRequests(e);
                 }}
               >
-                Track Item
+                Sorting Requests
               </Link>
             </Box>
             <hr />
@@ -239,7 +243,7 @@ export default function Dashboard() {
             ml: 1,
             width: 300,
             boxShadow: 2,
-            height: "185px",
+            height: "248px",
             backgroundColor: "#FFFFFF",
           }}
         >
@@ -301,6 +305,26 @@ export default function Dashboard() {
                 }}
               >
                 Assign for Audit
+              </Link>
+            </Box>
+            <hr />
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
+            >
+              <ArrowRightIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelTrackDeliveredItem(e);
+                }}
+              >
+                Track Item
               </Link>
             </Box>
             <hr />

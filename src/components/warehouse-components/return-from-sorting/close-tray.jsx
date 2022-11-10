@@ -17,24 +17,20 @@ import {
   TableRow,
   Grid,
 } from "@mui/material";
-import PropTypes from "prop-types";
 import { useParams } from "react-router-dom";
 import "yup-phone";
-import CloseIcon from "@mui/icons-material/Close";
-import { styled, alpha } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import { axiosBot, axiosWarehouseIn } from "../../../axios";
-import Swal from "sweetalert2";
-import Checkbox from "@mui/material/Checkbox";
 
 export default function DialogBox() {
   const navigate = useNavigate();
   const [trayData, setTrayData] = useState([]);
   const { trayId } = useParams();
+  const [loading, setLoading] = useState(false);
   /**************************************************************************** */
   const [refresh, setRefresh] = useState(false);
   const [uic, setUic] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [bagReuse, setBagReuse] = useState(false);
   const [description, setDescription] = useState([]);
   /*********************************************************** */
 
@@ -69,7 +65,7 @@ export default function DialogBox() {
           item: obj,
         };
         let res = await axiosWarehouseIn.post(
-          "/charging-done-put-item",
+          "/sorting-done-put-item",
           objData
         );
         if (res?.status == 200) {
@@ -86,15 +82,15 @@ export default function DialogBox() {
   const handelIssue = async (e) => {
     e.preventDefault();
     try {
-      setLoading(true)
+      setLoading(true);
       if (description == "") {
         alert("Please Add Description");
-        setLoading(false)
+        setLoading(false);
       } else {
         let obj = {
           trayId: trayId,
           description: description,
-          type:"Ready to bqc"
+          type: "Ready to audit",
         };
         let res = await axiosWarehouseIn.post(
           "/close-wht-tray-ready-to-next",
@@ -102,12 +98,11 @@ export default function DialogBox() {
         );
         if (res.status == 200) {
           alert(res.data.message);
-          setLoading(false)
-          navigate("/tray-return-from-charging");
+          setLoading(false);
+          navigate("/return-from-bqc");
         }
       }
     } catch (error) {
-      setLoading(false)
       alert(error);
     }
   };
@@ -118,7 +113,7 @@ export default function DialogBox() {
           uic: e.target.value,
           trayId: trayId,
         };
-        let res = await axiosWarehouseIn.post("/check-uic-charging-done", obj);
+        let res = await axiosWarehouseIn.post("/check-uic-sorting-done", obj);
         if (res?.status == 200) {
           addActualitem(res.data.data);
         }
@@ -161,9 +156,12 @@ export default function DialogBox() {
         >
           <h6 style={{ marginRight: "13px" }}>
             Closed On --{" "}
-            {new Date(trayData?.closed_time_bot).toLocaleString("en-GB", {
-              hour12: true,
-            })}
+            {new Date(trayData?.closed_time_sorting_agent).toLocaleString(
+              "en-GB",
+              {
+                hour12: true,
+              }
+            )}
           </h6>
           <h6 style={{ marginRight: "13px" }}>Brand -- {trayData?.brand}</h6>
           <h6 style={{ marginRight: "13px" }}>Model -- {trayData?.model}</h6>
@@ -187,7 +185,7 @@ export default function DialogBox() {
                 <Box sx={{}}>
                   <h5>Total</h5>
                   <p style={{ paddingLeft: "5px", fontSize: "22px" }}>
-                    {trayData?.actual_items?.length}/{trayData?.limit}
+                    {trayData?.items?.length}/{trayData?.limit}
                   </p>
                 </Box>
               </Box>
@@ -199,7 +197,7 @@ export default function DialogBox() {
                 <Box sx={{}}>
                   <h5>Valid</h5>
                   <p style={{ marginLeft: "14px", fontSize: "24px" }}>
-                    {trayData?.actual_items?.length}
+                    {trayData?.items?.length}
                   </p>
                 </Box>
               </Box>
@@ -219,19 +217,17 @@ export default function DialogBox() {
                     <TableCell>IMEI</TableCell>
                     <TableCell>Brand Name</TableCell>
                     <TableCell>Model Name</TableCell>
-                    <TableCell>VSKU ID</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {trayData?.actual_items?.map((data, index) => (
+                  {trayData?.items?.map((data, index) => (
                     <TableRow hover role="checkbox" tabIndex={-1}>
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>{data?.uic}</TableCell>
                       <TableCell>{data?.muic}</TableCell>
                       <TableCell>{data?.imei}</TableCell>
-                      <TableCell>{data?.brand_name}</TableCell>
-                      <TableCell>{data?.model_name}</TableCell>
-                      <TableCell>{data?.vendor_sku_id}</TableCell>
+                      <TableCell>{data?.brand}</TableCell>
+                      <TableCell>{data?.model}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -275,7 +271,7 @@ export default function DialogBox() {
                 <Box sx={{}}>
                   <h5>Total</h5>
                   <p style={{ marginLeft: "5px", fontSize: "24px" }}>
-                    {trayData?.items?.length}/{trayData?.limit}
+                    {trayData?.actual_items?.length}/{trayData?.limit}
                   </p>
                 </Box>
               </Box>
@@ -287,7 +283,7 @@ export default function DialogBox() {
                 <Box sx={{}}>
                   <h5>Valid</h5>
                   <p style={{ marginLeft: "19px", fontSize: "24px" }}>
-                    {trayData?.items?.length}
+                    {trayData?.actual_items?.length}
                   </p>
                 </Box>
               </Box>
@@ -310,8 +306,9 @@ export default function DialogBox() {
                     <TableCell>VSKU ID</TableCell>
                   </TableRow>
                 </TableHead>
+
                 <TableBody>
-                  {trayData?.items?.map((data, index) => (
+                  {trayData?.actual_items?.map((data, index) => (
                     <TableRow hover role="checkbox" tabIndex={-1}>
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>{data?.uic}</TableCell>
@@ -328,34 +325,36 @@ export default function DialogBox() {
           </Paper>
         </Grid>
       </Grid>
+      <div style={{ float: "right" }}>
+        <Box sx={{ float: "right" }}>
+          <textarea
+            onChange={(e) => {
+              setDescription(e.target.value);
+            }}
+            style={{ width: "400px" }}
+            placeholder="Description"
+          ></textarea>
 
-      <Box sx={{ float: "right" }}>
-        <textarea
-          onChange={(e) => {
-            setDescription(e.target.value);
-          }}
-          style={{ width: "400px" }}
-          placeholder="Description"
-        ></textarea>
-
-        <Button
-          sx={{ m: 3, mb: 9 }}
-          variant="contained"
-          disabled={
-            trayData?.items?.length == trayData?.actual_items?.length || loading == false 
-              ? false
-              : true
-          }
-          style={{ backgroundColor: "green" }}
-          onClick={(e) => {
-            if (window.confirm("You Want to Close?")) {
-              handelIssue(e);
+          <Button
+            sx={{ m: 3, mb: 9 }}
+            variant="contained"
+            disabled={
+              trayData?.items?.length == trayData?.actual_items?.length ||
+              loading == false
+                ? false
+                : true
             }
-          }}
-        >
-          Tray Close
-        </Button>
-      </Box>
+            style={{ backgroundColor: "green" }}
+            onClick={(e) => {
+              if (window.confirm("You Want to Close?")) {
+                handelIssue(e);
+              }
+            }}
+          >
+            Tray Close
+          </Button>
+        </Box>
+      </div>
     </>
   );
 }

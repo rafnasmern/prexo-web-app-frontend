@@ -45,6 +45,7 @@ import BotToWht from "./pages/mis-pages/bot-to-wht";
 import AssignForSorting from "./pages/mis-pages/assign-for-sorting";
 import ViewItemClubBot from "./pages/mis-pages/view-bot-item-club";
 import BotClubDataAssignToWht from "./pages/mis-pages/bot-club-to-wht";
+import ViewBotTraySentToSorting from "./pages/mis-pages/bot-sent-to-sorting";
 /*--------------------------------------------------------------------------------------------
 BOT
 ---------------------------------------------------------------------------------------------- */
@@ -84,6 +85,11 @@ import ReturnChargeDoneClose from "./pages/warehouse-page/return-from-charging/c
 import ViewBqcRequest from "./pages/warehouse-page/bqc-request/view-page";
 import ReturnFromBqc from "./pages/warehouse-page/return-from-bqc/view-all-wht";
 import ReturnBqcClose from "./pages/warehouse-page/return-from-bqc/close-tray";
+import SortingRequests from "./pages/warehouse-page/sorting-requests/view-sorting-requests";
+import ViewTrayForSorting from "./pages/warehouse-page/sorting-requests/view-tray-for-sorting";
+import ViewActualVsExpected from "./pages/warehouse-page/sorting-requests/ex-vs-act";
+import ReturnFromSortingView from "./pages/warehouse-page/return-from-sorting/view-tray";
+import ReturnFromSortingClose from "./pages/warehouse-page/return-from-sorting/close-tray";
 /**********************************CHARGING PANEL************************************* */
 import ChargingPanelDashboard from "./pages/charging-pages/charging-dashboard";
 import ViewAssignedTrayCharging from "./pages/charging-pages/view-assigned-tray";
@@ -94,6 +100,11 @@ import BqcDashboard from "./pages/bqc-pages/dashboard";
 import AssignedTrayBqc from "./pages/bqc-pages/view-assigned-tray";
 import BqcIn from "./pages/bqc-pages/bqc-in";
 import BqcOut from "./pages/bqc-pages/bqc-out";
+/**********************************SORTING AGENT PANEL************************************* */
+import SortingAgentDashboard from "./pages/sorting-agent-pages/dashboard";
+import ViewAssignedSortingRequests from "./pages/sorting-agent-pages/view-sorting-requests";
+import StartSorting from "./pages/sorting-agent-pages/start-sorting";
+import ViewAssignedWhtTray from "./pages/sorting-agent-pages/view-assigned-wht";
 /************************************************************************************** */
 import Login from "./pages/Login";
 import ChangePassword from "./pages/change-password";
@@ -181,7 +192,7 @@ function App() {
             path="/wht-tray-assign/:vendor_sku_id/:id"
             element={<WhtTrayAssign />}
           />
-          <Route path="/wht-tray" element={<AllWhtTray />} />
+          <Route path="/wht-tray/:type" element={<AllWhtTray />} />
           <Route path="/wht-tray-item/:trayId" element={<ViewWhtTrayItem />} />
           <Route
             path="/pick-list-close/:picklistId"
@@ -256,6 +267,40 @@ function App() {
           <Route
             path="/bot-club-to-wht-assignment/:muic/:trayId"
             element={<BotClubDataAssignToWht />}
+          />
+          <Route
+            path="/view-sorting-requests"
+            element={<ViewBotTraySentToSorting />}
+          />
+          <Route path="/sorting-requests" element={<SortingRequests />} />
+          <Route
+            path="/view-tray-for-sorting/:botTrayId"
+            element={<ViewTrayForSorting />}
+          />
+          <Route
+            path="/sorting-request-item-verifiy/:trayId"
+            element={<ViewActualVsExpected />}
+          />
+          <Route
+            path="/sorting-agent-dashboard"
+            element={<SortingAgentDashboard />}
+          />
+          <Route
+            path="/view-assigned-sorting-requests"
+            element={<ViewAssignedSortingRequests />}
+          />
+          <Route path="/start-sorting/:trayId" element={<StartSorting />} />
+          <Route
+            path="/sorting-view-assigned-wht"
+            element={<ViewAssignedWhtTray />}
+          />
+          <Route
+            path="/return-from-sorting"
+            element={<ReturnFromSortingView />}
+          />
+          <Route
+            path="/return-from-sorting-close/:trayId"
+            element={<ReturnFromSortingClose />}
           />
         </Routes>
       </BrowserRouter>
