@@ -60,7 +60,7 @@ export default function DialogBox() {
 
   /************************************************************************** */
   const addActualitem = async (obj) => {
-    if (trayData?.limit <= trayData?.items?.length) {
+    if (trayData?.actual_items?.length < trayData?.items.length) {
       alert("All Items are Verified");
     } else {
       try {
@@ -86,15 +86,15 @@ export default function DialogBox() {
   const handelIssue = async (e) => {
     e.preventDefault();
     try {
-      setLoading(true)
+      setLoading(true);
       if (description == "") {
         alert("Please Add Description");
-        setLoading(false)
+        setLoading(false);
       } else {
         let obj = {
           trayId: trayId,
           description: description,
-          type:"Ready to bqc"
+          type: "Ready to bqc",
         };
         let res = await axiosWarehouseIn.post(
           "/close-wht-tray-ready-to-next",
@@ -102,12 +102,12 @@ export default function DialogBox() {
         );
         if (res.status == 200) {
           alert(res.data.message);
-          setLoading(false)
+          setLoading(false);
           navigate("/tray-return-from-charging");
         }
       }
     } catch (error) {
-      setLoading(false)
+      setLoading(false);
       alert(error);
     }
   };
@@ -219,7 +219,6 @@ export default function DialogBox() {
                     <TableCell>IMEI</TableCell>
                     <TableCell>Brand Name</TableCell>
                     <TableCell>Model Name</TableCell>
-                    <TableCell>VSKU ID</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -231,7 +230,6 @@ export default function DialogBox() {
                       <TableCell>{data?.imei}</TableCell>
                       <TableCell>{data?.brand_name}</TableCell>
                       <TableCell>{data?.model_name}</TableCell>
-                      <TableCell>{data?.vendor_sku_id}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -307,7 +305,6 @@ export default function DialogBox() {
                     <TableCell>IMEI</TableCell>
                     <TableCell>Brand Name</TableCell>
                     <TableCell>Model Name</TableCell>
-                    <TableCell>VSKU ID</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -319,7 +316,6 @@ export default function DialogBox() {
                       <TableCell>{data?.imei}</TableCell>
                       <TableCell>{data?.brand_name}</TableCell>
                       <TableCell>{data?.model_name}</TableCell>
-                      <TableCell>{data?.vendor_sku_id}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -328,34 +324,36 @@ export default function DialogBox() {
           </Paper>
         </Grid>
       </Grid>
+      <div style={{ float: "right" }}>
+        <Box sx={{ float: "right" }}>
+          <textarea
+            onChange={(e) => {
+              setDescription(e.target.value);
+            }}
+            style={{ width: "400px" }}
+            placeholder="Description"
+          ></textarea>
 
-      <Box sx={{ float: "right" }}>
-        <textarea
-          onChange={(e) => {
-            setDescription(e.target.value);
-          }}
-          style={{ width: "400px" }}
-          placeholder="Description"
-        ></textarea>
-
-        <Button
-          sx={{ m: 3, mb: 9 }}
-          variant="contained"
-          disabled={
-            trayData?.items?.length == trayData?.actual_items?.length || loading == false 
-              ? false
-              : true
-          }
-          style={{ backgroundColor: "green" }}
-          onClick={(e) => {
-            if (window.confirm("You Want to Close?")) {
-              handelIssue(e);
+          <Button
+            sx={{ m: 3, mb: 9 }}
+            variant="contained"
+            disabled={
+              trayData?.items?.length == trayData?.actual_items?.length ||
+              loading == false
+                ? false
+                : true
             }
-          }}
-        >
-          Tray Close
-        </Button>
-      </Box>
+            style={{ backgroundColor: "green" }}
+            onClick={(e) => {
+              if (window.confirm("You Want to Close?")) {
+                handelIssue(e);
+              }
+            }}
+          >
+            Tray Close
+          </Button>
+        </Box>
+      </div>
     </>
   );
 }

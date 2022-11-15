@@ -81,6 +81,8 @@ export default function StickyHeadTable({ props }) {
   const [userTray, setUserTray] = useState("");
   const [trayStatus, setTrayStatus] = useState("");
   const [trayIdCheck, setTrayIdCheck] = useState("");
+  const [loadingAssign, setLoadingAssign] = useState(false);
+  const [laodingRecieved, setLoadinRecieved] = useState(false);
   const navigate = useNavigate();
   // YUP SCHEMA
   const schema = Yup.object().shape({
@@ -91,8 +93,10 @@ export default function StickyHeadTable({ props }) {
   // ON SUBMIT FOR ASSIGN NEW TRAY
   const onSubmit = async (values) => {
     try {
+      setLoadingAssign(true);
       let res = await axiosWarehouseIn.post("/assignNewTray", values);
       if (res.status === 200) {
+        setLoadingAssign(false);
         alert(res.data.message);
         setAssignNewTray(false);
         setUserTray("");
@@ -180,6 +184,7 @@ export default function StickyHeadTable({ props }) {
     if (receiveCheck === "") {
       alert("Please confirm counts");
     } else {
+      setLoadinRecieved(true);
       try {
         let obj = {
           trayId: trayId,
@@ -187,11 +192,13 @@ export default function StickyHeadTable({ props }) {
         };
         let res = await axiosWarehouseIn.post("/receivedTray", obj);
         if (res.status == 200) {
+          setLoadinRecieved(false);
           alert(res.data.message);
           setOpen(false);
           window.location.reload(false);
         }
       } catch (error) {
+        setLoadinRecieved(false);
         alert(error);
       }
     }
@@ -433,7 +440,13 @@ export default function StickyHeadTable({ props }) {
             sx={{
               m: 1,
             }}
-            disabled={trayStatus !== "Open" || userTray !== "" ? true : false}
+            disabled={
+              trayStatus !== "Open" || userTray !== ""
+                ? true
+                : false || loadingAssign == true
+                ? true
+                : false
+            }
             variant="contained"
             style={{ backgroundColor: "green" }}
             onClick={handleSubmit(onSubmit)}
@@ -533,6 +546,7 @@ export default function StickyHeadTable({ props }) {
                               m: 1,
                             }}
                             variant="contained"
+                            disabled={setLoadinRecieved}
                             style={{ backgroundColor: "green" }}
                             onClick={(e) => {
                               setOpen(true);

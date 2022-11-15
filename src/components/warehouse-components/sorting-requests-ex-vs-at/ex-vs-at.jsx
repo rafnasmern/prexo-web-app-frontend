@@ -90,7 +90,7 @@ export default function DialogBox() {
   /************************************************************************** */
   const handelIssue = async (e) => {
     e.preventDefault();
-    navigate("/view-tray-for-sorting/" + trayId);
+    navigate(-1);
   };
   const handelDelete = async (id) => {
     try {
@@ -293,7 +293,7 @@ export default function DialogBox() {
               handelIssue(e);
             }}
           >
-            Done
+            Back to List
           </Button>
         </Box>
       </div>

@@ -134,7 +134,6 @@ export default function DialogBox() {
       setLoading(true);
       let res = await axiosSortingAgent.post("/item-move-to-wht", itemDetails);
       if (res?.status == 200) {
-        alert(res.data.message);
         setRefresh((refresh) => !refresh);
         setAwbn("");
         handleClose();
@@ -158,7 +157,8 @@ export default function DialogBox() {
           trayId: trayId,
         };
         let res = await axiosSortingAgent.post(
-          "/bot-and-wht-send-to-warehouse/" + trayId
+          "/bot-and-wht-send-to-warehouse",
+          obj
         );
         if (res.status == 200) {
           alert(res.data.message);
@@ -183,6 +183,7 @@ export default function DialogBox() {
         <BootstrapDialogTitle
           id="customized-dialog-title"
           onClose={handleClose}
+          width="600px"
         >
           You are moving
         </BootstrapDialogTitle>
@@ -223,9 +224,7 @@ export default function DialogBox() {
             disabled={loading}
             component="span"
             onClick={(e) => {
-              if (window.confirm("You Want to move?")) {
                 addActualitem();
-              }
             }}
           >
             YES

@@ -95,7 +95,7 @@ export default function StickyHeadTable({ props }) {
                     <TableCell>Warehouse</TableCell>
                     <TableCell>Model</TableCell>
                     <TableCell>Brand</TableCell>
-                    <TableCell>Qunatity</TableCell>
+                    <TableCell>Quantity</TableCell>
                     <TableCell>Action</TableCell>
                   </TableRow>
                 </TableHead>

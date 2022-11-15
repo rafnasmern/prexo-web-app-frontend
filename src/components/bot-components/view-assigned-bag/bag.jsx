@@ -117,6 +117,7 @@ export default function DialogBox() {
     fetchData();
   }, [refresh]);
   useEffect(() => {
+    setCount(0);
     if (employeeData?.[1]?.tray !== undefined) {
       for (let x of employeeData?.[1]?.tray) {
         setCount(
@@ -463,7 +464,7 @@ export default function DialogBox() {
                   alt="No product image"
                   src={
                     awabnDetails?.[0]?.products.image == undefined
-                      ? "https://prexo-v1-dev-api.dealsdray.com/product/image/" +
+                      ? "http://prexo-v2-uat-adminapi.dealsdray.com/product/image/" +
                         awabnDetails?.[0]?.products.vendor_sku_id +
                         ".jpg"
                       : awabnDetails?.[0]?.products.image
@@ -577,6 +578,7 @@ export default function DialogBox() {
             fullwidth
             variant="contained"
             style={{ backgroundColor: "green" }}
+            disabled={loading}
             component="span"
             onClick={(e) => {
               if (window.confirm("You Want to Add?")) {
@@ -776,7 +778,7 @@ export default function DialogBox() {
         </DialogActions>
       </BootstrapDialog>
       <Box sx={{ mt: 13 }}>
-        <Box >
+        <Box>
           <Grid container spacing={2}>
             <Grid item xs={4}>
               <h5 style={{ marginLeft: "10px" }}>Bag Id : -{bagId}</h5>
@@ -1018,6 +1020,7 @@ export default function DialogBox() {
             mt: 2,
             mr: 3,
             ml: 3,
+            mb: 2,
           }}
         >
           <Box>

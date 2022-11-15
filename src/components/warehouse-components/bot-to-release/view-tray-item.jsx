@@ -82,11 +82,12 @@ export default function StickyHeadTable({ props }) {
                     <TableCell>S.NO</TableCell>
                     <TableCell>UIC</TableCell>
                     <TableCell>IMEI</TableCell>
-                    <TableCell>BagId</TableCell>
-                    <TableCell>Body Damage</TableCell>
-                    <TableCell>Other Info</TableCell>
-                   
-                    <TableCell>Added Date Time</TableCell>
+                    <TableCell>MUIC</TableCell>
+                    <TableCell>Brand</TableCell>
+                    <TableCell>Model</TableCell>
+                    <TableCell>WHT Tray</TableCell>
+
+                  
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -95,15 +96,11 @@ export default function StickyHeadTable({ props }) {
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>{data.uic}</TableCell>
                       <TableCell>{data.imei}</TableCell>
-                      <TableCell>{data.bag_id}</TableCell>
-                      <TableCell>{data.body_damage}</TableCell>
-                      <TableCell>{data?.stickerOne + "," + data?.stickerTwo + "," + data?.stickerThree + ","  + data?.stickerFour }</TableCell>
-                      <TableCell>
-                        {new Date(data.added_time).toLocaleString(
-                          "en-GB",
-                          { hour12: true }
-                        )}
-                      </TableCell>
+                      <TableCell>{data.muic}</TableCell>
+                      <TableCell>{data.brand}</TableCell>
+                      <TableCell>{data.model}</TableCell>
+                      <TableCell>{data.wht_tray}</TableCell>
+
                     
                     </TableRow>
                   ))}

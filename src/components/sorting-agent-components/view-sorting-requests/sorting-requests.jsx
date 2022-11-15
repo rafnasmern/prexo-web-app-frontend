@@ -128,7 +128,7 @@ export default function StickyHeadTable({ props }) {
                       </TableCell>
                       <TableCell>{data.sort_id}</TableCell>
                       <TableCell>
-                        <Button
+                        {/* <Button
                           sx={{
                             m: 1,
                           }}
@@ -138,8 +138,7 @@ export default function StickyHeadTable({ props }) {
                           component="span"
                         >
                           View Details
-                        </Button>
-
+                        </Button> */}
                         <Button
                           sx={{
                             m: 1,

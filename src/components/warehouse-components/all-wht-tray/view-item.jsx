@@ -83,7 +83,7 @@ export default function StickyHeadTable({ props }) {
                     <TableCell>Tracking Id</TableCell>
                     <TableCell>BOT Tray</TableCell>
                     <TableCell>BOT Agent</TableCell>
-                    <TableCell>Closed On</TableCell>
+                    {/* <TableCell>Closed On</TableCell> */}
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -98,13 +98,13 @@ export default function StickyHeadTable({ props }) {
                       <TableCell>{data.tray_id}</TableCell>
                       <TableCell>{data.bot_agent}</TableCell>
 
-                      <TableCell>
+                      {/* <TableCell>
                         {new Date(data.closed_time).toLocaleString("en-GB", {
                           year: "numeric",
                           month: "2-digit",
                           day: "2-digit",
                         })}
-                      </TableCell>
+                      </TableCell> */}
                     </TableRow>
                   ))}
                 </TableBody>

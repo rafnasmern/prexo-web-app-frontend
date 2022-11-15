@@ -83,6 +83,7 @@ export default function DialogBox() {
   const [open, setOpen] = useState(false);
   const [resDataUic, setResDataUic] = useState({});
   const [bodyDamage, setBodyDamage] = useState(false);
+  const [loading, setLoading] = useState(false);
   const handleClose = () => {
     setOpen(false);
   };
@@ -106,10 +107,10 @@ export default function DialogBox() {
   });
   /*********************************************************** */
   let admin = localStorage.getItem("prexo-authentication");
-  let user_name1
-  if(admin){
+  let user_name1;
+  if (admin) {
     let { user_name } = jwt_decode(admin);
-    user_name1=user_name
+    user_name1 = user_name;
   }
 
   useEffect(() => {
@@ -137,7 +138,7 @@ export default function DialogBox() {
         let res = await axiosWarehouseIn.post("/check-uic", obj);
         if (res?.status == 200) {
           setResDataUic(res.data.data);
-          handelAdd(res.data.data)
+          handelAdd(res.data.data);
         }
       } catch (error) {
         if (error.response.status == 403) {
@@ -150,7 +151,7 @@ export default function DialogBox() {
     }
   };
   const handelAdd = async (data) => {
-    if (trayData.limit <= trayData?.actual_items?.length) {
+    if (trayData.items.length < trayData?.actual_items?.length) {
       alert("All Items Scanned");
     } else {
       try {
@@ -197,17 +198,17 @@ export default function DialogBox() {
     try {
       if (description == "") {
         alert("Please Add Description");
-      } else if (
-        trayData?.actual_items?.length == trayData?.items?.length
-      ) {
+      } else if (trayData?.actual_items?.length == trayData?.items?.length) {
         let obj = {
           trayId: trayId,
           description: description,
         };
+        setLoading(true);
 
         let res = await axiosBqc.post("/bqc-done", obj);
         if (res.status == 200) {
           alert(res.data.message);
+          setLoading(false);
           navigate("/view-assigned-tray-bqc");
         }
       } else {
@@ -649,6 +650,7 @@ export default function DialogBox() {
         <Button
           sx={{ m: 3, mb: 9 }}
           variant="contained"
+          disabled={loading}
           style={{ backgroundColor: "green" }}
           onClick={() => {
             if (window.confirm("You Want send to warehouse?")) {

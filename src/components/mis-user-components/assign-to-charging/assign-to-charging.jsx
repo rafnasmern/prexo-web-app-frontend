@@ -74,6 +74,7 @@ export default function StickyHeadTable({ props }) {
   const [open, setOpen] = useState(false);
   const [chargingPerson, setChargingPerson] = useState("");
   const [chargingArr, setChrgingArr] = useState([]);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const handleClose = () => {
     setOpen(false);
@@ -153,6 +154,7 @@ export default function StickyHeadTable({ props }) {
   /*****************************************ASSING TO CHARGING REQUEST WILL GO TO MIS PANEL****** */
   const handelAssignToCharging = async (e) => {
     try {
+      setLoading(true);
       let obj = {
         tray: isCheck,
         user_name: chargingPerson,
@@ -160,12 +162,14 @@ export default function StickyHeadTable({ props }) {
       };
       let res = await axiosMisUser.post("/wht-sendTo-wharehouse", obj);
       if (res.status === 200) {
+        setLoading(false);
         setRefresh((refresh) => !refresh);
         alert(res.data.message);
         setOpen(false);
       }
     } catch (error) {
       if (error.response.status == 403) {
+        setLoading(false);
         alert(error.response.data.message);
       } else {
         alert(error);
@@ -230,7 +234,7 @@ export default function StickyHeadTable({ props }) {
             fullwidth
             variant="contained"
             style={{ backgroundColor: "green" }}
-            disabled={chargingPerson == "" ? true : false}
+            disabled={chargingPerson == "" || loading == true ? true : false}
             component="span"
             onClick={(e) => {
               if (window.confirm("You Want to assign?")) {

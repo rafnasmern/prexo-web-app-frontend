@@ -55,190 +55,215 @@ export default function Dashboard() {
   };
 
   return (
-    <Box>
+    <div style={{ marginBottom: "20px" }}>
       <h4 style={{ marginTop: "100px", marginLeft: "27px", color: "#495057" }}>
         Hi Admin! Welcome to Prexo Dashboard
       </h4>
-
       <Box
-        sx={{
-          cursor: "pointer",
-          ml: 3,
-          mt: 2,
-          width: 300,
-          boxShadow: 2,
-          height: "554px",
-          backgroundColor: "#FFFF",
-          mb: 2,
+        style={{
+          background: "#495057",
+          height: "52px",
+          marginLeft: "23px",
+          width: "610px",
+          marginTop: "19px",
         }}
       >
-        <Box style={{ background: "#495057", height: "52px" }}>
-          <h5
-            style={{ color: "#FFFFFF", textAlign: "center", paddingTop: "2px" }}
-          >
-            Dashboard
-          </h5>
-        </Box>
-        <div style={{ margin: "12px" }}>
-          <Box
-            style={{ marginBottom: "12px", marginTop: "20" }}
-            sx={{ display: "flex", flexDirection: "start" }}
-          >
-            <GroupIcon sx={{ marginTop: "4px" }} />
-            <Link
-              onClick={(e) => {
-                handelUsers(e);
-              }}
-              style={{
-                textDecoration: "none",
-                color: "black",
-                fontSize: "20px",
-                marginLeft: "5px",
-              }}
-            >
-              Users
-            </Link>
-          </Box>
-          <hr />
-          <Box
-            style={{ marginBottom: "12px", marginTop: "20" }}
-            sx={{ display: "flex", flexDirection: "start" }}
-          >
-            <LocationOnIcon sx={{ marginTop: "4px" }} />
-            <Link
-              style={{
-                textDecoration: "none",
-                color: "black",
-                fontSize: "20px",
-                marginLeft: "5px",
-              }}
-              onClick={(e) => {
-                handelLocation(e);
-              }}
-            >
-              Location
-            </Link>
-          </Box>
-          <hr />
-          <Box
-            style={{ marginBottom: "12px", marginTop: "20" }}
-            sx={{ display: "flex", flexDirection: "start" }}
-          >
-            <WarehouseIcon sx={{ marginTop: "4px" }} />
-            <Link
-              style={{
-                textDecoration: "none",
-                color: "black",
-                fontSize: "20px",
-                marginLeft: "5px",
-              }}
-              onClick={(e) => {
-                handelWarehouse(e);
-              }}
-            >
-              Warehouse
-            </Link>
-          </Box>
-          <hr />
-          <Box
-            style={{ marginBottom: "12px", marginTop: "20" }}
-            sx={{ display: "flex", flexDirection: "start" }}
-          >
-            <BrandingWatermarkIcon sx={{ marginTop: "4px" }} />
-            <Link
-              style={{
-                textDecoration: "none",
-                color: "black",
-                fontSize: "20px",
-                marginLeft: "5px",
-              }}
-              onClick={(e) => {
-                handelBrands(e);
-              }}
-            >
-              Brands
-            </Link>
-          </Box>
-          <hr />
-          <Box
-            style={{ marginBottom: "12px", marginTop: "20" }}
-            sx={{ display: "flex", flexDirection: "start" }}
-          >
-            <ProductionQuantityLimitsIcon sx={{ marginTop: "4px" }} />
-            <Link
-              style={{
-                textDecoration: "none",
-                color: "black",
-                fontSize: "20px",
-                marginLeft: "5px",
-              }}
-              onClick={(e) => {
-                handelProducts(e);
-              }}
-            >
-              Products
-            </Link>
-          </Box>
-          <hr />
-          <Box
-            style={{ marginBottom: "12px", marginTop: "20" }}
-            sx={{ display: "flex", flexDirection: "start" }}
-          >
-            <ShoppingBagSharpIcon sx={{ marginTop: "4px" }} />
-            <Link
-              style={{
-                textDecoration: "none",
-                color: "black",
-                fontSize: "20px",
-                marginLeft: "5px",
-              }}
-              onClick={(e) => {
-                handelBag(e);
-              }}
-            >
-              Bags
-            </Link>
-          </Box>
-          <hr />
-          <Box
-            style={{ marginBottom: "12px", marginTop: "20" }}
-            sx={{ display: "flex", flexDirection: "start" }}
-          >
-            <LuggageIcon sx={{ marginTop: "4px" }} />
-            <Link
-              style={{
-                textDecoration: "none",
-                color: "black",
-                fontSize: "20px",
-                marginLeft: "5px",
-              }}
-              onClick={(e) => {
-                handelTray(e);
-              }}
-            >
-              Tray
-            </Link>
-          </Box>
-          <hr />
-          <Box style={{ marginBottom: "12px", marginTop: "20" }}>
-            <TrendingFlatIcon sx={{ marginTop: "4px" }} />
-            <Link
-              style={{
-                textDecoration: "none",
-                color: "black",
-                fontSize: "20px",
-                marginLeft: "5px",
-              }}
-              onClick={(e) => {
-                handelTrack(e);
-              }}
-            >
-              Track Item
-            </Link>
-          </Box>
-          <hr />
-        </div>
+        <h5
+          style={{ color: "#FFFFFF", textAlign: "center", paddingTop: "2px" }}
+        >
+          Dashboard
+        </h5>
       </Box>
-    </Box>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+        }}
+      >
+        <Box
+          sx={{
+            cursor: "pointer",
+            ml: 3,
+            width: 300,
+            boxShadow: 2,
+            height: "437px",
+            backgroundColor: "#FFFFFF",
+          }}
+        >
+          <div style={{ margin: "12px" }}>
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
+            >
+              <GroupIcon sx={{ marginTop: "4px" }} />
+              <Link
+                onClick={(e) => {
+                  handelUsers(e);
+                }}
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+              >
+                Users
+              </Link>
+            </Box>
+            <hr />
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
+            >
+              <LocationOnIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelLocation(e);
+                }}
+              >
+                Location
+              </Link>
+            </Box>
+            <hr />
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
+            >
+              <WarehouseIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelWarehouse(e);
+                }}
+              >
+                Warehouse
+              </Link>
+            </Box>
+            <hr />
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
+            >
+              <BrandingWatermarkIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelBrands(e);
+                }}
+              >
+                Brands
+              </Link>
+            </Box>
+            <hr />
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
+            >
+              <ProductionQuantityLimitsIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelProducts(e);
+                }}
+              >
+                Products
+              </Link>
+            </Box>
+            <hr />
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
+            >
+              <ShoppingBagSharpIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelBag(e);
+                }}
+              >
+                Bags
+              </Link>
+            </Box>
+            <hr />
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
+            >
+              <LuggageIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelTray(e);
+                }}
+              >
+                Tray
+              </Link>
+            </Box>
+            <hr />
+          </div>
+        </Box>
+        <Box
+          sx={{
+            cursor: "pointer",
+            ml: 1,
+            width: 300,
+            boxShadow: 2,
+            height: "62px",
+            backgroundColor: "#FFFFFF",
+          }}
+        >
+          <div style={{ margin: "12px" }}>
+            <Box style={{ marginBottom: "12px", marginTop: "20" }}>
+              <TrendingFlatIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelTrack(e);
+                }}
+              >
+                Track Item
+              </Link>
+            </Box>
+            <hr />
+          </div>
+        </Box>
+      </Box>
+    </div>
   );
 }

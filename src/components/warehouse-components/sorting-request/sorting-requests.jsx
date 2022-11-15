@@ -11,7 +11,7 @@ import {
   Box,
   Button,
 } from "@mui/material";
-import { axiosMisUser, axiosWarehouseIn } from "../../../axios";
+import { axiosMisUser } from "../../../axios";
 // import jwt from "jsonwebtoken"
 import jwt_decode from "jwt-decode";
 //Datatable Modules
@@ -46,7 +46,11 @@ export default function StickyHeadTable({ props }) {
   }, []);
 
   const handelViewItem = (code) => {
-    navigate("/assign-for-sorting/" + code);
+    let isCheck = [];
+    isCheck.push(code);
+    navigate("/assign-for-sorting", {
+      state: { isCheck: isCheck, type: "From Request" },
+    });
   };
   const handelViewTrayForSorting = (e, code) => {
     e.preventDefault();
@@ -58,6 +62,7 @@ export default function StickyHeadTable({ props }) {
       scrollX: true,
     });
   }
+  console.log(botTray);
   return (
     <>
       <Box>
@@ -82,49 +87,50 @@ export default function StickyHeadTable({ props }) {
                 <TableHead>
                   <TableRow>
                     <TableCell>Record.NO</TableCell>
-                    <TableCell>Tray Id</TableCell>
+                    <TableCell>BOT Tray Id</TableCell>
                     <TableCell>Sorting Agent</TableCell>
-                    <TableCell>Closure Date</TableCell>
                     <TableCell>Assigned Date</TableCell>
-                    <TableCell>Quantity</TableCell>
+                    {/* <TableCell>Quantity</TableCell> */}
                     <TableCell>Status</TableCell>
+                    <TableCell>WHT Tray</TableCell>
                     <TableCell>Actions</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {botTray.map((data, index) => (
+                  {botTray?.map((data, index) => (
                     <TableRow hover role="checkbox" tabIndex={-1}>
                       <TableCell>{index + 1}</TableCell>
-                      <TableCell>{data.code}</TableCell>
-                      <TableCell>{data.issued_user_name}</TableCell>
+                      <TableCell>
+                        {data.tray?.[0]?.botTray?.join(", ")}
+                      </TableCell>
+                      <TableCell>{data._id}</TableCell>
+                      {/* <TableCell>
+                        {" "}
+                        {new Date(
+                          data?.tray[0].closed_time_wharehouse_from_bot
+                        ).toLocaleString("en-GB", {
+                          year: "numeric",
+                          month: "2-digit",
+                          day: "2-digit",
+                        })}
+                      </TableCell> */}
                       <TableCell>
                         {" "}
                         {new Date(
-                          data.closed_time_wharehouse_from_bot
+                          data?.tray[0]?.status_change_time
                         ).toLocaleString("en-GB", {
                           year: "numeric",
                           month: "2-digit",
                           day: "2-digit",
                         })}
                       </TableCell>
-                      <TableCell>
-                        {" "}
-                        {new Date(data.status_change_time).toLocaleString(
-                          "en-GB",
-                          {
-                            year: "numeric",
-                            month: "2-digit",
-                            day: "2-digit",
-                          }
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {data.items.length}/{data.limit}
-                      </TableCell>
-                      <TableCell>{data.sort_id}</TableCell>
 
+                      <TableCell>{data?.tray?.[0].sort_id}</TableCell>
                       <TableCell>
-                        <Button
+                        {data.tray?.[0]?.WhtTray?.join(", ")}
+                      </TableCell>
+                      <TableCell>
+                        {/* <Button
                           sx={{
                             m: 1,
                           }}
@@ -134,7 +140,7 @@ export default function StickyHeadTable({ props }) {
                           component="span"
                         >
                           View Details
-                        </Button>
+                        </Button> */}
                         {data.sort_id == "Assigned to sorting agent" ? (
                           <Button
                             sx={{
@@ -156,7 +162,7 @@ export default function StickyHeadTable({ props }) {
                             }}
                             variant="contained"
                             onClick={(e) =>
-                              handelViewTrayForSorting(e, data.code)
+                              handelViewTrayForSorting(e, data._id)
                             }
                             style={{ backgroundColor: "green" }}
                             component="span"

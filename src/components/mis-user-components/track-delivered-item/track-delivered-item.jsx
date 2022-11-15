@@ -214,6 +214,8 @@ export default function CustomizedMenus() {
             <TableCell>Tray Closed Time BOT</TableCell>
             <TableCell>Tray Received From BOT Time Warehouse</TableCell>
             <TableCell>Tray Closed Time Warehouse</TableCell>
+            <TableCell>Sorting Agent Name</TableCell>
+            <TableCell>Handover to Sorting Date</TableCell>
             <TableCell>WHT Tray</TableCell>
             <TableCell>WHT Tray Assigned Date</TableCell>
             <TableCell>Charging Username</TableCell>
@@ -335,6 +337,16 @@ export default function CustomizedMenus() {
                     )
                   : ""}
               </TableCell>
+              <TableCell>{data.delivery.sorting_agent_name}</TableCell>
+              <TableCell>
+                {data?.delivery.handover_sorting_date != undefined
+                  ? new Date(
+                      data?.delivery.handover_sorting_date
+                    ).toLocaleString("en-GB", {
+                      hour12: true,
+                    })
+                  : ""}
+              </TableCell>
               <TableCell>{data.delivery.wht_tray}</TableCell>
               <TableCell>
                 {data?.delivery.wht_tray_assigned_date != undefined
@@ -452,11 +464,10 @@ export default function CustomizedMenus() {
     );
   }, [item, data]);
   return (
-    <div >
+    <div>
       <Box
         sx={{
           mt: 10,
-         
         }}
       >
         <Box

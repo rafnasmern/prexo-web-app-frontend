@@ -74,7 +74,7 @@ export default function DialogBox() {
   };
   /************************************************************************** */
   const addActualitem = async (obj) => {
-    if (trayData.limit <= trayData?.actual_items?.length) {
+    if (trayData.items.length < trayData?.actual_items?.length) {
       alert("All Items Scanned");
     } else {
       try {
@@ -314,28 +314,30 @@ export default function DialogBox() {
           </Paper>
         </Grid>
       </Grid>
-      <Box sx={{ float: "right" }}>
-        <textarea
-          onChange={(e) => {
-            setDescription(e.target.value);
-          }}
-          style={{ width: "400px" }}
-          placeholder="Description"
-        ></textarea>
-        <Button
-          sx={{ m: 3, mb: 9 }}
-          variant="contained"
-          disabled={loading == true ? true : false}
-          style={{ backgroundColor: "green" }}
-          onClick={(e) => {
-            if (window.confirm("You Want to Issue?")) {
-              handelIssue(e);
-            }
-          }}
-        >
-          Issue To Agent
-        </Button>
-      </Box>
+      <div style={{ float: "right" }}>
+        <Box sx={{ float: "right" }}>
+          <textarea
+            onChange={(e) => {
+              setDescription(e.target.value);
+            }}
+            style={{ width: "400px" }}
+            placeholder="Description"
+          ></textarea>
+          <Button
+            sx={{ m: 3, mb: 9 }}
+            variant="contained"
+            disabled={loading == true ? true : false}
+            style={{ backgroundColor: "green" }}
+            onClick={(e) => {
+              if (window.confirm("You Want to Issue?")) {
+                handelIssue(e);
+              }
+            }}
+          >
+            Issue To Agent
+          </Button>
+        </Box>
+      </div>
     </>
   );
 }
