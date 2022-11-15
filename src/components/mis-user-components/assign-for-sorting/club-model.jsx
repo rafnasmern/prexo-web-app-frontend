@@ -21,7 +21,7 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { axiosMisUser } from "../../../axios";
 import CloseIcon from "@mui/icons-material/Close";
 import PropTypes from "prop-types";
@@ -64,15 +64,15 @@ BootstrapDialogTitle.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
-export default function CustomizedMenus() {
+export default function CustomizedMenus(props) {
   const [item, setItem] = useState({});
   const navigate = useNavigate();
-  const { trayId } = useParams();
-  const [sortingButtonDis, setSortingButtonDis] = useState(true);
   const [sortingAgent, setSortingAgent] = useState([]);
   const [sortingAgentName, setSortingAgentName] = useState("");
   const [open, setOpen] = useState(false);
   const [assignLoading, setAssignLoading] = useState(false);
+  const { state } = useLocation();
+  const { isCheck, type } = state;
   /******************************************************************************* */
   useEffect(() => {
     let admin = localStorage.getItem("prexo-authentication");
@@ -80,7 +80,10 @@ export default function CustomizedMenus() {
       const { location } = jwt_decode(admin);
       const fetchData = async () => {
         try {
-          let res = await axiosMisUser.post("/assign-for-sorting/" + trayId);
+          let obj = {
+            trayData: isCheck,
+          };
+          let res = await axiosMisUser.post("/assign-for-sorting", obj);
           if (res.status == 200) {
             setItem(res.data.data);
             dataTableFun();
@@ -95,19 +98,17 @@ export default function CustomizedMenus() {
     }
   }, []);
   useEffect(() => {
-    if (item?.temp_array !== undefined) {
-      let a = 0,
-        b = 0;
-      for (let x of item?.temp_array) {
-        a++;
-        if (x.assigned_count == x.item.length) {
-          b++;
-        }
-      }
-      if (a == b) {
-        setSortingButtonDis(false);
-      }
-    }
+    // if (item.length !== 0) {
+    //   for (let x of item) {
+    //     for (let y of x.items) {
+    //       if (x.wht_tray == null) {
+    //       }
+    //     }
+    //   }
+    //   // if (a == b) {
+    //   //   setSortingButtonDis(false);
+    //   // }
+    // }
   }, [item]);
   useEffect(() => {
     const fetchData = async () => {
@@ -145,10 +146,14 @@ export default function CustomizedMenus() {
   /******************************PICK LIST VIEW DETAIL**************************************** */
   const handelViewDetailClub = (e, muic) => {
     e.preventDefault();
-    navigate("/view-club-item-bot/" + muic + "/" + item.code);
+    navigate("/view-club-item-bot", {
+      state: { isCheck: isCheck, muic: muic },
+    });
   };
   const handelAssignWht = (e, muic) => {
-    navigate("/bot-club-to-wht-assignment/" + muic + "/" + item.code);
+    navigate("/bot-club-to-wht-assignment", {
+      state: { isCheck: isCheck, muic: muic },
+    });
   };
   /*********************************************TRAY ASSIGNE TO SORTING AGENT************************************************** */
   const handelSendRequestConfirm = async () => {
@@ -156,10 +161,11 @@ export default function CustomizedMenus() {
       setAssignLoading(true);
       let obj = {
         agent_name: sortingAgentName,
-        trayId: trayId,
+        trayId: isCheck,
       };
       let res = await axiosMisUser.post("/assign-to-sorting-agent", obj);
       if (res.status === 200) {
+        setAssignLoading(false);
         alert(res.data.message);
         navigate("/bot-to-wht");
       }
@@ -225,7 +231,9 @@ export default function CustomizedMenus() {
             fullwidth
             variant="contained"
             style={{ backgroundColor: "green" }}
-            disabled={sortingAgentName == "" ? true : false}
+            disabled={
+              sortingAgentName == "" || assignLoading == true ? true : false
+            }
             component="span"
             onClick={(e) => {
               if (window.confirm("You Want to assign?")) {
@@ -248,22 +256,12 @@ export default function CustomizedMenus() {
         <Box
           sx={{
             float: "left",
+            mb: 2,
           }}
         >
-          <h6 style={{ marginLeft: "3px" }}>BOT ID - {item.code}</h6>
-          <h6 style={{ marginLeft: "3px" }}>
-            Closed Date -{" "}
-            {new Date(item?.closed_time_wharehouse_from_bot).toLocaleString(
-              "en-GB",
-              {
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-              }
-            )}
-          </h6>
+          <h6>BOT Tray - {isCheck.toString()}</h6>
         </Box>
-        {item.sort_id == "Closed By Warehouse" ? (
+        {type == "Not From Request" ? (
           <Box
             sx={{
               float: "right",
@@ -277,7 +275,7 @@ export default function CustomizedMenus() {
               variant="contained"
               style={{ backgroundColor: "green" }}
               component="span"
-              disabled={sortingButtonDis}
+              disabled={item.not_assigned}
               onClick={(e) => {
                 handelClickOpen();
               }}
@@ -286,6 +284,7 @@ export default function CustomizedMenus() {
             </Button>
           </Box>
         ) : null}
+
         <Paper sx={{ width: "100%", overflow: "hidden", mt: 8 }}>
           <TableContainer>
             <Table
@@ -297,7 +296,6 @@ export default function CustomizedMenus() {
               <TableHead>
                 <TableRow>
                   <TableCell>Record.NO</TableCell>
-
                   <TableCell>MUIC</TableCell>
                   <TableCell>Brand Name</TableCell>
                   <TableCell>Model Name</TableCell>
@@ -316,8 +314,7 @@ export default function CustomizedMenus() {
                     <TableCell>{data.brand}</TableCell>
                     <TableCell>{data.model}</TableCell>
                     <TableCell>{data.item.length}</TableCell>
-                    <TableCell>{data?.wht_tray?.toString()}</TableCell>
-
+                    <TableCell>{data?.wht_tray?.join(', ')}</TableCell>
                     <TableCell>
                       <Button
                         sx={{
@@ -331,12 +328,12 @@ export default function CustomizedMenus() {
                       >
                         View Item
                       </Button>
-                      {item.sort_id == "Closed By Warehouse" ? (
+                      {type == "Not From Request" ? (
                         <Button
                           sx={{
                             m: 1,
                           }}
-                          disabled={data.item.length == data.assigned_count}
+                          disabled={data.dis_tray_assign}
                           variant="contained"
                           style={{ backgroundColor: "green" }}
                           onClick={(e) => {

@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { axiosMisUser } from "../../../axios";
 // import jwt from "jsonwebtoken"
 import jwt_decode from "jwt-decode";
+import Checkbox from "@mui/material/Checkbox";
 import moment from "moment";
 //Datatable Modules
 import $ from "jquery";
@@ -26,6 +27,8 @@ export default function CustomizedMenus() {
   const [sortDate, setSortDate] = useState("");
   const [sortData, setSortData] = useState(false);
   const [yesterdayDate, setYesterDayDate] = useState("");
+  const [isCheckAll, setIsCheckAll] = useState(false);
+  const [isCheck, setIsCheck] = useState([]);
   /*-----------------------------------------------------------------------------*/
   useEffect(() => {
     let date = new Date(); // Today!
@@ -79,11 +82,27 @@ export default function CustomizedMenus() {
       alert(error);
     }
   };
+  /*********************************************SELECT************************************************ */
+  const handleSelectAll = (e) => {
+    setIsCheckAll(!isCheckAll);
+    setIsCheck(item?.map((li, index) => li.code));
+    if (isCheckAll) {
+      setIsCheck([]);
+    }
+  };
+  const handleClick = (e) => {
+    const { id, checked } = e.target;
+    setIsCheck([...isCheck, id]);
+    if (!checked) {
+      setIsCheck(isCheck.filter((item) => item !== id));
+    }
+  };
+  const label = { inputProps: { "aria-label": "Checkbox demo" } };
   /*-----------------------------------------------------------------------------*/
   // NAVIGATE TO ASSIGN FOR SORTING PAGE
   const handelAssignForSorting = (e, code) => {
     e.preventDefault();
-    navigate("/assign-for-sorting/" + code);
+    navigate("/assign-for-sorting", { state: { isCheck: isCheck,type:"Not From Request" } });
   };
   /*-----------------------------------------------------------------------------*/
   const tableData = useMemo(() => {
@@ -96,18 +115,40 @@ export default function CustomizedMenus() {
       >
         <TableHead>
           <TableRow>
+            <TableCell>
+              {" "}
+              <Checkbox
+                {...label}
+                onClick={(e) => {
+                  handleSelectAll();
+                }}
+                checked={item?.length == isCheck.length ? true : false}
+              />{" "}
+              Select All
+            </TableCell>
             <TableCell>Record.NO</TableCell>
             <TableCell>Tray ID</TableCell>
             <TableCell>Date of Clouser</TableCell>
             <TableCell>Items Count</TableCell>
             <TableCell>Sku's Count</TableCell>
             <TableCell>Status</TableCell>
-            <TableCell>Action</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {item?.map((data, index) => (
             <TableRow tabIndex={-1}>
+              <TableCell>
+                {" "}
+                <Checkbox
+                  {...label}
+                  onClick={(e) => {
+                    handleClick(e);
+                  }}
+                  id={data.code}
+                  key={data.code}
+                  checked={isCheck.includes(data.code)}
+                />
+              </TableCell>
               <TableCell>{index + 1}</TableCell>
               <TableCell>{data.code}</TableCell>
               <TableCell>
@@ -126,27 +167,12 @@ export default function CustomizedMenus() {
               </TableCell>
               <TableCell>{data.temp_array.length}</TableCell>
               <TableCell>{data.sort_id}</TableCell>
-              <TableCell>
-                <Button
-                  sx={{
-                    ml: 2,
-                  }}
-                  variant="contained"
-                  style={{ backgroundColor: "green" }}
-                  component="span"
-                  onClick={(e) => {
-                    handelAssignForSorting(e, data.code);
-                  }}
-                >
-                  Assign For Sorting
-                </Button>
-              </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
     );
-  }, [item]);
+  }, [item, isCheck]);
   return (
     <div
       style={{ marginTop: "100px", marginLeft: "20px", marginRight: "20px" }}
@@ -207,6 +233,24 @@ export default function CustomizedMenus() {
           >
             Sort
           </Button>
+          <Box>
+            <Button
+              sx={{
+                mt: 2,
+                height: "48px",
+                width: "200px",
+              }}
+              variant="contained"
+              style={{ backgroundColor: "green" }}
+              component="span"
+              disabled={isCheck.length === 0}
+              onClick={(e) => {
+                handelAssignForSorting(e);
+              }}
+            >
+              Assign For Sorting
+            </Button>
+          </Box>
         </Box>
       </Box>
       <Paper sx={{ width: "100%", overflow: "hidden", mt: 3 }}>

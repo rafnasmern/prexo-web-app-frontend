@@ -1,14 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { styled, alpha } from "@mui/material/styles";
-
 import {
   Box,
   Button,
-  Dialog,
-  DialogContent,
-  DialogActions,
-  DialogTitle,
-  IconButton,
   TextField,
   Paper,
   Table,
@@ -18,15 +11,11 @@ import {
   TableHead,
   TableRow,
   Grid,
-  InputAdornment,
 } from "@mui/material";
-import PropTypes from "prop-types";
-import { useParams } from "react-router-dom";
 import "yup-phone";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 // import jwt from "jsonwebtoken"
-import jwt_decode from "jwt-decode";
-import CloseIcon from "@mui/icons-material/Close";
+
 import { axiosCharging, axiosWarehouseIn } from "../../../axios";
 export default function DialogBox() {
   const navigate = useNavigate();
@@ -36,11 +25,8 @@ export default function DialogBox() {
   const [uic, setUic] = useState("");
   const [description, setDescription] = useState([]);
   const [refresh, setRefresh] = useState(false);
-  const [open, setOpen] = useState(false);
   const [resDataUic, setResDataUic] = useState({});
-  const handleClose = () => {
-    setOpen(false);
-  };
+  const [loading, setLoading] = useState(false);
 
   /*********************************************************** */
 
@@ -71,7 +57,6 @@ export default function DialogBox() {
         let res = await axiosWarehouseIn.post("/check-uic", obj);
         if (res?.status == 200) {
           addActualitem(res.data.data);
-          setOpen(true);
         }
       } catch (error) {
         if (error.response.status == 403) {
@@ -98,7 +83,6 @@ export default function DialogBox() {
         if (res.status == 200) {
           setUic("");
           setRefresh((refresh) => !refresh);
-          handleClose();
         }
       } catch (error) {
         alert(error);
@@ -110,9 +94,8 @@ export default function DialogBox() {
     try {
       if (description == "") {
         alert("Please Add Description");
-      } else if (
-        trayData?.actual_items?.length == trayData?.items?.length
-      ) {
+      } else if (trayData?.actual_items?.length == trayData?.items?.length) {
+        setLoading(true);
         let obj = {
           trayId: trayId,
           description: description,
@@ -120,33 +103,18 @@ export default function DialogBox() {
         let res = await axiosCharging.post("/charge-in", obj);
         if (res.status == 200) {
           alert(res.data.message);
+          setLoading(false);
           navigate("/view-assigned-tray-charging");
         }
       } else {
         alert("Please Verify Actual Data");
       }
     } catch (error) {
+      setLoading(false);
       alert(error);
     }
   };
-  const handelDelete = async (id) => {
-    try {
-      let obj = {
-        trayId: trayId,
-        id: id,
-      };
-      let data = await axiosWarehouseIn.put("/actualBagItem", obj);
-      if (data.status == 200) {
-        alert(data.data.message);
-      }
-    } catch (error) {
-      alert(error);
-    }
-  };
-  /*********************************TRAY ASSIGNEMENT********************************** */
-
   /***************************************************************************************** */
-  const label = { inputProps: { "aria-label": "Checkbox demo" } };
   return (
     <>
       <Box
@@ -300,7 +268,6 @@ export default function DialogBox() {
                     <TableCell>MUIC</TableCell>
                     <TableCell>BOT Tray</TableCell>
                     <TableCell>BOT Agent</TableCell>
-                 
                   </TableRow>
                 </TableHead>
 
@@ -312,7 +279,6 @@ export default function DialogBox() {
                       <TableCell>{data?.muic}</TableCell>
                       <TableCell>{data?.tray_id}</TableCell>
                       <TableCell>{data?.bot_agent}</TableCell>
-                      
                     </TableRow>
                   ))}
                 </TableBody>
@@ -321,28 +287,30 @@ export default function DialogBox() {
           </Paper>
         </Grid>
       </Grid>
-
-      <Box sx={{ float: "right" }}>
-        <textarea
-          onChange={(e) => {
-            setDescription(e.target.value);
-          }}
-          style={{ width: "400px" }}
-          placeholder="Description"
-        ></textarea>
-        <Button
-          sx={{ m: 3, mb: 9 }}
-          variant="contained"
-          style={{ backgroundColor: "green" }}
-          onClick={() => {
-            if (window.confirm("Are you want to charge IN?")) {
-              handelIssue();
-            }
-          }}
-        >
-          Charging IN
-        </Button>
-      </Box>
+      <div style={{ float: "right" }}>
+        <Box sx={{ float: "right" }}>
+          <textarea
+            onChange={(e) => {
+              setDescription(e.target.value);
+            }}
+            style={{ width: "400px" }}
+            placeholder="Description"
+          ></textarea>
+          <Button
+            sx={{ m: 3, mb: 9 }}
+            variant="contained"
+            disabled={loading}
+            style={{ backgroundColor: "green" }}
+            onClick={() => {
+              if (window.confirm("Are you want to charge IN?")) {
+                handelIssue();
+              }
+            }}
+          >
+            Charging IN
+          </Button>
+        </Box>
+      </div>
     </>
   );
 }

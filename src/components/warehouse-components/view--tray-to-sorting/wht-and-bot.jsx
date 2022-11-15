@@ -69,8 +69,14 @@ export default function StickyHeadTable({ props }) {
         }
       }
       if (flag == false) {
+        let obj = {
+          allTray: botTray,
+          type: type,
+          username: botTray[0]?.issued_user_name,
+        };
         let res = await axiosWarehouseIn.post(
-          "/assign-to-sorting-confirm/" + botTray[0]?.code + "/" + type
+          "/assign-to-sorting-confirm",
+          obj
         );
         if (res.status == 200) {
           alert(res.data.message);
@@ -94,23 +100,6 @@ export default function StickyHeadTable({ props }) {
           mt: 13,
         }}
       >
-        <Box
-          sx={{
-            float: "left",
-          }}
-        >
-          <h6>BOT Tray ID - {botTray[0]?.code}</h6>
-          <h6>
-            Closure Date -{" "}
-            {new Date(
-              botTray[0]?.closed_time_wharehouse_from_bot
-            ).toLocaleString("en-GB", {
-              year: "numeric",
-              month: "2-digit",
-              day: "2-digit",
-            })}
-          </h6>
-        </Box>
         <Box
           sx={{
             float: "right",
@@ -159,7 +148,9 @@ export default function StickyHeadTable({ props }) {
                         {data.items.length}/{data.limit}
                       </TableCell>
                       <TableCell>
-                        {data.sort_id == "Sorting Request Sended To Warehouse"
+                        {data.sort_id ==
+                          "Sorting Request Sent To Warehouse" &&
+                        data.type_taxanomy == "BOT"
                           ? "Not Issued"
                           : data.type_taxanomy == "WHT" &&
                             data.items.length !== 0

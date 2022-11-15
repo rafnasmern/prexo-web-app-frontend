@@ -61,7 +61,7 @@ export default function DialogBox() {
 
   /************************************************************************** */
   const addActualitem = async (obj) => {
-    if (trayData?.limit <= trayData?.items?.length) {
+    if ( trayData?.actual_items?.length < trayData?.items.length ) {
       alert("All Items are Verified");
     } else {
       try {
@@ -108,6 +108,7 @@ export default function DialogBox() {
         }
       }
     } catch (error) {
+      setLoading(false)
       alert(error);
     }
   };
@@ -219,7 +220,6 @@ export default function DialogBox() {
                     <TableCell>IMEI</TableCell>
                     <TableCell>Brand Name</TableCell>
                     <TableCell>Model Name</TableCell>
-                    <TableCell>VSKU ID</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -231,7 +231,6 @@ export default function DialogBox() {
                       <TableCell>{data?.imei}</TableCell>
                       <TableCell>{data?.brand_name}</TableCell>
                       <TableCell>{data?.model_name}</TableCell>
-                      <TableCell>{data?.vendor_sku_id}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -307,7 +306,6 @@ export default function DialogBox() {
                     <TableCell>IMEI</TableCell>
                     <TableCell>Brand Name</TableCell>
                     <TableCell>Model Name</TableCell>
-                    <TableCell>VSKU ID</TableCell>
                   </TableRow>
                 </TableHead>
 
@@ -320,7 +318,6 @@ export default function DialogBox() {
                       <TableCell>{data?.imei}</TableCell>
                       <TableCell>{data?.brand_name}</TableCell>
                       <TableCell>{data?.model_name}</TableCell>
-                      <TableCell>{data?.vendor_sku_id}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -329,7 +326,7 @@ export default function DialogBox() {
           </Paper>
         </Grid>
       </Grid>
-
+      <div style={{float: "right" }}>
       <Box sx={{ float: "right" }}>
         <textarea
           onChange={(e) => {
@@ -357,6 +354,7 @@ export default function DialogBox() {
           Tray Close
         </Button>
       </Box>
+      </div>
     </>
   );
 }

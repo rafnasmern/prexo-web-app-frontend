@@ -24,7 +24,6 @@ import {
 import { axiosMisUser } from "../../../axios";
 import CloseIcon from "@mui/icons-material/Close";
 import PropTypes from "prop-types";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 //Datatable Modules
 import $ from "jquery";
 import "datatables.net";
@@ -68,13 +67,11 @@ BootstrapDialogTitle.propTypes = {
 
 export default function StickyHeadTable({ props }) {
   const [infraData, setInfraData] = useState([]);
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [request, setRequest] = useState("");
   const [botName, setBotName] = useState("");
-  const [bagId,setBagId]=useState("")
+  const [bagId, setBagId] = useState("");
   const [botArr, setBotArr] = useState([]);
-  const [clickState, setClickState] = useState(false);
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   useEffect(() => {
     try {
@@ -98,15 +95,14 @@ export default function StickyHeadTable({ props }) {
     try {
       const fetchData = async () => {
         let admin = localStorage.getItem("prexo-authentication");
-        if(admin){
+        if (admin) {
           let { location } = jwt_decode(admin);
           let res = await axiosMisUser.post("/getBot/" + location);
           if (res.status == 200) {
             setBotArr(res.data.data);
           }
-        }
-        else{
-          navigate('/')
+        } else {
+          navigate("/");
         }
       };
       fetchData();
@@ -114,13 +110,9 @@ export default function StickyHeadTable({ props }) {
       alert(error);
     }
   }, []);
-  // const handleClick = (event, code) => {
-  //   setRequest(code);
-  //   setClickState(false);
-  //   setAnchorEl(event.currentTarget);
-  // };
+
   const handleClose = () => {
-    setOpen(false)
+    setOpen(false);
   };
   function dataTableFun() {
     $("#example").DataTable({
@@ -129,11 +121,12 @@ export default function StickyHeadTable({ props }) {
     });
   }
   const handelClickOpen = (bagid) => {
-    setBagId(bagid)
-    setOpen(true)
+    setBagId(bagid);
+    setOpen(true);
   };
   const handelSendRequestConfirm = async () => {
     try {
+      setLoading(true);
       let obj = {
         bagId: bagId,
         bot_name: botName,
@@ -141,11 +134,13 @@ export default function StickyHeadTable({ props }) {
 
       let res = await axiosMisUser.post("/issueRequestSend", obj);
       if (res.status == 200) {
+        setLoading(false);
         alert(res.data.message);
         window.location.reload(false);
       }
     } catch (error) {
       if (error.response.status == 403) {
+        setLoading(false);
         alert(error.response.data.message);
         navigate("/uic-generate/" + error.response.data.bagId);
       }
@@ -155,7 +150,7 @@ export default function StickyHeadTable({ props }) {
     e.preventDefault();
     navigate("/uic-generate/" + bagid);
   };
- 
+
   return (
     <>
       <BootstrapDialog
@@ -214,7 +209,7 @@ export default function StickyHeadTable({ props }) {
             fullwidth
             variant="contained"
             style={{ backgroundColor: "green" }}
-            disabled={botName == "" ? true : false}
+            disabled={botName == "" || loading == true ? true : false}
             component="span"
             onClick={(e) => {
               if (window.confirm("You Want to assign?")) {
@@ -302,42 +297,44 @@ export default function StickyHeadTable({ props }) {
                       <TableCell>{data?.items?.length}</TableCell>
                       <TableCell>
                         {
-                        // request == data.code && clickState == true ? (
-                        //   <Button
-                        //     type="submit"
-                        //     variant="contained"
-                        //     style={{ backgroundColor: "#206CE2" }}
-                        //     onClick={(e) => {
-                        //       {
-                        //         if (window.confirm("You Want to Send Request?"))
-                        //           handelSendRequestConfirm(e, data.code);
-                        //       }
-                        //     }}
-                        //   >
-                        //     Send Request
-                        //   </Button>
-                        // ) : 
-                        data.sort_id != "Requested to Warehouse" &&
+                          // request == data.code && clickState == true ? (
+                          //   <Button
+                          //     type="submit"
+                          //     variant="contained"
+                          //     style={{ backgroundColor: "#206CE2" }}
+                          //     onClick={(e) => {
+                          //       {
+                          //         if (window.confirm("You Want to Send Request?"))
+                          //           handelSendRequestConfirm(e, data.code);
+                          //       }
+                          //     }}
+                          //   >
+                          //     Send Request
+                          //   </Button>
+                          // ) :
+                          data.sort_id != "Requested to Warehouse" &&
                           data.sort_id != "Issued" &&
                           data.sort_id != "Closed By Bot" ? (
-                          <>
-                            <Button
-                              variant="contained"
-                              // aria-controls={open ? "basic-menu" : undefined}
-                              // aria-haspopup="true"
-                              // aria-expanded={open ? "true" : undefined}
-                              // onClick={(e) => {
-                              //   handleClick(e, data.code);
-                              // }}
-                              disabled={
-                                data.sort_id == "In Progress" ? true : false
-                              }
-                              // endIcon={<KeyboardArrowDownIcon />}
-                              onClick={(e)=>{ handelClickOpen(data.code)}}
-                            >
-                              Assign To BOT
-                            </Button>
-                            {/* <Menu
+                            <>
+                              <Button
+                                variant="contained"
+                                // aria-controls={open ? "basic-menu" : undefined}
+                                // aria-haspopup="true"
+                                // aria-expanded={open ? "true" : undefined}
+                                // onClick={(e) => {
+                                //   handleClick(e, data.code);
+                                // }}
+                                disabled={
+                                  data.sort_id == "In Progress" ? true : false
+                                }
+                                // endIcon={<KeyboardArrowDownIcon />}
+                                onClick={(e) => {
+                                  handelClickOpen(data.code);
+                                }}
+                              >
+                                Assign To BOT
+                              </Button>
+                              {/* <Menu
                               id="basic-menu"
                               anchorEl={anchorEl}
                               open={open}
@@ -357,21 +354,22 @@ export default function StickyHeadTable({ props }) {
                                 </MenuItem>
                               ))}
                             </Menu> */}
-                          </>
-                        ) : data.sort_id != "Issued" &&
-                          data.sort_id != "Closed By Bot" ? (
-                          <Button
-                            variant="contained"
-                            style={{ backgroundColor: "#206CE2" }}
-                            // onClick={
-                            //   handleSubmit(onSubmit)
-                            // }
-                          >
-                            Requested
-                          </Button>
-                        ) : (
-                          ""
-                        )}
+                            </>
+                          ) : data.sort_id != "Issued" &&
+                            data.sort_id != "Closed By Bot" ? (
+                            <Button
+                              variant="contained"
+                              style={{ backgroundColor: "#206CE2" }}
+                              // onClick={
+                              //   handleSubmit(onSubmit)
+                              // }
+                            >
+                              Requested
+                            </Button>
+                          ) : (
+                            ""
+                          )
+                        }
                         <Button
                           sx={{
                             ml: 2,

@@ -29,7 +29,7 @@ export default function StickyHeadTable({ props }) {
         if (admin) {
           let { location } = jwt_decode(admin);
           let response = await axiosMisUser.post(
-            "/view-sorting-item/" + location  + "/" + "mis"
+            "/view-sorting-item/" + location + "/" + "mis"
           );
           if (response.status === 200) {
             setBotTray(response.data.data);
@@ -46,7 +46,9 @@ export default function StickyHeadTable({ props }) {
   }, []);
 
   const handelViewItem = (code) => {
-    navigate("/assign-for-sorting/" + code);
+    let isCheck = [];
+    isCheck.push(code);
+    navigate("/assign-for-sorting", { state: { isCheck: isCheck,type:"From Request" } });
   };
   function dataTableFun() {
     $("#example").DataTable({
@@ -116,7 +118,7 @@ export default function StickyHeadTable({ props }) {
                         )}
                       </TableCell>
                       <TableCell>
-                        {data.items.length}/{data.limit}
+                       {} {data.items.length}/{data.limit}
                       </TableCell>
                       <TableCell>{data.sort_id}</TableCell>
 

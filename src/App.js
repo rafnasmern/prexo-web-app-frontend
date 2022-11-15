@@ -75,7 +75,8 @@ import PickListClose from "./pages/warehouse-page/picklist-close";
 import AllPickList from "./pages/warehouse-page/created-picklist";
 import ViewPickListItem from "./pages/warehouse-page/view-pick-list-items";
 import InuseWhtTray from "./pages/warehouse-page/in-use-wht-tray";
-import BotToRelease from "./pages/warehouse-page/bot-to-release";
+import BotToRelease from "./pages/warehouse-page/bot-release/bot-to-release";
+import BotReleaseViewItem from "./pages/warehouse-page/bot-release/view-tray-item"
 import ChargingRequestRecieved from "./pages/warehouse-page/charging-request-recieved";
 import ChargingRequestApprove from "./pages/warehouse-page/charging-request-approve";
 import TraysInChargingWarehouse from "./pages/warehouse-page/trays-in-charging";
@@ -257,15 +258,15 @@ function App() {
           <Route path="/assign-to-audit" element={<AssigntoAudit />} />
           <Route path="/bot-to-wht" element={<BotToWht />} />
           <Route
-            path="/assign-for-sorting/:trayId"
+            path="/assign-for-sorting"
             element={<AssignForSorting />}
           />
           <Route
-            path="/view-club-item-bot/:muic/:trayId"
+            path="/view-club-item-bot"
             element={<ViewItemClubBot />}
           />
           <Route
-            path="/bot-club-to-wht-assignment/:muic/:trayId"
+            path="/bot-club-to-wht-assignment"
             element={<BotClubDataAssignToWht />}
           />
           <Route
@@ -301,6 +302,10 @@ function App() {
           <Route
             path="/return-from-sorting-close/:trayId"
             element={<ReturnFromSortingClose />}
+          />
+          <Route
+            path="/bot-release-view-item/:trayId"
+            element={<BotReleaseViewItem />}
           />
         </Routes>
       </BrowserRouter>

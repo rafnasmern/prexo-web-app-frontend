@@ -8,7 +8,7 @@ import {
   TableRow,
   TableBody,
 } from "@mui/material";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams,useLocation } from "react-router-dom";
 import { axiosWarehouseIn, axiosMisUser } from "../../../axios";
 //Datatable Modules
 import $ from "jquery";
@@ -17,14 +17,19 @@ import "datatables.net";
 export default function CustomizedMenus() {
   const [item, setItem] = useState({});
   const navigate = useNavigate();
-  const { muic, trayId } = useParams();
+  const { state } = useLocation();
+  const { isCheck,muic } = state;
   useEffect(() => {
     let admin = localStorage.getItem("prexo-authentication");
     if (admin) {
       const fetchData = async () => {
         try {
+          let obj={
+            tray:isCheck,
+            muic:muic
+          }
           let res = await axiosMisUser.post(
-            "/view-bot-clubed-data-model/" + muic + "/" + trayId
+            "/view-bot-clubed-data-model" ,obj
           );
           if (res.status === 200) {
             setItem(res.data.data);
@@ -75,14 +80,14 @@ export default function CustomizedMenus() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {item?.temp_array?.[0]?.item?.map((data, index) => (
+              {item?.temp_array?.map((data, index) => (
                 <TableRow tabIndex={-1}>
                   <TableCell>{index + 1}</TableCell>
                   <TableCell>{data?.uic}</TableCell>
                   <TableCell>{data?.imei}</TableCell>
-                  <TableCell>{item?.temp_array?.[0].muic}</TableCell>
-                  <TableCell>{item?.temp_array?.[0].brand}</TableCell>
-                  <TableCell>{item?.temp_array?.[0].model}</TableCell>
+                  <TableCell>{item.muic}</TableCell>
+                  <TableCell>{item.brand}</TableCell>
+                  <TableCell>{item.model}</TableCell>
                   <TableCell>{data?.bag_id}</TableCell>
                   <TableCell>{data?.user_name}</TableCell>
                   <TableCell>{data?.tray_id}</TableCell>

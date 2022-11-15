@@ -53,10 +53,9 @@ export default function DialogBox() {
     };
     fetchData();
   }, [refresh]);
-
   /************************************************************************** */
   const addActualitem = async (obj) => {
-    if (trayData?.limit <= trayData?.items?.length) {
+    if (trayData?.items.length < trayData?.actual_items?.length) {
       alert("All Items are Verified");
     } else {
       try {
@@ -87,19 +86,15 @@ export default function DialogBox() {
         alert("Please Add Description");
         setLoading(false);
       } else {
-        let obj = {
-          trayId: trayId,
-          description: description,
-          type: "Ready to audit",
-        };
+        trayData.description=description
         let res = await axiosWarehouseIn.post(
-          "/close-wht-tray-ready-to-next",
-          obj
+          "/wht-tray-close-from-sorting",
+          trayData
         );
         if (res.status == 200) {
           alert(res.data.message);
           setLoading(false);
-          navigate("/return-from-bqc");
+          navigate("/return-from-sorting");
         }
       }
     } catch (error) {
@@ -226,8 +221,8 @@ export default function DialogBox() {
                       <TableCell>{data?.uic}</TableCell>
                       <TableCell>{data?.muic}</TableCell>
                       <TableCell>{data?.imei}</TableCell>
-                      <TableCell>{data?.brand}</TableCell>
-                      <TableCell>{data?.model}</TableCell>
+                      <TableCell>{data?.brand_name}</TableCell>
+                      <TableCell>{data?.model_name}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -303,7 +298,6 @@ export default function DialogBox() {
                     <TableCell>IMEI</TableCell>
                     <TableCell>Brand Name</TableCell>
                     <TableCell>Model Name</TableCell>
-                    <TableCell>VSKU ID</TableCell>
                   </TableRow>
                 </TableHead>
 
@@ -316,7 +310,6 @@ export default function DialogBox() {
                       <TableCell>{data?.imei}</TableCell>
                       <TableCell>{data?.brand_name}</TableCell>
                       <TableCell>{data?.model_name}</TableCell>
-                      <TableCell>{data?.vendor_sku_id}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

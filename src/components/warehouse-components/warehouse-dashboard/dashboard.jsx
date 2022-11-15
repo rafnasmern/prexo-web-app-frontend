@@ -36,7 +36,7 @@ export default function Dashboard() {
   };
   const handelWhtTrayIssuedSorting = (e) => {
     e.preventDefault();
-    navigate("/wht-tray/" + "issued-to-sorting");
+    navigate("/trays-in-charging");
   };
   const handelViewSortingRequests = (e) => {
     e.preventDefault();
@@ -291,7 +291,7 @@ export default function Dashboard() {
                   handelWhtTrayIssuedSorting(e);
                 }}
               >
-                WHT's Issued
+                In-charging WHT
               </Link>
             </Box>
             <hr />
@@ -345,7 +345,7 @@ export default function Dashboard() {
                   handelInUseWhtTray(e);
                 }}
               >
-                Inuse wht
+                In-sorting WHT
               </Link>
             </Box>
             <hr />

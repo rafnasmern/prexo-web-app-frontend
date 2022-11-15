@@ -6,12 +6,11 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  TablePagination,
   TableRow,
   Box,
   Button,
 } from "@mui/material";
-import { axiosSuperAdminPrexo, axiosWarehouseIn } from "../../../axios";
+import { axiosWarehouseIn } from "../../../axios";
 // import jwt from "jsonwebtoken"
 import jwt_decode from "jwt-decode";
 //Datatable Modules
@@ -22,6 +21,7 @@ import { useNavigate } from "react-router-dom";
 export default function StickyHeadTable({ props }) {
   const [whtTray, setWhtTray] = useState([]);
   const [refresh, setRefresh] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,10 +49,12 @@ export default function StickyHeadTable({ props }) {
 
   const handelRelease = async (e, trayId) => {
     try {
+      setLoading(true);
       let res = await axiosWarehouseIn.post(
         "/approve-release-bot-tray/" + trayId
       );
       if (res.status === 200) {
+        setLoading(false);
         alert(res.data.message);
         $("#example").DataTable().destroy();
         setRefresh((refresh) => !refresh);
@@ -67,6 +69,10 @@ export default function StickyHeadTable({ props }) {
       scrollX: true,
     });
   }
+  const handelViewTray = (e, id) => {
+    e.preventDefault();
+    navigate("/bot-release-view-item/" + id);
+  };
 
   return (
     <>
@@ -118,6 +124,19 @@ export default function StickyHeadTable({ props }) {
                             m: 1,
                           }}
                           variant="contained"
+                          style={{ backgroundColor: "#206CE2" }}
+                          onClick={(e) => {
+                            handelViewTray(e, data.code);
+                          }}
+                        >
+                          View
+                        </Button>
+                        <Button
+                          sx={{
+                            m: 1,
+                          }}
+                          variant="contained"
+                          disabled={loading}
                           onClick={(e) => {
                             if (window.confirm("You Want to Release?")) {
                               handelRelease(e, data.code);

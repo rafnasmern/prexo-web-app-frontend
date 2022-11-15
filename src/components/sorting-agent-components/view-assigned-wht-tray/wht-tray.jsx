@@ -14,12 +14,7 @@ import {
   MenuItem,
   Menu,
 } from "@mui/material";
-import {
-  axiosBot,
-  axiosMisUser,
-  axiosSortingAgent,
-  axiosSuperAdminPrexo,
-} from "../../../axios";
+import { axiosSortingAgent } from "../../../axios";
 import Swal from "sweetalert2";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { useNavigate } from "react-router-dom";
@@ -31,6 +26,7 @@ import "datatables.net";
 export default function StickyHeadTable({ props }) {
   const [infraData, setInfraData] = useState([]);
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const open = Boolean(anchorEl);
@@ -72,13 +68,16 @@ export default function StickyHeadTable({ props }) {
   // TRAY CLOSE
   const handelCloseTray = async (trayid) => {
     try {
+      setLoading(true);
       let res = await axiosSortingAgent.post("/wht-tray-close/" + trayid);
       if (res.status == 200) {
         alert(res.data.message);
+        setLoading(false);
         window.location.reload(false);
       }
     } catch (error) {
       if (error.response.status == 403) {
+        setLoading(false);
         alert(error.response.data.message);
       } else {
         alert(error);
@@ -150,6 +149,7 @@ export default function StickyHeadTable({ props }) {
                         <Button
                           sx={{ m: 1 }}
                           type="submit"
+                          disabled={loading}
                           variant="contained"
                           style={{ backgroundColor: "red" }}
                           onClick={(e) => {

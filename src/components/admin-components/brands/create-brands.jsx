@@ -310,7 +310,7 @@ export default function DialogBox() {
           <Button
             sx={{ m: 1 }}
             variant="contained"
-            style={{ backgroundColor: "#206CE2" }}
+            style={{ backgroundColor: "green" }}
             onClick={handleClickOpen}
           >
             Add Brand

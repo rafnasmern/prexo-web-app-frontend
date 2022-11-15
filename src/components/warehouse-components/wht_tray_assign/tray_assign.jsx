@@ -290,7 +290,7 @@ export default function DialogBox() {
                   <TableRow>
                     <TableCell>S.NO</TableCell>
                     <TableCell>Tray Id</TableCell>
-                    <TableCell>Qunatity</TableCell>
+                    <TableCell>Quantity</TableCell>
                     {clubModel?.item?.filter((data) => data.wht_tray !== null)
                       .length !== clubModel?.item?.length ? (
                       <TableCell>Select</TableCell>
@@ -360,7 +360,7 @@ export default function DialogBox() {
                   <TableRow>
                     <TableCell>S.NO</TableCell>
                     <TableCell>Tray Id</TableCell>
-                    <TableCell>Qunatity</TableCell>
+                    <TableCell>Quantity</TableCell>
                     <TableCell>Action</TableCell>
                   </TableRow>
                 </TableHead>

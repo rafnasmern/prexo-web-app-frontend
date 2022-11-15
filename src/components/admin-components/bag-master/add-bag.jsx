@@ -196,7 +196,7 @@ export default function DialogBox() {
     } catch (error) {
       setLoading(false);
       if (error.response.status == 400) {
-        setOpen(false);
+        handleClose()
         Swal.fire({
           position: "top-center",
           icon: "error",
@@ -474,7 +474,7 @@ export default function DialogBox() {
           </Button>
           <Button
             variant="contained"
-            style={{ backgroundColor: "#206CE2" }}
+            style={{ backgroundColor: "green" }}
             onClick={handleClickOpen}
           >
             Add Bag

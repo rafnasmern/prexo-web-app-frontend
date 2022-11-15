@@ -18,8 +18,6 @@ import {
 import { useNavigate } from "react-router-dom";
 import { axiosMisUser, axiosSuperAdminPrexo } from "../../../axios";
 import Checkbox from "@mui/material/Checkbox";
-import { styled, alpha } from "@mui/material/styles";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 // import jwt from "jsonwebtoken"
 import jwt_decode from "jwt-decode";
 
@@ -34,7 +32,6 @@ export default function Home() {
   const [isCheckAll, setIsCheckAll] = useState(false);
   const [isCheck, setIsCheck] = useState([]);
   const [found, setFound] = useState(false);
-  const [anchorEl, setAnchorEl] = React.useState(null);
   const [refresh, setRefresh] = useState(false);
   useEffect(() => {
     let admin = localStorage.getItem("prexo-authentication");
@@ -176,48 +173,7 @@ export default function Home() {
       setIsCheck(isCheck.filter((item) => item !== id));
     }
   };
-  const StyledMenu = styled((props) => (
-    <Menu
-      elevation={0}
-      anchorOrigin={{
-        vertical: "bottom",
-        horizontal: "right",
-      }}
-      transformOrigin={{
-        vertical: "top",
-        horizontal: "right",
-      }}
-      {...props}
-    />
-  ))(({ theme }) => ({
-    "& .MuiPaper-root": {
-      borderRadius: 6,
-      marginTop: theme.spacing(1),
-      minWidth: 180,
-      color:
-        theme.palette.mode === "light"
-          ? "rgb(55, 65, 81)"
-          : theme.palette.grey[300],
-      boxShadow:
-        "rgb(255, 255, 255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px",
-      "& .MuiMenu-list": {
-        padding: "4px 0",
-      },
-      "& .MuiMenuItem-root": {
-        "& .MuiSvgIcon-root": {
-          fontSize: 18,
-          color: theme.palette.text.secondary,
-          marginRight: theme.spacing(1.5),
-        },
-        "&:active": {
-          backgroundColor: alpha(
-            theme.palette.primary.main,
-            theme.palette.action.selectedOpacity
-          ),
-        },
-      },
-    },
-  }));
+  
 
   const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
@@ -334,6 +290,7 @@ export default function Home() {
             mt: 9,
             mr: 3,
             ml: 3,
+            mb:2
           }}
         >
           <Box sx={{ mr: 3 }}>

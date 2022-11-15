@@ -723,6 +723,7 @@ export default function DialogBox() {
         </Grid>
 
         <Grid item xs={6}>
+          
           <Box sx={{ float: "right" }}>
             <textarea
               onChange={(e) => {

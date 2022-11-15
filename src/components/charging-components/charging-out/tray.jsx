@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { styled, alpha } from "@mui/material/styles";
-
 import {
   Box,
   Button,
@@ -83,6 +82,7 @@ export default function DialogBox() {
   const [open, setOpen] = useState(false);
   const [resDataUic, setResDataUic] = useState({});
   const [bodyDamage, setBodyDamage] = useState(false);
+  const [loading, setlLoading] = useState(false);
   const [charge, setCharge] = useState("");
   const handleClose = () => {
     setOpen(false);
@@ -173,6 +173,7 @@ export default function DialogBox() {
     if (trayData.limit <= trayData?.actual_items?.length) {
       alert("All Items Scanned");
     } else {
+      setlLoading(true);
       try {
         let objData = {
           trayId: trayId,
@@ -182,6 +183,7 @@ export default function DialogBox() {
         let res = await axiosWarehouseIn.post("/wht-add-actual-item", objData);
         if (res.status == 200) {
           setUic("");
+          setlLoading(false);
           setRefresh((refresh) => !refresh);
           handleClose();
         }
@@ -190,34 +192,14 @@ export default function DialogBox() {
       }
     }
   };
-  /************************************************************************** */
-  const addActualitem = async () => {
-    if (trayData.limit <= trayData?.actual_items?.length) {
-      alert("All Items Scanned");
-    } else {
-      resDataUic.remark = description;
-      try {
-        let objData = {
-          trayId: trayId,
-          item: resDataUic,
-        };
-        let res = await axiosWarehouseIn.post("/wht-add-actual-item", objData);
-        if (res.status == 200) {
-          setUic("");
-          setRefresh((refresh) => !refresh);
-          handleClose();
-        }
-      } catch (error) {
-        alert(error);
-      }
-    }
-  };
+
   /************************************************************************** */
   const handelIssue = async (e) => {
     try {
       if (description == "") {
         alert("Please Add Description");
       } else if (trayData?.actual_items?.length == trayData?.items?.length) {
+        setlLoading(true);
         let obj = {
           trayId: trayId,
           description: description,
@@ -226,26 +208,14 @@ export default function DialogBox() {
         let res = await axiosCharging.post("/charging-done", obj);
         if (res.status == 200) {
           alert(res.data.message);
+          setlLoading(false);
           navigate("/view-assigned-tray-charging");
         }
       } else {
         alert("Please Verify Actual Data");
       }
     } catch (error) {
-      alert(error);
-    }
-  };
-  const handelDelete = async (id) => {
-    try {
-      let obj = {
-        trayId: trayId,
-        id: id,
-      };
-      let data = await axiosWarehouseIn.put("/actualBagItem", obj);
-      if (data.status == 200) {
-        alert(data.data.message);
-      }
-    } catch (error) {
+      setlLoading(false);
       alert(error);
     }
   };
@@ -254,10 +224,7 @@ export default function DialogBox() {
     setBodyDamage(false);
     setOpen(true);
   };
-  /*********************************TRAY ASSIGNEMENT********************************** */
-
   /***************************************************************************************** */
-  const label = { inputProps: { "aria-label": "Checkbox demo" } };
   return (
     <>
       <BootstrapDialog
@@ -525,6 +492,7 @@ export default function DialogBox() {
             variant="contained"
             style={{ backgroundColor: "green" }}
             component="span"
+            disabled={loading}
             type="submit"
             onClick={handleSubmit(onSubmit)}
           >
@@ -702,27 +670,30 @@ export default function DialogBox() {
           </Paper>
         </Grid>
       </Grid>
-      <Box sx={{ float: "right" }}>
-        <textarea
-          onChange={(e) => {
-            setDescription(e.target.value);
-          }}
-          style={{ width: "400px" }}
-          placeholder="Description"
-        ></textarea>
-        <Button
-          sx={{ m: 3, mb: 9 }}
-          variant="contained"
-          style={{ backgroundColor: "green" }}
-          onClick={() => {
-            if (window.confirm("You Want send to warehouse?")) {
-              handelIssue();
-            }
-          }}
-        >
-          Charging Done
-        </Button>
-      </Box>
+      <div style={{ float: "right" }}>
+        <Box sx={{ float: "right" }}>
+          <textarea
+            onChange={(e) => {
+              setDescription(e.target.value);
+            }}
+            style={{ width: "400px" }}
+            placeholder="Description"
+          ></textarea>
+          <Button
+            sx={{ m: 3, mb: 9 }}
+            variant="contained"
+            disabled={loading}
+            style={{ backgroundColor: "green" }}
+            onClick={() => {
+              if (window.confirm("You Want send to warehouse?")) {
+                handelIssue();
+              }
+            }}
+          >
+            Charging Done
+          </Button>
+        </Box>
+      </div>
     </>
   );
 }

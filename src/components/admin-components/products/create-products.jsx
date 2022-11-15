@@ -552,7 +552,7 @@ export default function DialogBox() {
         <Box sx={{ maxHeight: "10px" }}>
           <Button
             variant="contained"
-            style={{ backgroundColor: "#206CE2" }}
+            style={{ backgroundColor: "green" }}
             onClick={handleClickOpen}
           >
             Add Products
