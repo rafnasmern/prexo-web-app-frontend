@@ -546,7 +546,7 @@ export default function StickyHeadTable({ props }) {
                               m: 1,
                             }}
                             variant="contained"
-                            disabled={setLoadinRecieved}
+                            disabled={laodingRecieved}
                             style={{ backgroundColor: "green" }}
                             onClick={(e) => {
                               setOpen(true);

@@ -78,6 +78,18 @@ export default function Dashboard() {
     e.preventDefault();
     navigate("/return-from-bqc");
   };
+  const handelViewInuseMmtAndPmt = (e) => {
+    e.preventDefault();
+    navigate("/inuse-mmt-pmt");
+  };
+  const handelPmtReport = (e) => {
+    e.preventDefault();
+    navigate("/pmt-report");
+  };
+  const handelMmtReport = (e) => {
+    e.preventDefault();
+    navigate("/mmt-report");
+  };
   return (
     <div style={{ marginBottom: "20px" }}>
       <h4 style={{ marginTop: "100px", marginLeft: "22px", color: "#495057" }}>
@@ -88,7 +100,7 @@ export default function Dashboard() {
           background: "#495057",
           height: "52px",
           marginLeft: "23px",
-          width: "610px",
+          width: "918px",
           marginTop: "19px",
         }}
       >
@@ -110,7 +122,7 @@ export default function Dashboard() {
             ml: 3,
             width: 300,
             boxShadow: 2,
-            height: "500px",
+            height: "437px",
             backgroundColor: "#FFFFFF",
           }}
         >
@@ -171,7 +183,7 @@ export default function Dashboard() {
                   handelBagIssue(e);
                 }}
               >
-                Bag issue request
+                Bag issue Request
               </Link>
             </Box>
             <hr />
@@ -191,7 +203,7 @@ export default function Dashboard() {
                   handelTrayCloseRequest(e);
                 }}
               >
-                Tray close request
+                Tray close Request
               </Link>
             </Box>
             <hr />
@@ -211,7 +223,7 @@ export default function Dashboard() {
                   handelBagCloseRequest(e);
                 }}
               >
-                Bag close request
+                Bag close Request
               </Link>
             </Box>
             <hr />
@@ -275,26 +287,7 @@ export default function Dashboard() {
               </Link>
             </Box>
             <hr />
-            <Box
-              style={{ marginBottom: "12px", marginTop: "20" }}
-              sx={{ display: "flex", flexDirection: "start" }}
-            >
-              <ArrowRightIcon sx={{ marginTop: "4px" }} />
-              <Link
-                style={{
-                  textDecoration: "none",
-                  color: "black",
-                  fontSize: "20px",
-                  marginLeft: "5px",
-                }}
-                onClick={(e) => {
-                  handelWhtTrayIssuedSorting(e);
-                }}
-              >
-                In-charging WHT
-              </Link>
-            </Box>
-            <hr />
+
             {/* <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}
@@ -323,11 +316,31 @@ export default function Dashboard() {
             ml: 1,
             width: 300,
             boxShadow: 2,
-            height: "499px",
+            height: "437px",
             backgroundColor: "#FFFFFF",
           }}
         >
           <div style={{ margin: "12px" }}>
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
+            >
+              <ArrowRightIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelWhtTrayIssuedSorting(e);
+                }}
+              >
+                In-charging WHT
+              </Link>
+            </Box>
+            <hr />
             <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}
@@ -386,7 +399,7 @@ export default function Dashboard() {
                   handelBotRelease(e);
                 }}
               >
-                Bot to release
+                Bot to Release
               </Link>
             </Box>
             <hr />
@@ -449,7 +462,21 @@ export default function Dashboard() {
                 Return from Charging
               </Link>
             </Box>
+
             <hr />
+          </div>
+        </Box>
+        <Box
+          sx={{
+            cursor: "pointer",
+            ml: 1,
+            width: 300,
+            boxShadow: 2,
+            height: "310px",
+            backgroundColor: "#FFFFFF",
+          }}
+        >
+          <div style={{ margin: "12px" }}>
             <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}
@@ -487,6 +514,66 @@ export default function Dashboard() {
                 }}
               >
                 Return from BQC
+              </Link>
+            </Box>
+            <hr />
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
+            >
+              <ArrowRightIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelViewInuseMmtAndPmt(e);
+                }}
+              >
+                Inuse PMT/MMT
+              </Link>
+            </Box>
+            <hr />
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
+            >
+              <ArrowRightIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelPmtReport(e);
+                }}
+              >
+                PMT Report
+              </Link>
+            </Box>
+            <hr />
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
+            >
+              <ArrowRightIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelMmtReport(e);
+                }}
+              >
+                MMT Report
               </Link>
             </Box>
             <hr />

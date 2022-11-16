@@ -18,7 +18,6 @@ import $ from "jquery";
 import "datatables.net";
 export default function StickyHeadTable({ props }) {
   const [infraData, setInfraData] = useState([]);
-  const [anchorEl, setAnchorEl] = React.useState(null);
   const { trayId } = useParams();
   const navigate = useNavigate();
   useEffect(() => {
@@ -41,16 +40,12 @@ export default function StickyHeadTable({ props }) {
       alert(error);
     }
   }, []);
-
-  //api for delete a employee
-
   function dataTableFun() {
     $("#example").DataTable({
       destroy: true,
       scrollX: true,
     });
   }
-
   return (
     <>
       <Box>
@@ -63,6 +58,7 @@ export default function StickyHeadTable({ props }) {
             display: "flex",
             flexDirection: "cloumn",
             justifyContent: "center",
+            mb:2
           }}
         >
           <Paper sx={{ width: "100%", overflow: "hidden" }}>
@@ -81,6 +77,7 @@ export default function StickyHeadTable({ props }) {
                     <TableCell>BagId</TableCell>
                     <TableCell>Body Damage</TableCell>
                     <TableCell>Other Info</TableCell>
+
                     <TableCell>Added Date Time</TableCell>
                   </TableRow>
                 </TableHead>

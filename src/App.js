@@ -76,7 +76,7 @@ import AllPickList from "./pages/warehouse-page/created-picklist";
 import ViewPickListItem from "./pages/warehouse-page/view-pick-list-items";
 import InuseWhtTray from "./pages/warehouse-page/in-use-wht-tray";
 import BotToRelease from "./pages/warehouse-page/bot-release/bot-to-release";
-import BotReleaseViewItem from "./pages/warehouse-page/bot-release/view-tray-item"
+import BotReleaseViewItem from "./pages/warehouse-page/bot-release/view-tray-item";
 import ChargingRequestRecieved from "./pages/warehouse-page/charging-request-recieved";
 import ChargingRequestApprove from "./pages/warehouse-page/charging-request-approve";
 import TraysInChargingWarehouse from "./pages/warehouse-page/trays-in-charging";
@@ -91,6 +91,9 @@ import ViewTrayForSorting from "./pages/warehouse-page/sorting-requests/view-tra
 import ViewActualVsExpected from "./pages/warehouse-page/sorting-requests/ex-vs-act";
 import ReturnFromSortingView from "./pages/warehouse-page/return-from-sorting/view-tray";
 import ReturnFromSortingClose from "./pages/warehouse-page/return-from-sorting/close-tray";
+import InuseMmtPmtTray from "./pages/warehouse-page/inue-pmt-mmt";
+import PmtReport from "./pages/warehouse-page/report/pmt-report";
+import MmtReport from "./pages/warehouse-page/report/mmt-report";
 /**********************************CHARGING PANEL************************************* */
 import ChargingPanelDashboard from "./pages/charging-pages/charging-dashboard";
 import ViewAssignedTrayCharging from "./pages/charging-pages/view-assigned-tray";
@@ -257,14 +260,8 @@ function App() {
           />
           <Route path="/assign-to-audit" element={<AssigntoAudit />} />
           <Route path="/bot-to-wht" element={<BotToWht />} />
-          <Route
-            path="/assign-for-sorting"
-            element={<AssignForSorting />}
-          />
-          <Route
-            path="/view-club-item-bot"
-            element={<ViewItemClubBot />}
-          />
+          <Route path="/assign-for-sorting" element={<AssignForSorting />} />
+          <Route path="/view-club-item-bot" element={<ViewItemClubBot />} />
           <Route
             path="/bot-club-to-wht-assignment"
             element={<BotClubDataAssignToWht />}
@@ -307,6 +304,9 @@ function App() {
             path="/bot-release-view-item/:trayId"
             element={<BotReleaseViewItem />}
           />
+          <Route path="/inuse-mmt-pmt" element={<InuseMmtPmtTray />} />
+          <Route path="/pmt-report" element={<PmtReport />} />
+          <Route path="/mmt-report" element={<MmtReport />} />
         </Routes>
       </BrowserRouter>
     </>
