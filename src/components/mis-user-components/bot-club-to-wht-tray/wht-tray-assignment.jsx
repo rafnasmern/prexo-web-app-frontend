@@ -65,7 +65,6 @@ export default function DialogBox() {
     if (clubModel?.items !== undefined) {
       for (let x of clubModel?.items) {
         if (x.muic == clubModel.muic) {
-          console.log(x);
         }
         if (x.wht_tray !== null && x.muic == clubModel.muic) {
           setCount((count) => count + 1);
@@ -129,7 +128,6 @@ export default function DialogBox() {
       alert(error);
     }
   };
-  console.log(clubModel.temp_array);
   /****************************************SELECT TRAY*********************************************** */
   const handelSelect = async (whtTrayId, trayLimit, trayQunatity) => {
     try {
@@ -145,7 +143,6 @@ export default function DialogBox() {
       let count = trayLimit - trayQunatity;
       for (let x of clubModel.items) {
         if (x.wht_tray == null && x.muic == clubModel?.muic) {
-          console.log(x);
           if (trayLimit >= i && count >= i) {
             x.model_name = clubModel?.model;
             x.brand_name = clubModel?.brand;

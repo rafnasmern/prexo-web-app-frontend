@@ -62,7 +62,6 @@ export default function StickyHeadTable({ props }) {
       scrollX: true,
     });
   }
-  console.log(botTray);
   return (
     <>
       <Box>

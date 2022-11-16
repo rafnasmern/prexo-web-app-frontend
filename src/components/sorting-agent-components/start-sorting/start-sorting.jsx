@@ -224,7 +224,7 @@ export default function DialogBox() {
             disabled={loading}
             component="span"
             onClick={(e) => {
-                addActualitem();
+              addActualitem();
             }}
           >
             YES
@@ -440,7 +440,7 @@ export default function DialogBox() {
               handelIssue(e, trayId);
             }}
           >
-            Send to Warehouse
+            Close BOT Tray
           </Button>
         </Box>
       </div>

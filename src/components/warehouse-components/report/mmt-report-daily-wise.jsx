@@ -69,7 +69,7 @@ export default function CustomizedMenus() {
         try {
           let obj = {
             location: location,
-            trayType: "PMT",
+            trayType: "MMT",
           };
           let res = await axiosWarehouseIn.post("/mmt-pmt-report", obj);
           if (res.status == 200) {
@@ -178,7 +178,7 @@ export default function CustomizedMenus() {
         let obj = {
           date: sortDate,
           location: location,
-          trayType: "PMT",
+          trayType: "MMT",
         };
         let res = await axiosWarehouseIn.post("/sort-mmt-pmt-report", obj);
         if (res.status == 200) {
@@ -224,7 +224,6 @@ export default function CustomizedMenus() {
             <TableCell>Record.NO</TableCell>
             <TableCell>Tracking ID</TableCell>
             <TableCell>Order ID</TableCell>
-            <TableCell>Uic Status</TableCell>
             <TableCell>UIC</TableCell>
             <TableCell>IMEI</TableCell>
             <TableCell>Item ID</TableCell>
@@ -232,6 +231,7 @@ export default function CustomizedMenus() {
             <TableCell>BOT Agent Name</TableCell>
             <TableCell>Tray ID</TableCell>
             <TableCell>Tray Type</TableCell>
+            <TableCell>Tray Closed Date</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -243,9 +243,15 @@ export default function CustomizedMenus() {
               <TableCell>{data.uic_code?.code}</TableCell>
               <TableCell>{data.imei}</TableCell>
               <TableCell>{data.item_id}</TableCell>
+              <TableCell>{data.bag_id}</TableCell>
               <TableCell>{data.agent_name}</TableCell>
               <TableCell>{data.tray_id}</TableCell>
               <TableCell>{data.tray_type}</TableCell>
+              <TableCell>
+                {new Date(data?.warehouse_close_date).toLocaleString("en-GB", {
+                  hour12: true,
+                })}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

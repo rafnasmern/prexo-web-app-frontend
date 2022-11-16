@@ -101,8 +101,28 @@ export default function DialogBox() {
     display_condition: Yup.string().required("Required*").nullable(),
     lock_status: Yup.string().required("Required*").nullable(),
     charging_jack_type: Yup.string().required("Required*").nullable(),
-    cimei_1: Yup.string().required("Required*").min(15).nullable(),
-    cimei_2: Yup.string().required("Required*").min(15).nullable(),
+    cimei_1: Yup.string()
+      .when("battery_status", (battery_status, schema) => {
+        if (
+          battery_status !== "Charge failed" ||
+          battery_status == "Battery Bulgingd"
+        ) {
+          return schema.required("Required");
+        }
+      })
+      .min(15)
+      .nullable(),
+    cimei_2: Yup.string()
+      .when("battery_status", (battery_status, schema) => {
+        if (
+          battery_status !== "Charge failed" ||
+          battery_status == "Battery Bulgingd"
+        ) {
+          return schema.required("Required");
+        }
+      })
+      .min(15)
+      .nullable(),
     boady_part_missing: Yup.string().required("Required*").nullable(),
     part_name: Yup.string()
       .when("boady_part_missing", (boady_part_missing, schema) => {
@@ -281,7 +301,7 @@ export default function DialogBox() {
                   value="Battery Bulging"
                   onClick={(e) => setCharge("")}
                 >
-                  Battery Bulging
+                  Battery Bulgingd
                 </MenuItem>
                 <MenuItem value="No-battery" onClick={(e) => setCharge("")}>
                   No-battery
@@ -359,7 +379,6 @@ export default function DialogBox() {
                 <MenuItem value="Display with major scratches">
                   Display with major scratches
                 </MenuItem>
-                <MenuItem value="Charge failed">Charge failed</MenuItem>
               </Select>
             </FormControl>
             <FormControl fullWidth>
@@ -380,6 +399,7 @@ export default function DialogBox() {
                 <MenuItem value="Pin/Pattern Lock">Pin/Pattern Lock</MenuItem>
                 <MenuItem value="Google Locked">Google Locked</MenuItem>
                 <MenuItem value="iCloud Locked">iCloud Locked</MenuItem>
+                <MenuItem value="Software Issue">Software Issue</MenuItem>
               </Select>
             </FormControl>
 

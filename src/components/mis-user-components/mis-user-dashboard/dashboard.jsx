@@ -243,7 +243,7 @@ export default function Dashboard() {
             ml: 1,
             width: 300,
             boxShadow: 2,
-            height: "248px",
+            height: "183px",
             backgroundColor: "#FFFFFF",
           }}
         >
@@ -308,7 +308,7 @@ export default function Dashboard() {
               </Link>
             </Box>
             <hr />
-            <Box
+            {/* <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}
             >
@@ -327,7 +327,7 @@ export default function Dashboard() {
                 Track Item
               </Link>
             </Box>
-            <hr />
+            <hr /> */}
           </div>
         </Box>
       </Box>

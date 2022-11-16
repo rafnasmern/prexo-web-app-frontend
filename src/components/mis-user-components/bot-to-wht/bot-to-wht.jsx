@@ -104,7 +104,6 @@ export default function CustomizedMenus() {
     e.preventDefault();
     navigate("/assign-for-sorting", { state: { isCheck: isCheck,type:"Not From Request" } });
   };
-  console.log(item?.length == isCheck.length);
   /*-----------------------------------------------------------------------------*/
   const tableData = useMemo(() => {
     return (

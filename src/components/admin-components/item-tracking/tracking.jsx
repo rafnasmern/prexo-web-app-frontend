@@ -330,8 +330,8 @@ export default function CustomizedMenus() {
                   : ""}
               </TableCell>
               <TableCell>
-                {data?.delivery.closed_time_wharehouse != undefined
-                  ? new Date(data?.delivery.closed_time_wharehouse).toLocaleString(
+                {data?.delivery.warehouse_close_date != undefined
+                  ? new Date(data?.delivery.warehouse_close_date).toLocaleString(
                       "en-GB",
                       {
                         hour12: true,

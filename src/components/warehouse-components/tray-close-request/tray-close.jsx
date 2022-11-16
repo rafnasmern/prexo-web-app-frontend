@@ -505,6 +505,7 @@ export default function StickyHeadTable({ props }) {
                     <TableCell>Tray Type</TableCell>
                     <TableCell>Status</TableCell>
                     <TableCell>Assigned Date</TableCell>
+                    <TableCell>Closed Date</TableCell>
                     <TableCell>Agent Name</TableCell>
                     <TableCell>Action</TableCell>
                   </TableRow>
@@ -522,6 +523,13 @@ export default function StickyHeadTable({ props }) {
                       <TableCell>
                         {" "}
                         {new Date(data.status_change_time).toLocaleString(
+                          "en-GB",
+                          { hour12: true }
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {" "}
+                        {new Date(data.closed_time_bot).toLocaleString(
                           "en-GB",
                           { hour12: true }
                         )}
