@@ -172,7 +172,6 @@ export default function CustomizedMenus() {
         } else {
           let obj = {
             location: location,
-            type: search.type,
             searchData: e.target.value,
           };
           let res = await axiosSuperAdminPrexo.post(
@@ -192,7 +191,7 @@ export default function CustomizedMenus() {
   };
   const tableData = useMemo(() => {
     return (
-      <Table stickyHeader aria-label="sticky table" >
+      <Table >
         <TableHead>
           <TableRow>
             <TableCell>Record.NO</TableCell>
@@ -216,8 +215,6 @@ export default function CustomizedMenus() {
             <TableCell>Tray Closed Time BOT</TableCell>
             <TableCell>Tray Received From BOT Time Warehouse</TableCell>
             <TableCell>Tray Closed Time Warehouse</TableCell>
-            <TableCell>Sorting Agent Name</TableCell>
-            <TableCell>Handover to Sorting Date</TableCell>
             <TableCell>WHT Tray</TableCell>
             <TableCell>WHT Tray Assigned Date</TableCell>
             <TableCell>Charging Username</TableCell>
@@ -339,16 +336,6 @@ export default function CustomizedMenus() {
                     )
                   : ""}
               </TableCell>
-              <TableCell>{data.delivery.sorting_agent_name}</TableCell>
-              <TableCell>
-                {data?.delivery.handover_sorting_date != undefined
-                  ? new Date(
-                      data?.delivery.handover_sorting_date
-                    ).toLocaleString("en-GB", {
-                      hour12: true,
-                    })
-                  : ""}
-              </TableCell>
               <TableCell>{data.delivery.wht_tray}</TableCell>
               <TableCell>
                 {data?.delivery.wht_tray_assigned_date != undefined
@@ -466,11 +453,11 @@ export default function CustomizedMenus() {
     );
   }, [data, item]);
   return (
-    <>
+    <div >
       <Box
         sx={{
           mt: 10,
-          ml: 2,
+          mr: 1,
         }}
       >
         <Box
@@ -484,7 +471,7 @@ export default function CustomizedMenus() {
               flexDirection: "start",
             }}
           >
-            <FormControl sx={{ m: 1 }} fullWidth>
+            {/* <FormControl sx={{ m: 1 }} fullWidth>
               <InputLabel sx={{ pt: 1 }} id="demo-simple-select-label">
                 Select
               </InputLabel>
@@ -501,14 +488,13 @@ export default function CustomizedMenus() {
                 <MenuItem value="uic">UIC</MenuItem>
                 <MenuItem value="tracking_id">Tracking ID</MenuItem>
               </Select>
-            </FormControl>
+            </FormControl> */}
             <TextField
               onChange={(e) => {
                 searchTrackItem(e);
               }}
               label="Search"
               variant="outlined"
-              disabled={search.type == "" ? true : false}
               fullWidth
               sx={{ m: 2 }}
             />
@@ -530,8 +516,8 @@ export default function CustomizedMenus() {
           </Box>
         </Container>
       ) : (
-        <Paper sx={{ overflow: "hidden", m: 3 }}>
-          <TableContainer sx={{ maxHeight: 1000 }}>
+        <Paper sx={{ width: "100%", overflow: "hidden", mt: 3 }}>
+          <TableContainer>
             {tableData}
             <TableFooter>
               <TableRow>
@@ -556,6 +542,6 @@ export default function CustomizedMenus() {
           </TableContainer>
         </Paper>
       )}
-    </>
+    </div>
   );
 }

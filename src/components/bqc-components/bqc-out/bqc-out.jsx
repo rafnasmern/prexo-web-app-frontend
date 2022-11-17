@@ -639,6 +639,8 @@ export default function DialogBox() {
           </Paper>
         </Grid>
       </Grid>
+      <div style={{ float: "right" }}>
+
       <Box sx={{ float: "right" }}>
         <textarea
           onChange={(e) => {
@@ -661,6 +663,7 @@ export default function DialogBox() {
           BQC Done
         </Button>
       </Box>
+      </div>
     </>
   );
 }

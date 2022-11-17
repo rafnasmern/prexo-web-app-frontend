@@ -102,104 +102,102 @@ export default function StickyHeadTable({ props }) {
             flexDirection: "cloumn",
           }}
         >
-          {
-            loading == false ? 
+          {loading == false ? (
             <Container>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                flexDirection: "column",
-              }}
-            >
-              <CircularProgress />
-              <p style={{ paddingTop: "10px" }}>Loading...</p>
-            </Box>
-          </Container>
-          :
-
-          <Paper sx={{ width: "100%" }}>
-            <TableContainer>
-              <Table style={{ width: "100%" }} id="example">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Record.NO</TableCell>
-                    <TableCell>Image</TableCell>
-                    <TableCell>Vendor SKU ID</TableCell>
-                    <TableCell>Brand Name</TableCell>
-                    <TableCell>Model Name</TableCell>
-                    <TableCell>Vendor Name</TableCell>
-                    <TableCell>MUIC</TableCell>
-                    <TableCell>Creation Time</TableCell>
-                    <TableCell>Actions</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {props.productsData.map((data, index) => (
-                    <TableRow key={data._id} hover>
-                      <TableCell>{index + 1}</TableCell>
-                      <TableCell>
-                        <img
-                          height="80px"
-                          width="80px"
-                          src={
-                            data.image == undefined
-                              ? "https://prexo-v1-dev-api.dealsdray.com/product/image/" +
-                                data.vendor_sku_id +
-                                ".jpg"
-                              : data.image
-                          }
-                        />
-                      </TableCell>
-                      <TableCell>{data.vendor_sku_id}</TableCell>
-                      <TableCell>{data.brand_name}</TableCell>
-                      <TableCell>{data.model_name}</TableCell>
-                      <TableCell>{data.vendor_name}</TableCell>
-                      <TableCell>{data.muic}</TableCell>
-                      <TableCell>
-                        {new Date(data.created_at).toLocaleString("en-GB", {
-                          hour12: true,
-                        })}
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          variant="contained"
-                          onClick={() => props.editUser(data._id)}
-                          style={{ backgroundColor: "#206CE2" }}
-                          component="span"
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          sx={{
-                            ml: 2,
-                          }}
-                          variant="contained"
-                          onClick={() => props.editImage(data._id)}
-                          style={{ backgroundColor: "green" }}
-                          component="span"
-                        >
-                          Edit Image
-                        </Button>
-                        <Button
-                          sx={{
-                            ml: 2,
-                          }}
-                          variant="contained"
-                          style={{ backgroundColor: "red" }}
-                          component="span"
-                          onClick={() => handelDelete(data._id)}
-                        >
-                          Delete
-                        </Button>
-                      </TableCell>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  flexDirection: "column",
+                }}
+              >
+                <CircularProgress />
+                <p style={{ paddingTop: "10px" }}>Loading...</p>
+              </Box>
+            </Container>
+          ) : (
+            <Paper sx={{ width: "100%" }}>
+              <TableContainer>
+                <Table style={{ width: "100%" }} id="example">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Record.NO</TableCell>
+                      <TableCell>Image</TableCell>
+                      <TableCell>Vendor SKU ID</TableCell>
+                      <TableCell>Brand Name</TableCell>
+                      <TableCell>Model Name</TableCell>
+                      <TableCell>Vendor Name</TableCell>
+                      <TableCell>MUIC</TableCell>
+                      <TableCell>Creation Time</TableCell>
+                      <TableCell>Actions</TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Paper>
-          }
+                  </TableHead>
+                  <TableBody>
+                    {props.productsData.map((data, index) => (
+                      <TableRow key={data._id} hover>
+                        <TableCell>{index + 1}</TableCell>
+                        <TableCell>
+                          <img
+                            height="80px"
+                            width="80px"
+                            src={
+                              data.image == undefined
+                                ? "http://localhost:8000/product/image/" +
+                                  data.vendor_sku_id +
+                                  ".jpg"
+                                : data.image
+                            }
+                          />
+                        </TableCell>
+                        <TableCell>{data.vendor_sku_id}</TableCell>
+                        <TableCell>{data.brand_name}</TableCell>
+                        <TableCell>{data.model_name}</TableCell>
+                        <TableCell>{data.vendor_name}</TableCell>
+                        <TableCell>{data.muic}</TableCell>
+                        <TableCell>
+                          {new Date(data.created_at).toLocaleString("en-GB", {
+                            hour12: true,
+                          })}
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="contained"
+                            onClick={() => props.editUser(data._id)}
+                            style={{ backgroundColor: "#206CE2" }}
+                            component="span"
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            sx={{
+                              ml: 2,
+                            }}
+                            variant="contained"
+                            onClick={() => props.editImage(data._id)}
+                            style={{ backgroundColor: "green" }}
+                            component="span"
+                          >
+                            Edit Image
+                          </Button>
+                          <Button
+                            sx={{
+                              ml: 2,
+                            }}
+                            variant="contained"
+                            style={{ backgroundColor: "red" }}
+                            component="span"
+                            onClick={() => handelDelete(data._id)}
+                          >
+                            Delete
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Paper>
+          )}
         </Box>
       </Box>
     </>

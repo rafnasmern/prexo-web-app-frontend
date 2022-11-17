@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from "react";
+import { styled, alpha } from "@mui/material/styles";
+
 import {
   Box,
   Button,
+  Dialog,
+  DialogContent,
+  DialogActions,
+  DialogTitle,
+  IconButton,
   TextField,
   Paper,
   Table,
@@ -11,11 +18,16 @@ import {
   TableHead,
   TableRow,
   Grid,
+  InputAdornment,
 } from "@mui/material";
+import PropTypes from "prop-types";
 import { useParams } from "react-router-dom";
 import "yup-phone";
 import { useNavigate } from "react-router-dom";
-import { axiosBqc, axiosWarehouseIn } from "../../../axios";
+// import jwt from "jsonwebtoken"
+import jwt_decode from "jwt-decode";
+import CloseIcon from "@mui/icons-material/Close";
+import { axiosBqc, axiosCharging, axiosWarehouseIn } from "../../../axios";
 export default function DialogBox() {
   const navigate = useNavigate();
   const [trayData, setTrayData] = useState([]);
@@ -26,8 +38,6 @@ export default function DialogBox() {
   const [refresh, setRefresh] = useState(false);
   const [open, setOpen] = useState(false);
   const [resDataUic, setResDataUic] = useState({});
-  const [loading, setLoading] = useState(false);
-
   const handleClose = () => {
     setOpen(false);
   };
@@ -97,26 +107,44 @@ export default function DialogBox() {
     try {
       if (description == "") {
         alert("Please Add Description");
-      } else if (trayData?.actual_items?.length == trayData?.items?.length) {
-        setLoading(true);
+      } else if (
+        trayData?.actual_items?.length == trayData?.items?.length
+      ) {
         let obj = {
           trayId: trayId,
           description: description,
         };
+
         let res = await axiosBqc.post("/bqc-in", obj);
         if (res.status == 200) {
           alert(res.data.message);
-          setLoading(false);
           navigate("/view-assigned-tray-bqc");
         }
       } else {
         alert("Please Verify Actual Data");
       }
     } catch (error) {
-      setLoading(false);
       alert(error);
     }
   };
+  const handelDelete = async (id) => {
+    try {
+      let obj = {
+        trayId: trayId,
+        id: id,
+      };
+      let data = await axiosWarehouseIn.put("/actualBagItem", obj);
+      if (data.status == 200) {
+        alert(data.data.message);
+      }
+    } catch (error) {
+      alert(error);
+    }
+  };
+  /*********************************TRAY ASSIGNEMENT********************************** */
+
+  /***************************************************************************************** */
+  const label = { inputProps: { "aria-label": "Checkbox demo" } };
   return (
     <>
       <Box
@@ -289,6 +317,7 @@ export default function DialogBox() {
           </Paper>
         </Grid>
       </Grid>
+
       <Box sx={{ float: "right" }}>
         <textarea
           onChange={(e) => {
@@ -300,7 +329,6 @@ export default function DialogBox() {
         <Button
           sx={{ m: 3, mb: 9 }}
           variant="contained"
-          disabled={loading}
           style={{ backgroundColor: "green" }}
           onClick={() => {
             if (window.confirm("Are you want to BQC IN?")) {
@@ -311,6 +339,7 @@ export default function DialogBox() {
           BQC IN
         </Button>
       </Box>
+      </div>
     </>
   );
 }
