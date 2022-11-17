@@ -191,7 +191,7 @@ export default function CustomizedMenus() {
   };
   const tableData = useMemo(() => {
     return (
-      <Table stickyHeader aria-label="sticky table">
+      <Table >
         <TableHead>
           <TableRow>
             <TableCell>Record.NO</TableCell>
@@ -215,8 +215,6 @@ export default function CustomizedMenus() {
             <TableCell>Tray Closed Time BOT</TableCell>
             <TableCell>Tray Received From BOT Time Warehouse</TableCell>
             <TableCell>Tray Closed Time Warehouse</TableCell>
-            <TableCell>Sorting Agent Name</TableCell>
-            <TableCell>Handover to Sorting Date</TableCell>
             <TableCell>WHT Tray</TableCell>
             <TableCell>WHT Tray Assigned Date</TableCell>
             <TableCell>Charging Username</TableCell>
@@ -329,23 +327,13 @@ export default function CustomizedMenus() {
                   : ""}
               </TableCell>
               <TableCell>
-                {data?.delivery.tray_close_wh_date != undefined
-                  ? new Date(data?.delivery.tray_close_wh_date).toLocaleString(
+                {data?.delivery.closed_time_wharehouse != undefined
+                  ? new Date(data?.delivery.closed_time_wharehouse).toLocaleString(
                       "en-GB",
                       {
                         hour12: true,
                       }
                     )
-                  : ""}
-              </TableCell>
-              <TableCell>{data.delivery.sorting_agent_name}</TableCell>
-              <TableCell>
-                {data?.delivery.handover_sorting_date != undefined
-                  ? new Date(
-                      data?.delivery.handover_sorting_date
-                    ).toLocaleString("en-GB", {
-                      hour12: true,
-                    })
                   : ""}
               </TableCell>
               <TableCell>{data.delivery.wht_tray}</TableCell>
@@ -465,11 +453,11 @@ export default function CustomizedMenus() {
     );
   }, [data, item]);
   return (
-    <>
+    <div >
       <Box
         sx={{
           mt: 10,
-          ml: 2,
+          mr: 1,
         }}
       >
         <Box
@@ -528,8 +516,8 @@ export default function CustomizedMenus() {
           </Box>
         </Container>
       ) : (
-        <Paper sx={{ overflow: "hidden", m: 3 }}>
-          <TableContainer sx={{ maxHeight: 1000 }}>
+        <Paper sx={{ width: "100%", overflow: "hidden", mt: 3 }}>
+          <TableContainer>
             {tableData}
             <TableFooter>
               <TableRow>
@@ -554,6 +542,6 @@ export default function CustomizedMenus() {
           </TableContainer>
         </Paper>
       )}
-    </>
+    </div>
   );
 }

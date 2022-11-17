@@ -55,7 +55,6 @@ export default function StickyHeadTable({ props }) {
       scrollX: true,
     });
   }
-
   return (
     <>
       <Box>
