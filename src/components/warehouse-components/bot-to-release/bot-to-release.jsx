@@ -98,6 +98,7 @@ export default function StickyHeadTable({ props }) {
                 <TableHead>
                   <TableRow>
                     <TableCell>Record.NO</TableCell>
+                    <TableCell>Sorting Agent</TableCell>
                     <TableCell>Tray Id</TableCell>
                     <TableCell>Tray Category</TableCell>
                     <TableCell>Quantity</TableCell>
@@ -109,6 +110,7 @@ export default function StickyHeadTable({ props }) {
                   {whtTray.map((data, index) => (
                     <TableRow hover role="checkbox" tabIndex={-1}>
                       <TableCell>{index + 1}</TableCell>
+                      <TableCell>{data.issued_user_name}</TableCell>
                       <TableCell>{data.code}</TableCell>
                       <TableCell>{data.type_taxanomy}</TableCell>
 

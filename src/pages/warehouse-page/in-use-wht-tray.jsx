@@ -1,6 +1,6 @@
 import React from "react";
 import Header from "../../components/header/Header";
-import InuseWhtTray from "../../components/warehouse-components/in-use-wht-tray/wht-tray";
+import InuseWhtTray from "../../components/warehouse-components/in-sorting-wht/wht-tray";
 import Footer from "../../components/footer/footer";
 import "../../App.css";
 const InuseWhtTrayPage = () => {

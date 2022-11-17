@@ -207,7 +207,7 @@ function App() {
             path="/view-pick-list-items/:pickListId"
             element={<ViewPickListItem />}
           />
-          <Route path="/inuse-wht-tray" element={<InuseWhtTray />} />
+          <Route path="/in-sorting-wht-tray" element={<InuseWhtTray />} />
           <Route
             path="/charging-dashboard"
             element={<ChargingPanelDashboard />}

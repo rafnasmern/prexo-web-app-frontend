@@ -82,6 +82,7 @@ export default function StickyHeadTable({ props }) {
                   <TableRow>
                     <TableCell>Record.NO</TableCell>
                     <TableCell>Tray Id</TableCell>
+                    <TableCell>Agent Name</TableCell>
                     <TableCell>Warehouse</TableCell>
                     <TableCell>Tray Category</TableCell>
                     <TableCell>Tray Brand</TableCell>
@@ -90,7 +91,7 @@ export default function StickyHeadTable({ props }) {
                     <TableCell>Quantity</TableCell>
                     <TableCell>Tray Display</TableCell>
                     <TableCell>status</TableCell>
-                    <TableCell>Creation Time</TableCell>
+                    <TableCell>Assigned Date</TableCell>
                     <TableCell>Actions</TableCell>
                   </TableRow>
                 </TableHead>
@@ -99,6 +100,7 @@ export default function StickyHeadTable({ props }) {
                     <TableRow hover role="checkbox" tabIndex={-1}>
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>{data.code}</TableCell>
+                      <TableCell>{data.issued_user_name}</TableCell>
                       <TableCell>{data.warehouse}</TableCell>
                       <TableCell>{data.type_taxanomy}</TableCell>
                       <TableCell>{data.brand}</TableCell>

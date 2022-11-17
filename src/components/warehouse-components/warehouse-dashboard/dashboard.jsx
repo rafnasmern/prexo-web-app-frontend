@@ -48,7 +48,7 @@ export default function Dashboard() {
   };
   const handelInUseWhtTray = (e) => {
     e.preventDefault();
-    navigate("/inuse-wht-tray");
+    navigate("/in-sorting-wht-tray");
   };
   const handelReturnFromSorting = (e) => {
     e.preventDefault();
@@ -334,14 +334,14 @@ export default function Dashboard() {
                   marginLeft: "5px",
                 }}
                 onClick={(e) => {
-                  handelWhtTrayIssuedSorting(e);
+                  handelInUseWhtTray(e);
                 }}
               >
-                In-charging WHT
+                In-Sorting WHT
               </Link>
             </Box>
             <hr />
-            <Box
+            {/* <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}
             >
@@ -361,7 +361,7 @@ export default function Dashboard() {
                 In-charging WHT
               </Link>
             </Box>
-            <hr />
+            <hr /> */}
             <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}
@@ -464,19 +464,6 @@ export default function Dashboard() {
             </Box>
 
             <hr />
-          </div>
-        </Box>
-        <Box
-          sx={{
-            cursor: "pointer",
-            ml: 1,
-            width: 300,
-            boxShadow: 2,
-            height: "310px",
-            backgroundColor: "#FFFFFF",
-          }}
-        >
-          <div style={{ margin: "12px" }}>
             <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}
@@ -497,6 +484,20 @@ export default function Dashboard() {
               </Link>
             </Box>
             <hr />
+          </div>
+        </Box>
+        <Box
+          sx={{
+            cursor: "pointer",
+            ml: 1,
+            width: 300,
+            boxShadow: 2,
+            height: "248px",
+            backgroundColor: "#FFFFFF",
+          }}
+        >
+          <div style={{ margin: "12px" }}>
+          
             <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}

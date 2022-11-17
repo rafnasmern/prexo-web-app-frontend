@@ -69,7 +69,6 @@ export default function DialogBox() {
   /**************************************************************************** */
   const [awbn, setAwbn] = useState("");
   const [awbnSuccess, setAwbnSuccess] = useState(false);
-  const [uic, setUic] = useState(false);
   const [open, setOpen] = useState(false);
   const [description, setDescription] = useState([]);
   const [itemDetails, setItemDetails] = useState([]);
@@ -111,6 +110,7 @@ export default function DialogBox() {
         let obj = {
           uic: e.target.value,
           trayId: trayId,
+          wht_tray:tray?.wht
         };
         let res = await axiosSortingAgent.post("/cheack-uic-for-sorting", obj);
         if (res?.status == 200) {
@@ -143,7 +143,6 @@ export default function DialogBox() {
       alert(error);
     }
   };
-
   /************************************************************************** */
   const handelIssue = async (e, trayId) => {
     e.preventDefault();
