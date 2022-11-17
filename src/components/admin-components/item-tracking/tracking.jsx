@@ -484,7 +484,7 @@ export default function CustomizedMenus() {
               flexDirection: "start",
             }}
           >
-            <FormControl sx={{ m: 1 }} fullWidth>
+            {/* <FormControl sx={{ m: 1 }} fullWidth>
               <InputLabel sx={{ pt: 1 }} id="demo-simple-select-label">
                 Select
               </InputLabel>
@@ -501,14 +501,13 @@ export default function CustomizedMenus() {
                 <MenuItem value="uic">UIC</MenuItem>
                 <MenuItem value="tracking_id">Tracking ID</MenuItem>
               </Select>
-            </FormControl>
+            </FormControl> */}
             <TextField
               onChange={(e) => {
                 searchTrackItem(e);
               }}
               label="Search"
               variant="outlined"
-              disabled={search.type == "" ? true : false}
               fullWidth
               sx={{ m: 2 }}
             />

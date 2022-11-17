@@ -358,7 +358,7 @@ export default function Dashboard() {
                   handelInUseWhtTray(e);
                 }}
               >
-                In-sorting WHT
+                In-charging WHT
               </Link>
             </Box>
             <hr />
