@@ -87,10 +87,6 @@ export default function Home() {
       accumulator.created_at = Date.now();
       accumulator[key.toLowerCase()?.split(" ").join("_")] = obj[key];
       accumulator.delet_id = id;
-      // accumulator.order_date = new Date(accumulator.order_date).toLocaleDateString()
-      // accumulator.order_timestamp = new Date(accumulator.order_timestamp);
-      // accumulator.delivery_date = new Date(accumulator.delivery_date);
-      // accumulator.gc_redeem_time = new Date(accumulator.gc_redeem_time);
       return accumulator;
     }, {});
   }
@@ -132,19 +128,10 @@ export default function Home() {
         invalidItem: [],
       };
       pagination.item.forEach((data) => {
-        data.order_date = moment(data.order_date, "DD-MM-YYYY").toDate();
-        data.order_timestamp = moment(
-          data.order_timestamp,
-          "DD-MM-YYYY HH:mm"
-        ).toDate();
-        data.delivery_date = moment(
-          data.delivery_date,
-          "DD-MM-YYYY HH:mm"
-        ).toDate();
-        data.gc_redeem_time = moment(
-          data.gc_redeem_time,
-          "DD-MM-YYYY HH:mm"
-        ).toDate();
+        data.order_date = new Date(data.order_date);
+        data.order_timestamp = new Date(data.order_timestamp);
+        data.delivery_date = new Date(data.gc_redeem_time);
+        data.gc_redeem_time = new Date(data.gc_redeem_time);
         if (data.order_status == "NEW") {
           if (
             err?.order_id_is_duplicate?.includes(data?.order_id) ||

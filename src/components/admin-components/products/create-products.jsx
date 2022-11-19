@@ -415,9 +415,7 @@ export default function DialogBox() {
                 sx={{ mt: 2 }}
               >
                 {brands.map((data) => (
-                  <MenuItem value={data.brand_name + "-" + data.brand_id}>
-                    {data.brand_name + "-" + data.brand_id}
-                  </MenuItem>
+                  <MenuItem value={data.brand_name}>{data.brand_name}</MenuItem>
                 ))}
               </Select>
             </FormControl>

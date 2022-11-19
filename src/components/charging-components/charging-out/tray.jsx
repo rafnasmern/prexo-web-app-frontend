@@ -92,7 +92,7 @@ export default function DialogBox() {
     battery_status: Yup.string().required("Required*").nullable(),
     charge_percentage: Yup.string()
       .when("battery_status", (battery_status, schema) => {
-        if (battery_status == "Charge" || battery_status == "Heat problem") {
+        if (battery_status == "Charge" || battery_status == "Heat Problem") {
           return schema.required("Required");
         }
       })
@@ -102,26 +102,36 @@ export default function DialogBox() {
     lock_status: Yup.string().required("Required*").nullable(),
     charging_jack_type: Yup.string().required("Required*").nullable(),
     cimei_1: Yup.string()
-      .when("battery_status", (battery_status, schema) => {
-        if (
-          battery_status !== "Charge failed" ||
-          battery_status == "Battery Bulgingd"
-        ) {
-          return schema.required("Required");
+      .when(
+        ["battery_status", "lock_status"],
+        (battery_status, lock_status, schema) => {
+          if (
+            battery_status !== "Charge failed" &&
+            battery_status !== "Battery Bulging" &&
+            lock_status !== "Pin/Pattern Lock" &&
+            lock_status !== "Google Locked" &&
+            lock_status !== "iCloud Locked"
+          ) {
+            return schema.required("Required").min(15);
+          }
         }
-      })
-      .min(15)
+      )
       .nullable(),
     cimei_2: Yup.string()
-      .when("battery_status", (battery_status, schema) => {
-        if (
-          battery_status !== "Charge failed" ||
-          battery_status == "Battery Bulgingd"
-        ) {
-          return schema.required("Required");
+      .when(
+        ["battery_status", "lock_status"],
+        (battery_status, lock_status, schema) => {
+          if (
+            battery_status !== "Charge failed" &&
+            battery_status !== "Battery Bulging" &&
+            lock_status !== "Pin/Pattern Lock" &&
+            lock_status !== "Google Locked" &&
+            lock_status !== "iCloud Locked"
+          ) {
+            return schema.required("Required").min(15);
+          }
         }
-      })
-      .min(15)
+      )
       .nullable(),
     boady_part_missing: Yup.string().required("Required*").nullable(),
     part_name: Yup.string()
@@ -279,7 +289,6 @@ export default function DialogBox() {
                 labelId="demo-simple-select-label"
                 fullWidth
                 label="Battery Status"
-                value={getValues("battery_status")}
                 {...register("battery_status")}
                 error={errors.battery_status ? true : false}
                 helperText={errors.battery_status?.message}
@@ -301,7 +310,7 @@ export default function DialogBox() {
                   value="Battery Bulging"
                   onClick={(e) => setCharge("")}
                 >
-                  Battery Bulgingd
+                  Battery Bulging
                 </MenuItem>
                 <MenuItem value="No-battery" onClick={(e) => setCharge("")}>
                   No-battery
@@ -317,7 +326,6 @@ export default function DialogBox() {
                   labelId="demo-simple-select-label"
                   fullWidth
                   label="Charge Percentage"
-                  value={getValues("charge_percentage")}
                   {...register("charge_percentage")}
                   error={errors.charge_percentage ? true : false}
                   helperText={errors.charge_percentage?.message}
@@ -339,7 +347,6 @@ export default function DialogBox() {
                 labelId="demo-simple-select-label"
                 fullWidth
                 label="Body Condition"
-                value={getValues("body_condition")}
                 {...register("body_condition")}
                 error={errors.body_condition ? true : false}
                 helperText={errors.body_condition?.message}
@@ -363,7 +370,6 @@ export default function DialogBox() {
                 labelId="demo-simple-select-label"
                 fullWidth
                 label="Display Condition"
-                value={getValues("display_condition")}
                 {...register("display_condition")}
                 error={errors.display_condition ? true : false}
                 helperText={errors.display_condition?.message}
@@ -373,11 +379,11 @@ export default function DialogBox() {
                   Display Condition Ok
                 </MenuItem>
                 <MenuItem value="Display Broken">Display Broken</MenuItem>
-                <MenuItem value="Display with minor scratches">
-                  Display with minor scratches
+                <MenuItem value="Display With Minor Scratches">
+                  Display With Minor Scratches
                 </MenuItem>
-                <MenuItem value="Display with major scratches">
-                  Display with major scratches
+                <MenuItem value="Display With Major Scratches">
+                  Display With Major scratches
                 </MenuItem>
               </Select>
             </FormControl>
@@ -389,7 +395,6 @@ export default function DialogBox() {
                 labelId="demo-simple-select-label"
                 fullWidth
                 label="Lock Status"
-                value={getValues("lock_status")}
                 {...register("lock_status")}
                 error={errors.lock_status ? true : false}
                 helperText={errors.lock_status?.message}
@@ -411,7 +416,6 @@ export default function DialogBox() {
                 labelId="demo-simple-select-label"
                 fullWidth
                 label="Charging Jack type"
-                value={getValues("charging_jack_type")}
                 {...register("charging_jack_type")}
                 error={errors.charging_jack_type ? true : false}
                 helperText={errors.charging_jack_type?.message}

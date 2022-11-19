@@ -110,7 +110,7 @@ export default function Home() {
       };
       pagination.item.forEach((data) => {
         data.delivery_date = deliveryData;
-        data.order_date = moment(data.order_date, "DD-MM-YYYY HH:mm").toDate();
+        data.order_date = new Date(data.order_date);
         if (
           err?.delivery_date?.includes(data?.order_date) ||
           data?.order_date == undefined ||

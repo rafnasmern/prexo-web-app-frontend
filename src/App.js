@@ -74,7 +74,7 @@ import ViewWhtTrayItem from "./pages/warehouse-page/view-wht-tray-item";
 import PickListClose from "./pages/warehouse-page/picklist-close";
 import AllPickList from "./pages/warehouse-page/created-picklist";
 import ViewPickListItem from "./pages/warehouse-page/view-pick-list-items";
-import InuseWhtTray from "./pages/warehouse-page/in-use-wht-tray";
+import InuseSorting from "./pages/warehouse-page/in-sorting-wht";
 import BotToRelease from "./pages/warehouse-page/bot-release/bot-to-release";
 import BotReleaseViewItem from "./pages/warehouse-page/bot-release/view-tray-item";
 import ChargingRequestRecieved from "./pages/warehouse-page/charging-request-recieved";
@@ -91,9 +91,11 @@ import ViewTrayForSorting from "./pages/warehouse-page/sorting-requests/view-tra
 import ViewActualVsExpected from "./pages/warehouse-page/sorting-requests/ex-vs-act";
 import ReturnFromSortingView from "./pages/warehouse-page/return-from-sorting/view-tray";
 import ReturnFromSortingClose from "./pages/warehouse-page/return-from-sorting/close-tray";
-import InuseMmtPmtTray from "./pages/warehouse-page/inue-pmt-mmt";
+import IssuedMmtPmtTray from "./pages/warehouse-page/issued-pmt-mmt";
 import PmtReport from "./pages/warehouse-page/report/pmt-report";
 import MmtReport from "./pages/warehouse-page/report/mmt-report";
+import InuseWhtTray from "./pages/warehouse-page/in-use-wht-tray/wht-tray";
+import InusePmtMmtTray from "./pages/warehouse-page/in-use-pmt-mmt/tray-page";
 /**********************************CHARGING PANEL************************************* */
 import ChargingPanelDashboard from "./pages/charging-pages/charging-dashboard";
 import ViewAssignedTrayCharging from "./pages/charging-pages/view-assigned-tray";
@@ -207,7 +209,8 @@ function App() {
             path="/view-pick-list-items/:pickListId"
             element={<ViewPickListItem />}
           />
-          <Route path="/in-sorting-wht-tray" element={<InuseWhtTray />} />
+          <Route path="/in-sorting-wht-tray" element={<InuseSorting />} />
+          <Route path="/in-use-wht-tray" element={<InuseWhtTray />} />
           <Route
             path="/charging-dashboard"
             element={<ChargingPanelDashboard />}
@@ -304,9 +307,10 @@ function App() {
             path="/bot-release-view-item/:trayId"
             element={<BotReleaseViewItem />}
           />
-          <Route path="/inuse-mmt-pmt" element={<InuseMmtPmtTray />} />
+          <Route path="/issued-mmt-pmt" element={<IssuedMmtPmtTray />} />
           <Route path="/pmt-report" element={<PmtReport />} />
           <Route path="/mmt-report" element={<MmtReport />} />
+          <Route path="/in-use-pmt-mmt" element={<InusePmtMmtTray />} />
         </Routes>
       </BrowserRouter>
     </>

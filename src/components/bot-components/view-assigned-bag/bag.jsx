@@ -243,6 +243,7 @@ export default function DialogBox() {
           stickertThree == "" ||
           stickerFour == ""
         ) {
+          setLoading(false);
           alert("Please Confirm All Stickers");
         } else if (tray[0]?.limit <= tray?.[0]?.items?.length) {
           if (tray[0]?.sort_id == "Issued") {
@@ -251,6 +252,8 @@ export default function DialogBox() {
               handelCloseTray(tray[0].code);
             }
           } else {
+            setLoading(false);
+
             alert("Tray already closed");
           }
         } else {
@@ -289,10 +292,12 @@ export default function DialogBox() {
       } else if (tray?.length !== 0) {
         if (stickerOne == "" || stickerTwo == "" || stickertThree == "") {
           alert("Please Confirm All Stickers");
+          setLoading(false);
         } else if (
           tray[0].limit <= tray?.[0]?.items?.length &&
           trayType == "BOT"
         ) {
+          setLoading(false);
           alert("Tray Is Full");
         } else if (
           tray[0].limit <= tray?.[0]?.items?.length &&
@@ -304,6 +309,7 @@ export default function DialogBox() {
               handelCloseTray(tray[0].code);
             }
           } else {
+            setLoading(false);
             alert("Tray Already Closed");
           }
         } else {
@@ -581,8 +587,11 @@ export default function DialogBox() {
             disabled={loading}
             component="span"
             onClick={(e) => {
+              setLoading(true);
               if (window.confirm("You Want to Add?")) {
                 traySegrigation(e, "BOT");
+              } else {
+                setLoading(false);
               }
             }}
           >
@@ -667,8 +676,11 @@ export default function DialogBox() {
             style={{ backgroundColor: "green" }}
             component="span"
             onClick={(e) => {
+              setLoading(true);
               if (window.confirm("You Want to Add?")) {
                 traySegrigation(e, "PMT");
+              } else {
+                setLoading(false);
               }
             }}
           >
@@ -768,8 +780,11 @@ export default function DialogBox() {
             style={{ backgroundColor: "green" }}
             component="span"
             onClick={(e) => {
+              setLoading(true);
               if (window.confirm("You Want to Add?")) {
                 traySegrigation(e, "MMT");
+              } else {
+                setLoading(false);
               }
             }}
           >
@@ -927,7 +942,7 @@ export default function DialogBox() {
                       ")  "}
                   </h5>
                   {data.sort_id == "Closed By Bot" ||
-                  data.sort_id == "Received" ||
+                  data.sort_id == "Received From BOT " ||
                   data.sort_id == "Closed By Warehouse" ? (
                     <h6 style={{ color: "red" }}>-Tray Closed</h6>
                   ) : (

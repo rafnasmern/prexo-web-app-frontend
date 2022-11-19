@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Box, Container, TextField } from "@mui/material";
+import { Box } from "@mui/material";
 import * as XLSX from "xlsx";
 import * as FileSaver from "file-saver";
 import { useParams } from "react-router-dom";
@@ -33,6 +33,7 @@ export default function Home() {
   const [isCheck, setIsCheck] = useState([]);
   const [found, setFound] = useState(false);
   const [refresh, setRefresh] = useState(false);
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     let admin = localStorage.getItem("prexo-authentication");
     try {
@@ -64,6 +65,7 @@ export default function Home() {
     if (isCheck.length == 0) {
       alert("Please Select Atleast One Delivered Data");
     } else {
+      setLoading(true);
       const addUic = async () => {
         let count = 0;
         for (let i = 0; i < isCheck.length; i++) {
@@ -87,7 +89,8 @@ export default function Home() {
           count++;
         }
         if (count == isCheck.length) {
-          alert("Successfully Created");
+          alert("Successfully Genrated");
+          setLoading(false);
           setIsCheck([]);
           setRefresh((refresh) => !refresh);
         }
@@ -95,7 +98,6 @@ export default function Home() {
       addUic();
     }
   };
- 
 
   const fileType =
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
@@ -173,7 +175,6 @@ export default function Home() {
       setIsCheck(isCheck.filter((item) => item !== id));
     }
   };
-  
 
   const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
@@ -290,7 +291,6 @@ export default function Home() {
             mt: 9,
             mr: 3,
             ml: 3,
-            mb:2
           }}
         >
           <Box sx={{ mr: 3 }}>
@@ -298,6 +298,7 @@ export default function Home() {
               variant="contained"
               fullWidth
               sx={{ mt: 2, mb: 1 }}
+              disabled={loading}
               style={{ backgroundColor: "#206CE2", float: "left" }}
               onClick={(e) => {
                 handelUicGen(e);
@@ -355,7 +356,7 @@ export default function Home() {
           </MenuItem>
         </StyledMenu> */}
       </Box>
-      <Paper sx={{ width: "100%", overflow: "hidden", mt: 3 }}>
+      <Paper sx={{ width: "100%", overflow: "hidden", mt: 3, mb: 2 }}>
         <TableContainer>{tabelData}</TableContainer>
       </Paper>
     </>

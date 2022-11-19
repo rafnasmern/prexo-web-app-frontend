@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { styled, alpha } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 import {
   Paper,
   Table,
@@ -11,7 +11,6 @@ import {
   Box,
   Button,
   MenuItem,
-  Menu,
   Dialog,
   DialogTitle,
   IconButton,
@@ -441,7 +440,7 @@ export default function StickyHeadTable({ props }) {
               m: 1,
             }}
             disabled={
-              trayStatus !== "Open" || userTray !== ""
+              trayStatus !== "Open" || trayStatus !== "Inuse" || userTray !== ""
                 ? true
                 : false || loadingAssign == true
                 ? true

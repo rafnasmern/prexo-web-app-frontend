@@ -172,6 +172,7 @@ export default function CustomizedMenus() {
   const handelSort = async (e) => {
     e.preventDefault();
     try {
+      setLoading(false);
       let admin = localStorage.getItem("prexo-authentication");
       if (admin) {
         const { location } = jwt_decode(admin);
@@ -182,6 +183,7 @@ export default function CustomizedMenus() {
         };
         let res = await axiosWarehouseIn.post("/sort-mmt-pmt-report", obj);
         if (res.status == 200) {
+          setLoading(true);
           setItem(res.data.data);
         }
       }
@@ -364,7 +366,7 @@ export default function CustomizedMenus() {
           </Box>
         </Container>
       ) : (
-        <Paper sx={{ width: "100%", overflow: "hidden", mt: 3 }}>
+        <Paper sx={{ width: "100%", overflow: "hidden", mt: 3,mb:2 }}>
           <TableContainer>
             {tableData}
             {item.length == 0 ? (

@@ -192,7 +192,7 @@ export default function CustomizedMenus() {
   };
   const tableData = useMemo(() => {
     return (
-      <Table stickyHeader aria-label="sticky table" >
+      <Table stickyHeader aria-label="sticky table">
         <TableHead>
           <TableRow>
             <TableCell>Record.NO</TableCell>
@@ -220,6 +220,8 @@ export default function CustomizedMenus() {
             <TableCell>Handover to Sorting Date</TableCell>
             <TableCell>WHT Tray</TableCell>
             <TableCell>WHT Tray Assigned Date</TableCell>
+            <TableCell>WHT Tray Received From Sorting</TableCell>
+            <TableCell>WHT Tray Closed After Sorting</TableCell>
             <TableCell>Charging Username</TableCell>
             <TableCell>Charging Assigned Date</TableCell>
             <TableCell>Charge In Date</TableCell>
@@ -330,14 +332,20 @@ export default function CustomizedMenus() {
                   : ""}
               </TableCell>
               <TableCell>
-                {data?.delivery.closed_time_wharehouse != undefined
-                  ? new Date(data?.delivery.closed_time_wharehouse).toLocaleString(
+                {data?.delivery.warehouse_close_date != undefined
+                  ? new Date(
+                      data?.delivery.warehouse_close_date
+                    ).toLocaleString("en-GB", {
+                      hour12: true,
+                    })
+                  : data?.delivery.tray_close_wh_date != undefined
+                  ? new Date(data?.delivery.tray_close_wh_date).toLocaleString(
                       "en-GB",
                       {
                         hour12: true,
                       }
                     )
-                  : ""}
+                  : null}
               </TableCell>
               <TableCell>{data.delivery.sorting_agent_name}</TableCell>
               <TableCell>
@@ -357,6 +365,25 @@ export default function CustomizedMenus() {
                     ).toLocaleString("en-GB", {
                       hour12: true,
                     })
+                  : ""}
+              </TableCell>
+              <TableCell>
+                {data?.delivery.received_from_sorting != undefined
+                  ? new Date(
+                      data?.delivery.received_from_sorting
+                    ).toLocaleString("en-GB", {
+                      hour12: true,
+                    })
+                  : ""}
+              </TableCell>
+              <TableCell>
+                {data?.delivery.closed_from_sorting != undefined
+                  ? new Date(data?.delivery.closed_from_sorting).toLocaleString(
+                      "en-GB",
+                      {
+                        hour12: true,
+                      }
+                    )
                   : ""}
               </TableCell>
               <TableCell>{data.delivery.agent_name_charging}</TableCell>

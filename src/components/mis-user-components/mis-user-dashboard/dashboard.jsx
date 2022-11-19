@@ -210,11 +210,10 @@ export default function Dashboard() {
                   handelBotToWht(e);
                 }}
               >
-                Bot to Wht
+                BOT to WHT
               </Link>
             </Box>
             <hr />
-
             <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}
@@ -243,11 +242,31 @@ export default function Dashboard() {
             ml: 1,
             width: 300,
             boxShadow: 2,
-            height: "183px",
+            height: "310px",
             backgroundColor: "#FFFFFF",
           }}
         >
           <div style={{ margin: "12px" }}>
+          <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
+            >
+              <ArrowRightIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelAssignToCharging(e);
+                }}
+              >
+                WHT Merge
+              </Link>
+            </Box>
+            <hr />
             <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}
@@ -268,6 +287,7 @@ export default function Dashboard() {
               </Link>
             </Box>
             <hr />
+          
             <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}
@@ -308,7 +328,7 @@ export default function Dashboard() {
               </Link>
             </Box>
             <hr />
-            {/* <Box
+            <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}
             >
@@ -327,7 +347,7 @@ export default function Dashboard() {
                 Track Item
               </Link>
             </Box>
-            <hr /> */}
+            <hr />
           </div>
         </Box>
       </Box>

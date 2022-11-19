@@ -26,17 +26,13 @@ export default function Dashboard() {
     e.preventDefault();
     navigate("/bot-tray-close");
   };
-  const handelPicklist = (e) => {
-    e.preventDefault();
-    navigate("/picklist-request");
-  };
+  // const handelPicklist = (e) => {
+  //   e.preventDefault();
+  //   navigate("/picklist-request");
+  // };
   const handelWhtTray = (e) => {
     e.preventDefault();
     navigate("/wht-tray/" + "all-wht-tray");
-  };
-  const handelWhtTrayIssuedSorting = (e) => {
-    e.preventDefault();
-    navigate("/trays-in-charging");
   };
   const handelViewSortingRequests = (e) => {
     e.preventDefault();
@@ -46,7 +42,7 @@ export default function Dashboard() {
     e.preventDefault();
     navigate("/all-pick-list");
   };
-  const handelInUseWhtTray = (e) => {
+  const handelInSortingWhtTray = (e) => {
     e.preventDefault();
     navigate("/in-sorting-wht-tray");
   };
@@ -78,9 +74,9 @@ export default function Dashboard() {
     e.preventDefault();
     navigate("/return-from-bqc");
   };
-  const handelViewInuseMmtAndPmt = (e) => {
+  const handelViewIssuedMmtAndPmt = (e) => {
     e.preventDefault();
-    navigate("/inuse-mmt-pmt");
+    navigate("/issued-mmt-pmt");
   };
   const handelPmtReport = (e) => {
     e.preventDefault();
@@ -89,6 +85,14 @@ export default function Dashboard() {
   const handelMmtReport = (e) => {
     e.preventDefault();
     navigate("/mmt-report");
+  };
+  const handelInuseWhtTray = (e) => {
+    e.preventDefault();
+    navigate("/in-use-wht-tray");
+  };
+  const handelInusePmtMmtTray = (e) => {
+    e.preventDefault();
+    navigate("/in-use-pmt-mmt");
   };
   return (
     <div style={{ marginBottom: "20px" }}>
@@ -334,7 +338,7 @@ export default function Dashboard() {
                   marginLeft: "5px",
                 }}
                 onClick={(e) => {
-                  handelInUseWhtTray(e);
+                  handelInSortingWhtTray(e);
                 }}
               >
                 In-Sorting WHT
@@ -492,12 +496,11 @@ export default function Dashboard() {
             ml: 1,
             width: 300,
             boxShadow: 2,
-            height: "248px",
+            height: "374px",
             backgroundColor: "#FFFFFF",
           }}
         >
           <div style={{ margin: "12px" }}>
-          
             <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}
@@ -531,10 +534,50 @@ export default function Dashboard() {
                   marginLeft: "5px",
                 }}
                 onClick={(e) => {
-                  handelViewInuseMmtAndPmt(e);
+                  handelInuseWhtTray(e);
+                }}
+              >
+                Inuse WHT
+              </Link>
+            </Box>
+            <hr />
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
+            >
+              <ArrowRightIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelInusePmtMmtTray(e);
                 }}
               >
                 Inuse PMT/MMT
+              </Link>
+            </Box>
+            <hr />
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
+            >
+              <ArrowRightIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelViewIssuedMmtAndPmt(e);
+                }}
+              >
+                Issued PMT/MMT
               </Link>
             </Box>
             <hr />
