@@ -29,11 +29,10 @@ import PropTypes from "prop-types";
 import { useParams } from "react-router-dom";
 import "yup-phone";
 import CloseIcon from "@mui/icons-material/Close";
-import { styled, alpha } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { axiosBot } from "../../../axios";
-import Swal from "sweetalert2";
 import Checkbox from "@mui/material/Checkbox";
 // import jwt from "jsonwebtoken"
 import jwt_decode from "jwt-decode";
@@ -173,7 +172,7 @@ export default function DialogBox() {
           trayId: botTray[0].code,
         };
         let res = await axiosBot.post("/closeBag", obj);
-        if (res.status == 200) {
+        if (res.status === 200) {
           setLoading(false);
           alert(res.data.message);
           navigate("/bot-bag-page");
@@ -196,13 +195,13 @@ export default function DialogBox() {
           username: user_name1,
         };
         let res = await axiosBot.post("/awbnScanning", obj);
-        if (res.status == 200) {
+        if (res.status === 200) {
           setAwbnDetails(res.data.data);
           setAwbn("");
           setOpen(true);
         }
       } catch (error) {
-        if (error.response.status == 403) {
+        if (error.response.status === 403) {
           alert(error.response.data.message);
           setAwbn("");
         } else {
@@ -361,7 +360,11 @@ export default function DialogBox() {
       }
     } catch (error) {
       setLoading(false);
-      alert(error);
+      if (error.response.status == 403) {
+        alert(error.response.data.message);
+      } else {
+        alert(error);
+      }
     }
   };
   // TRAY CLOSE
@@ -942,7 +945,7 @@ export default function DialogBox() {
                       ")  "}
                   </h5>
                   {data.sort_id == "Closed By Bot" ||
-                  data.sort_id == "Received From BOT " ||
+                  data.sort_id == "Received From BOT" ||
                   data.sort_id == "Closed By Warehouse" ? (
                     <h6 style={{ color: "red" }}>-Tray Closed</h6>
                   ) : (

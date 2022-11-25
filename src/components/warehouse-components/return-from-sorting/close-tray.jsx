@@ -2,11 +2,6 @@ import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
-  Dialog,
-  DialogContent,
-  DialogActions,
-  DialogTitle,
-  IconButton,
   TextField,
   Paper,
   Table,
@@ -32,8 +27,7 @@ export default function DialogBox() {
   const [uic, setUic] = useState("");
   const [bagReuse, setBagReuse] = useState(false);
   const [description, setDescription] = useState([]);
-  /*********************************************************** */
-
+  /************************************************************/
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -72,7 +66,11 @@ export default function DialogBox() {
           setUic("");
         }
       } catch (error) {
-        alert(error);
+        if (error.response.status == 403) {
+          alert(error.response.data.message);
+        } else {
+          alert(error);
+        }
       }
     }
   };
@@ -86,7 +84,7 @@ export default function DialogBox() {
         alert("Please Add Description");
         setLoading(false);
       } else {
-        trayData.description=description
+        trayData.description = description;
         let res = await axiosWarehouseIn.post(
           "/wht-tray-close-from-sorting",
           trayData

@@ -118,11 +118,16 @@ export default function StickyHeadTable({ props }) {
   });
   const handelOpen = async () => {
     try {
-      let res = await axiosWarehouseIn.post("/botUsers");
-      if (res.status == 200) {
-        setAssignNewTray(true);
-        setBotUsers(res.data.data);
+      let admin = localStorage.getItem("prexo-authentication");
+      if(admin){
+        let { location } = jwt_decode(admin);
+        let res = await axiosWarehouseIn.post("/botUsers/" +  location);
+        if (res.status == 200) {
+          setAssignNewTray(true);
+          setBotUsers(res.data.data);
+        }
       }
+
     } catch (error) {
       alert(error);
     }
@@ -357,14 +362,7 @@ export default function StickyHeadTable({ props }) {
               sx={{ mt: 2 }}
             >
               <MenuItem value="">Select</MenuItem>
-              <MenuItem
-                onClick={(e) =>
-                  handelBotTrayCheck(getValues("user_name"), "BOT")
-                }
-                value="BOT"
-              >
-                BOT
-              </MenuItem>
+
               <MenuItem
                 onClick={(e) =>
                   handelBotTrayCheck(getValues("user_name"), "PMT")
@@ -380,14 +378,6 @@ export default function StickyHeadTable({ props }) {
                 value="MMT"
               >
                 MMT
-              </MenuItem>
-              <MenuItem
-                onClick={(e) =>
-                  handelBotTrayCheck(getValues("user_name"), "WHT")
-                }
-                value="WHT"
-              >
-                WHT
               </MenuItem>
             </Select>
           </FormControl>
@@ -440,7 +430,7 @@ export default function StickyHeadTable({ props }) {
               m: 1,
             }}
             disabled={
-              trayStatus !== "Open" || trayStatus !== "Inuse" || userTray !== ""
+              trayStatus !== "Open" && trayStatus !== "Inuse" && userTray !== ""
                 ? true
                 : false || loadingAssign == true
                 ? true

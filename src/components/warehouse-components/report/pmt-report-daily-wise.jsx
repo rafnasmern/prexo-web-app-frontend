@@ -222,43 +222,76 @@ export default function CustomizedMenus() {
   const tableData = useMemo(() => {
     return (
       <Table id="example">
-        <TableHead>
-          <TableRow>
-            <TableCell>Record.NO</TableCell>
-            <TableCell>Tracking ID</TableCell>
-            <TableCell>Order ID</TableCell>
-            <TableCell>UIC</TableCell>
-            <TableCell>IMEI</TableCell>
-            <TableCell>Item ID</TableCell>
-            <TableCell>Bag ID</TableCell>
-            <TableCell>BOT Agent Name</TableCell>
-            <TableCell>Tray ID</TableCell>
-            <TableCell>Tray Type</TableCell>
-            <TableCell>Tray Closed Date</TableCell>
+      <TableHead>
+        <TableRow>
+          <TableCell>Record.NO</TableCell>
+          <TableCell>Tracking ID</TableCell>
+          <TableCell>Order ID</TableCell>
+          <TableCell>Order Date</TableCell>
+          <TableCell>Delivery Date</TableCell>
+          <TableCell>UIC</TableCell>
+          <TableCell>IMEI</TableCell>
+          <TableCell>Item ID</TableCell>
+          <TableCell>MUIC</TableCell>
+          <TableCell>Brand</TableCell>
+          <TableCell>Model</TableCell>
+          <TableCell>Bag ID</TableCell>
+          <TableCell>BOT Agent Name</TableCell>
+          <TableCell>Assigned Date</TableCell>
+          <TableCell>Tray ID</TableCell>
+          <TableCell>Tray Type</TableCell>
+          <TableCell>Tray Closed Date</TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {data.map((data, index) => (
+          <TableRow tabIndex={-1}>
+            <TableCell>{data.id}</TableCell>
+            <TableCell>{data.tracking_id}</TableCell>
+            <TableCell>{data.order_id}</TableCell>
+            <TableCell>
+              {data?.order[0]?.order_date != undefined
+                ? new Date(data?.order[0]?.order_date).toLocaleString(
+                    "en-GB",
+                    {
+                      hour12: true,
+                    }
+                  )
+                : ""}
+            </TableCell>
+            <TableCell>
+              {data?.delivery_date != undefined
+                ? new Date(data?.delivery_date).toLocaleString("en-GB", {
+                    hour12: true,
+                  })
+                : ""}
+            </TableCell>
+            <TableCell>{data.uic_code?.code}</TableCell>
+            <TableCell>{data.imei}</TableCell>
+            <TableCell>{data.item_id}</TableCell>
+            <TableCell>{data?.product[0]?.muic}</TableCell>
+            <TableCell>{data?.product[0]?.brand_name}</TableCell>
+            <TableCell>{data?.product[0]?.model_name}</TableCell>
+            <TableCell>{data.bag_id}</TableCell>
+            <TableCell>{data.agent_name}</TableCell>
+            <TableCell>
+              {data?.assign_to_agent != undefined
+                ? new Date(data?.assign_to_agent).toLocaleString("en-GB", {
+                    hour12: true,
+                  })
+                : ""}
+            </TableCell>
+            <TableCell>{data.tray_id}</TableCell>
+            <TableCell>{data.tray_type}</TableCell>
+            <TableCell>
+              {new Date(data?.warehouse_close_date).toLocaleString("en-GB", {
+                hour12: true,
+              })}
+            </TableCell>
           </TableRow>
-        </TableHead>
-        <TableBody>
-          {data.map((data, index) => (
-            <TableRow tabIndex={-1}>
-              <TableCell>{data.id}</TableCell>
-              <TableCell>{data.tracking_id}</TableCell>
-              <TableCell>{data.order_id}</TableCell>
-              <TableCell>{data.uic_code?.code}</TableCell>
-              <TableCell>{data.imei}</TableCell>
-              <TableCell>{data.item_id}</TableCell>
-              <TableCell>{data.bag_id}</TableCell>
-              <TableCell>{data.agent_name}</TableCell>
-              <TableCell>{data.tray_id}</TableCell>
-              <TableCell>{data.tray_type}</TableCell>
-              <TableCell>
-                {new Date(data?.warehouse_close_date).toLocaleString("en-GB", {
-                  hour12: true,
-                })}
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+        ))}
+      </TableBody>
+    </Table>
     );
   }, [item, data]);
   return (

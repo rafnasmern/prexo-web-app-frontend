@@ -188,7 +188,6 @@ export default function Home() {
           obj.invalidItem.push(data);
         }
       });
-
       let res = await axiosMisUser.post("/ordersImport", obj);
       if (res.status == 200) {
         alert("Successfully Added");

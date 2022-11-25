@@ -23,10 +23,10 @@ import "yup-phone";
 // import jwt from "jsonwebtoken"
 import jwt_decode from "jwt-decode";
 import CloseIcon from "@mui/icons-material/Close";
-import { styled, alpha } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 
-import { axiosSortingAgent, axiosWarehouseIn } from "../../../axios";
+import { axiosSortingAgent } from "../../../axios";
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
     padding: theme.spacing(2),
@@ -68,7 +68,6 @@ export default function DialogBox() {
   const { trayId } = useParams();
   /**************************************************************************** */
   const [awbn, setAwbn] = useState("");
-  const [awbnSuccess, setAwbnSuccess] = useState(false);
   const [open, setOpen] = useState(false);
   const [description, setDescription] = useState([]);
   const [itemDetails, setItemDetails] = useState([]);
@@ -113,14 +112,13 @@ export default function DialogBox() {
           wht_tray: tray?.wht,
         };
         let res = await axiosSortingAgent.post("/cheack-uic-for-sorting", obj);
-        if (res?.status == 200) {
+        if (res?.status === 200) {
           setItemDetails(res.data.data);
           setOpen(true);
         }
       } catch (error) {
         setAwbn("");
-        setAwbnSuccess(false);
-        if (error.response.status == 403) {
+        if (error.response.status === 403) {
           alert(error.response.data.message);
         } else {
           alert(error);
@@ -129,18 +127,28 @@ export default function DialogBox() {
     }
   };
   /************************************************************************** */
-  const addActualitem = async () => {
+  const addActualitem = async (e) => {
     try {
-      setLoading(true);
-      let res = await axiosSortingAgent.post("/item-move-to-wht", itemDetails);
-      if (res?.status == 200) {
-        setRefresh((refresh) => !refresh);
-        setAwbn("");
-        handleClose();
-        setLoading(false);
+      if (e.keyCode === 32) {
+      } else {
+        setLoading(true);
+        let res = await axiosSortingAgent.post(
+          "/item-move-to-wht",
+          itemDetails
+        );
+        if (res?.status === 200) {
+          setRefresh((refresh) => !refresh);
+          setAwbn("");
+          handleClose();
+          setLoading(false);
+        }
       }
     } catch (error) {
-      alert(error);
+      if (error.response.status === 403) {
+        alert(error.response.data.message);
+      } else {
+        alert(error);
+      }
     }
   };
   /************************************************************************** */
@@ -159,7 +167,7 @@ export default function DialogBox() {
           "/bot-and-wht-send-to-warehouse",
           obj
         );
-        if (res.status == 200) {
+        if (res.status === 200) {
           alert(res.data.message);
           setLoading2(false);
           navigate("/view-assigned-sorting-requests");
@@ -175,7 +183,6 @@ export default function DialogBox() {
   };
 
   /***************************************************************************************** */
-  const label = { inputProps: { "aria-label": "Checkbox demo" } };
   return (
     <>
       <BootstrapDialog aria-labelledby="customized-dialog-title" open={open}>
@@ -223,7 +230,7 @@ export default function DialogBox() {
             disabled={loading}
             component="span"
             onClick={(e) => {
-              addActualitem();
+              addActualitem(e);
             }}
           >
             YES

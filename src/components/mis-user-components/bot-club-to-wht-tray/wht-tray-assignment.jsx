@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-
 import {
   Box,
   Button,
@@ -16,7 +15,6 @@ import {
   InputLabel,
   Select,
 } from "@mui/material";
-import { useParams } from "react-router-dom";
 import "yup-phone";
 import { useNavigate, useLocation } from "react-router-dom";
 // import jwt from "jsonwebtoken"
@@ -36,6 +34,7 @@ export default function DialogBox() {
   const [currentstate, setCurrentState] = useState("");
   const [loading, setLoading] = useState(false);
   const [trayDataCheck, setTrayDataCheck] = useState(false);
+  const [whtTrayId, setWhtTrayId] = useState([]);
   const { state } = useLocation();
   const [count, setCount] = useState(0);
   const { isCheck, muic } = state;
@@ -64,9 +63,9 @@ export default function DialogBox() {
     setCount(0);
     if (clubModel?.items !== undefined) {
       for (let x of clubModel?.items) {
-        if (x.muic == clubModel.muic) {
+        if (x.muic === clubModel.muic) {
         }
-        if (x.wht_tray !== null && x.muic == clubModel.muic) {
+        if (x.wht_tray !== null && x.muic === clubModel.muic) {
           setCount((count) => count + 1);
         }
       }
@@ -85,10 +84,13 @@ export default function DialogBox() {
             model: clubModel.model,
             location: location,
             trayId: isCheck,
+            whtTrayId: clubModel?.items,
           };
-          let res = await axiosWarehouseIn.post("/getAssignedTray", obj);
-          if (res.status === 200) {
-            setAssignedTray(res.data.data);
+          if (clubModel?.items !== undefined) {
+            let res = await axiosWarehouseIn.post("/getAssignedTray", obj);
+            if (res.status === 200) {
+              setAssignedTray(res.data.data);
+            }
           }
           handeTrayGet("Use_existing_tray");
         } else {
@@ -129,7 +131,12 @@ export default function DialogBox() {
     }
   };
   /****************************************SELECT TRAY*********************************************** */
-  const handelSelect = async (whtTrayId, trayLimit, trayQunatity) => {
+  const handelSelect = async (
+    whtTrayId,
+    trayLimit,
+    trayQunatity,
+    tempLength
+  ) => {
     try {
       setLoading(true);
       let obj = {
@@ -141,9 +148,10 @@ export default function DialogBox() {
       };
       let i = 1;
       let count = trayLimit - trayQunatity;
+      let tempCount = trayLimit - tempLength;
       for (let x of clubModel.items) {
-        if (x.wht_tray == null && x.muic == clubModel?.muic) {
-          if (trayLimit >= i && count >= i) {
+        if (x.wht_tray === null && x.muic === clubModel?.muic) {
+          if (trayLimit >= i && count >= i && tempCount >= i) {
             x.model_name = clubModel?.model;
             x.brand_name = clubModel?.brand;
             x.muic = clubModel?.muic;
@@ -155,13 +163,16 @@ export default function DialogBox() {
           i++;
         }
       }
-      // obj.count = Number(clubModel?.assigned_count + obj.item.length);
-      let res = await axiosWarehouseIn.post("/itemAssignToWht", obj);
-      if (res.status === 200) {
-        setLoading(false);
-        setRefresh((refresh) => !refresh);
-        handeTrayGet(currentstate);
-        alert(res.data.message);
+      if (obj.item.length !== 0) {
+        let res = await axiosWarehouseIn.post("/itemAssignToWht", obj);
+        if (res.status === 200) {
+          setLoading(false);
+          setRefresh((refresh) => !refresh);
+          handeTrayGet(currentstate);
+          alert(res.data.message);
+        }
+      } else {
+        alert("Tray Already Full");
       }
     } catch (error) {
       alert(error);
@@ -170,12 +181,6 @@ export default function DialogBox() {
   /**********************************DATATABLE************************************************* */
   function dataTableFun() {
     $("#trayTable").DataTable({
-      destroy: true,
-      scrollX: true,
-    });
-  }
-  function dataTableFun2() {
-    $("#trayTable2").DataTable({
       destroy: true,
       scrollX: true,
     });
@@ -202,11 +207,7 @@ export default function DialogBox() {
     e.preventDefault();
     navigate(-1);
   };
-
-  /************************************************VIEW ITEM************************************************** */
-  const handelViewItem = (id) => {
-    navigate("/wht-tray-item/" + id);
-  };
+  console.log(whtTrayId);
   return (
     <>
       <Box
@@ -276,7 +277,7 @@ export default function DialogBox() {
                       <TableCell>S.NO</TableCell>
                       <TableCell>Tray Id</TableCell>
                       <TableCell>Quantity</TableCell>
-                      {count == clubModel?.temp_array?.length ? (
+                      {count === clubModel?.temp_array?.length ? (
                         <TableCell>Select</TableCell>
                       ) : (
                         ""
@@ -290,23 +291,33 @@ export default function DialogBox() {
                         <TableCell>{index + 1}</TableCell>
                         <TableCell>{data?.code}</TableCell>
                         <TableCell>
-                          {data?.items?.length} / {data?.limit}
+                          {data.items.length +
+                            "/" +
+                            data?.temp_array?.length +
+                            "/" +
+                            data?.limit}
                         </TableCell>
-                        {count == clubModel?.temp_array?.length ? null : (
+                        {count === clubModel?.temp_array?.length ? null : (
                           <TableCell>
-                            <Checkbox
-                              {...label}
-                              disabled={loading == true ? true : false}
-                              onClick={(e) => {
-                                handelSelect(
-                                  data.code,
-                                  data.limit,
-                                  data?.items?.length
-                                );
-                              }}
-                              id={index}
-                              key={index}
-                            />
+                            {data?.items?.length < data.limit &&
+                            data?.temp_array?.length < data.limit &&
+                            data?.items?.length + data?.temp_array?.length <
+                              data.limit ? (
+                              <Checkbox
+                                {...label}
+                                disabled={loading === true ? true : false}
+                                onClick={(e) => {
+                                  handelSelect(
+                                    data.code,
+                                    data.limit,
+                                    data?.items?.length,
+                                    data?.temp_array?.length
+                                  );
+                                }}
+                                id={index}
+                                key={index}
+                              />
+                            ) : null}
                           </TableCell>
                         )}
                       </TableRow>
@@ -314,7 +325,7 @@ export default function DialogBox() {
                   </TableBody>
                 </Table>
               </TableContainer>
-              {trayDataCheck == true ? (
+              {trayDataCheck === true ? (
                 <p style={{ textAlign: "center" }}>
                   No data available in table
                 </p>
@@ -345,8 +356,11 @@ export default function DialogBox() {
                         <TableCell>{index + 1}</TableCell>
                         <TableCell>{data?.code}</TableCell>
                         <TableCell>
-                          {data.items.length + "/" + data?.temp_array?.length + "/" + data?.limit
-                           }
+                          {data.items.length +
+                            "/" +
+                            data?.temp_array?.length +
+                            "/" +
+                            data?.limit}
                         </TableCell>
                         <TableCell>
                           <Button
@@ -378,7 +392,7 @@ export default function DialogBox() {
             <Button
               sx={{ m: 3, mb: 9 }}
               variant="contained"
-              disabled={loading == true ? true : false}
+              disabled={loading === true ? true : false}
               style={{ backgroundColor: "green" }}
               onClick={(e) => {
                 handelIssue(e);

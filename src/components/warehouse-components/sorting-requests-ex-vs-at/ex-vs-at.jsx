@@ -11,9 +11,7 @@ import {
   TableHead,
   TableRow,
   Grid,
-  InputAdornment,
 } from "@mui/material";
-import PropTypes from "prop-types";
 import { useParams } from "react-router-dom";
 import "yup-phone";
 import { useNavigate } from "react-router-dom";
@@ -22,10 +20,8 @@ export default function DialogBox() {
   const navigate = useNavigate();
   const [trayData, setTrayData] = useState([]);
   const { trayId } = useParams();
-  const [loading, setLoading] = useState(false);
   /**************************************************************************** */
   const [uic, setUic] = useState("");
-  const [description, setDescription] = useState([]);
   const [refresh, setRefresh] = useState(false);
   /*********************************************************** */
 
@@ -54,7 +50,7 @@ export default function DialogBox() {
           trayId: trayId,
         };
         let res = await axiosWarehouseIn.post("/check-uic", obj);
-        if (res?.status == 200) {
+        if (res?.status === 200) {
           addActualitem(res.data.data);
         }
       } catch (error) {
@@ -78,12 +74,16 @@ export default function DialogBox() {
           item: obj,
         };
         let res = await axiosWarehouseIn.post("/wht-add-actual-item", objData);
-        if (res.status == 200) {
+        if (res.status === 200) {
           setUic("");
           setRefresh((refresh) => !refresh);
         }
       } catch (error) {
-        alert(error);
+        if (error.response.status === 403) {
+          alert(error.response.data.message);
+        } else {
+          alert(error);
+        }
       }
     }
   };
@@ -92,22 +92,20 @@ export default function DialogBox() {
     e.preventDefault();
     navigate(-1);
   };
-  const handelDelete = async (id) => {
-    try {
-      let obj = {
-        trayId: trayId,
-        id: id,
-      };
-      let data = await axiosWarehouseIn.put("/actualBagItem", obj);
-      if (data.status == 200) {
-        alert(data.data.message);
-      }
-    } catch (error) {
-      alert(error);
-    }
-  };
-  /*********************************TRAY ASSIGNEMENT********************************** */
-
+  // const handelDelete = async (id) => {
+  //   try {
+  //     let obj = {
+  //       trayId: trayId,
+  //       id: id,
+  //     };
+  //     let data = await axiosWarehouseIn.put("/actualBagItem", obj);
+  //     if (data.status == 200) {
+  //       alert(data.data.message);
+  //     }
+  //   } catch (error) {
+  //     alert(error);
+  //   }
+  // };
   /***************************************************************************************** */
   const label = { inputProps: { "aria-label": "Checkbox demo" } };
   return (
@@ -182,7 +180,6 @@ export default function DialogBox() {
                     <TableCell>UIC</TableCell>
                     <TableCell>MUIC</TableCell>
                     <TableCell>BOT Tray</TableCell>
-                    <TableCell>BOT Agent</TableCell>
                     {/* <TableCell>Tracking Number</TableCell> */}
                   </TableRow>
                 </TableHead>
@@ -193,7 +190,6 @@ export default function DialogBox() {
                       <TableCell>{data?.uic}</TableCell>
                       <TableCell>{data?.muic}</TableCell>
                       <TableCell>{data?.tray_id}</TableCell>
-                      <TableCell>{data?.user_name}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -287,7 +283,6 @@ export default function DialogBox() {
           <Button
             sx={{ m: 3, mb: 9 }}
             variant="contained"
-            disabled={loading == true ? true : false}
             style={{ backgroundColor: "green" }}
             onClick={(e) => {
               handelIssue(e);

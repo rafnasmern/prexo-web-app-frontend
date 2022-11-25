@@ -102,7 +102,9 @@ export default function CustomizedMenus() {
   // NAVIGATE TO ASSIGN FOR SORTING PAGE
   const handelAssignForSorting = (e, code) => {
     e.preventDefault();
-    navigate("/assign-for-sorting", { state: { isCheck: isCheck,type:"Not From Request" } });
+    navigate("/assign-for-sorting", {
+      state: { isCheck: isCheck, type: "Not From Request" },
+    });
   };
   /*-----------------------------------------------------------------------------*/
   const tableData = useMemo(() => {

@@ -10,16 +10,12 @@ import {
   Box,
   TableFooter,
   TablePagination,
-  FormControl,
-  MenuItem,
-  InputLabel,
-  Select,
   TextField,
   Container,
   Button,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { axiosMisUser, axiosWarehouseIn } from "../../../axios";
+import { axiosWarehouseIn } from "../../../axios";
 import IconButton from "@mui/material/IconButton";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
@@ -192,32 +188,6 @@ export default function CustomizedMenus() {
     }
   };
   /*******************************SEARCH********************************* */
-  const searchTrackItem = async (e) => {
-    e.preventDefault();
-    try {
-      let admin = localStorage.getItem("prexo-authentication");
-      if (admin) {
-        let { location } = jwt_decode(admin);
-        if (e.target.value == "") {
-          setRefresh((refresh) => !refresh);
-        } else {
-          let obj = {
-            location: location,
-            type: search.type,
-            searchData: e.target.value,
-          };
-          let res = await axiosMisUser.post("/search-mis-track-item", obj);
-          if (res.status == 200) {
-            setRowsPerPage(10);
-            setPage(0);
-            setItem(res.data.data);
-          }
-        }
-      }
-    } catch (error) {
-      alert(error);
-    }
-  };
   const tableData = useMemo(() => {
     return (
       <Table id="example">
@@ -226,11 +196,17 @@ export default function CustomizedMenus() {
             <TableCell>Record.NO</TableCell>
             <TableCell>Tracking ID</TableCell>
             <TableCell>Order ID</TableCell>
+            <TableCell>Order Date</TableCell>
+            <TableCell>Delivery Date</TableCell>
             <TableCell>UIC</TableCell>
             <TableCell>IMEI</TableCell>
             <TableCell>Item ID</TableCell>
+            <TableCell>MUIC</TableCell>
+            <TableCell>Brand</TableCell>
+            <TableCell>Model</TableCell>
             <TableCell>Bag ID</TableCell>
             <TableCell>BOT Agent Name</TableCell>
+            <TableCell>Assigned Date</TableCell>
             <TableCell>Tray ID</TableCell>
             <TableCell>Tray Type</TableCell>
             <TableCell>Tray Closed Date</TableCell>
@@ -242,11 +218,38 @@ export default function CustomizedMenus() {
               <TableCell>{data.id}</TableCell>
               <TableCell>{data.tracking_id}</TableCell>
               <TableCell>{data.order_id}</TableCell>
+              <TableCell>
+                {data?.order[0]?.order_date != undefined
+                  ? new Date(data?.order[0]?.order_date).toLocaleString(
+                      "en-GB",
+                      {
+                        hour12: true,
+                      }
+                    )
+                  : ""}
+              </TableCell>
+              <TableCell>
+                {data?.delivery_date != undefined
+                  ? new Date(data?.delivery_date).toLocaleString("en-GB", {
+                      hour12: true,
+                    })
+                  : ""}
+              </TableCell>
               <TableCell>{data.uic_code?.code}</TableCell>
               <TableCell>{data.imei}</TableCell>
               <TableCell>{data.item_id}</TableCell>
+              <TableCell>{data?.product[0]?.muic}</TableCell>
+              <TableCell>{data?.product[0]?.brand_name}</TableCell>
+              <TableCell>{data?.product[0]?.model_name}</TableCell>
               <TableCell>{data.bag_id}</TableCell>
               <TableCell>{data.agent_name}</TableCell>
+              <TableCell>
+                {data?.assign_to_agent != undefined
+                  ? new Date(data?.assign_to_agent).toLocaleString("en-GB", {
+                      hour12: true,
+                    })
+                  : ""}
+              </TableCell>
               <TableCell>{data.tray_id}</TableCell>
               <TableCell>{data.tray_type}</TableCell>
               <TableCell>
@@ -366,7 +369,7 @@ export default function CustomizedMenus() {
           </Box>
         </Container>
       ) : (
-        <Paper sx={{ width: "100%", overflow: "hidden", mt: 3,mb:2 }}>
+        <Paper sx={{ width: "100%", overflow: "hidden", mt: 3, mb: 2 }}>
           <TableContainer>
             {tableData}
             {item.length == 0 ? (

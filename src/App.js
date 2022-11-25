@@ -46,6 +46,7 @@ import AssignForSorting from "./pages/mis-pages/assign-for-sorting";
 import ViewItemClubBot from "./pages/mis-pages/view-bot-item-club";
 import BotClubDataAssignToWht from "./pages/mis-pages/bot-club-to-wht";
 import ViewBotTraySentToSorting from "./pages/mis-pages/bot-sent-to-sorting";
+import WhtTrayMerge from "./pages/mis-pages/wht-tray-merge";
 /*--------------------------------------------------------------------------------------------
 BOT
 ---------------------------------------------------------------------------------------------- */
@@ -311,6 +312,7 @@ function App() {
           <Route path="/pmt-report" element={<PmtReport />} />
           <Route path="/mmt-report" element={<MmtReport />} />
           <Route path="/in-use-pmt-mmt" element={<InusePmtMmtTray />} />
+          <Route path="/wht-tray-merge" element={<WhtTrayMerge />} />
         </Routes>
       </BrowserRouter>
     </>

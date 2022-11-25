@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { styled } from "@mui/material/styles";
-
 import {
   TableCell,
   Paper,
@@ -21,7 +20,7 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { axiosMisUser } from "../../../axios";
 import CloseIcon from "@mui/icons-material/Close";
 import PropTypes from "prop-types";
@@ -72,19 +71,19 @@ export default function CustomizedMenus(props) {
   const [open, setOpen] = useState(false);
   const [assignLoading, setAssignLoading] = useState(false);
   const { state } = useLocation();
+  const [trayNotInuse, setTrayNotInuse] = useState([]);
   const { isCheck, type } = state;
   /******************************************************************************* */
   useEffect(() => {
     let admin = localStorage.getItem("prexo-authentication");
     if (admin) {
-      const { location } = jwt_decode(admin);
       const fetchData = async () => {
         try {
           let obj = {
             trayData: isCheck,
           };
           let res = await axiosMisUser.post("/assign-for-sorting", obj);
-          if (res.status == 200) {
+          if (res.status === 200) {
             setItem(res.data.data);
             dataTableFun();
           }
@@ -97,19 +96,6 @@ export default function CustomizedMenus(props) {
       navigate("/");
     }
   }, []);
-  useEffect(() => {
-    // if (item.length !== 0) {
-    //   for (let x of item) {
-    //     for (let y of x.items) {
-    //       if (x.wht_tray == null) {
-    //       }
-    //     }
-    //   }
-    //   // if (a == b) {
-    //   //   setSortingButtonDis(false);
-    //   // }
-    // }
-  }, [item]);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -150,9 +136,9 @@ export default function CustomizedMenus(props) {
       state: { isCheck: isCheck, muic: muic },
     });
   };
-  const handelAssignWht = (e, muic) => {
+  const handelAssignWht = (e, muic, whtTray) => {
     navigate("/bot-club-to-wht-assignment", {
-      state: { isCheck: isCheck, muic: muic },
+      state: { isCheck: isCheck, muic: muic, whtTrayId: whtTray },
     });
   };
   /*********************************************TRAY ASSIGNE TO SORTING AGENT************************************************** */
@@ -163,14 +149,28 @@ export default function CustomizedMenus(props) {
         agent_name: sortingAgentName,
         trayId: isCheck,
       };
-      let res = await axiosMisUser.post("/assign-to-sorting-agent", obj);
-      if (res.status === 200) {
-        setAssignLoading(false);
-        alert(res.data.message);
-        navigate("/bot-to-wht");
+      let checkReadyForSorting = await axiosMisUser.post(
+        "/check-all-wht-inuse-for-sorting",
+        obj
+      );
+      if (checkReadyForSorting.status === 200) {
+        let res = await axiosMisUser.post("/assign-to-sorting-agent", obj);
+        if (res.status === 200) {
+          setAssignLoading(false);
+          alert(res.data.message);
+          navigate("/bot-to-wht");
+        }
       }
     } catch (error) {
-      alert(error);
+      if (error.response.status === 403) {
+        setTrayNotInuse(error.response.data.data);
+        alert(error.response.data.message);
+        setAssignLoading(false);
+        setOpen(false);
+        setSortingAgentName("");
+      } else {
+        alert(error);
+      }
     }
   };
   return (
@@ -232,13 +232,11 @@ export default function CustomizedMenus(props) {
             variant="contained"
             style={{ backgroundColor: "green" }}
             disabled={
-              sortingAgentName == "" || assignLoading == true ? true : false
+              sortingAgentName === "" || assignLoading === true ? true : false
             }
             component="span"
             onClick={(e) => {
-              if (window.confirm("You Want to assign?")) {
-                handelSendRequestConfirm();
-              }
+              handelSendRequestConfirm();
             }}
           >
             Assign
@@ -261,7 +259,7 @@ export default function CustomizedMenus(props) {
         >
           <h6>BOT Tray - {isCheck.toString()}</h6>
         </Box>
-        {type == "Not From Request" ? (
+        {type === "Not From Request" ? (
           <Box
             sx={{
               float: "right",
@@ -300,8 +298,6 @@ export default function CustomizedMenus(props) {
                   <TableCell>Brand Name</TableCell>
                   <TableCell>Model Name</TableCell>
                   <TableCell>IN BOT</TableCell>
-                  {/* <TableCell>In WHT</TableCell> */}
-                  {/* <TableCell>IN Picklist</TableCell> */}
                   <TableCell>WHT Tray</TableCell>
                   <TableCell>Action</TableCell>
                 </TableRow>
@@ -314,7 +310,7 @@ export default function CustomizedMenus(props) {
                     <TableCell>{data.brand}</TableCell>
                     <TableCell>{data.model}</TableCell>
                     <TableCell>{data.item.length}</TableCell>
-                    <TableCell>{data?.wht_tray?.join(', ')}</TableCell>
+                    <TableCell>{data?.wht_tray?.join(", ")}</TableCell>
                     <TableCell>
                       <Button
                         sx={{
@@ -328,19 +324,19 @@ export default function CustomizedMenus(props) {
                       >
                         View Item
                       </Button>
-                      {type == "Not From Request" ? (
+                      {type === "Not From Request" ? (
                         <Button
                           sx={{
                             m: 1,
                           }}
-                          disabled={data.dis_tray_assign}
+                         
                           variant="contained"
                           style={{ backgroundColor: "green" }}
                           onClick={(e) => {
-                            handelAssignWht(e, data.muic);
+                            handelAssignWht(e, data.muic, data.wht_tray);
                           }}
                         >
-                          {data.item.length == data.assigned_count
+                          {data.item.length === data.assigned_count
                             ? "Tray Assigned"
                             : " Assign Tray"}
                         </Button>

@@ -57,6 +57,10 @@ export default function Dashboard() {
     e.preventDefault();
     navigate("/view-sorting-requests");
   };
+  const handelWhtTrayMerge = (e) => {
+    e.preventDefault();
+    navigate("/wht-tray-merge");
+  };
   return (
     <div style={{ marginBottom: "20px" }}>
       <h4 style={{ marginTop: "100px", marginLeft: "27px", color: "#495057" }}>
@@ -242,12 +246,12 @@ export default function Dashboard() {
             ml: 1,
             width: 300,
             boxShadow: 2,
-            height: "310px",
+            height: "247px",
             backgroundColor: "#FFFFFF",
           }}
         >
           <div style={{ margin: "12px" }}>
-          <Box
+            {/* <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}
             >
@@ -260,13 +264,13 @@ export default function Dashboard() {
                   marginLeft: "5px",
                 }}
                 onClick={(e) => {
-                  handelAssignToCharging(e);
+                  handelWhtTrayMerge(e);
                 }}
               >
                 WHT Merge
               </Link>
             </Box>
-            <hr />
+            <hr /> */}
             <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}
@@ -287,7 +291,7 @@ export default function Dashboard() {
               </Link>
             </Box>
             <hr />
-          
+
             <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}
