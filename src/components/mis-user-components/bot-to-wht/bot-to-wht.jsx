@@ -255,7 +255,7 @@ export default function CustomizedMenus() {
           </Box>
         </Box>
       </Box>
-      <Paper sx={{ width: "100%", overflow: "hidden", mt: 3 }}>
+      <Paper sx={{ width: "100%", overflow: "hidden", mt: 3, mb: 2 }}>
         <TableContainer>{tableData}</TableContainer>
       </Paper>
     </div>

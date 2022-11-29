@@ -94,7 +94,6 @@ export default function Home() {
   //     if (isCheck.length == 0) {
   //       alert("Please Select Atleast One Data");
   //     } else {
-  //       console.log(isCheck);
   //       let res = await axiosMisUser.post("/deleteBadOrders", isCheck);
   //       if (res.status == 200) {
   //         alert(res.data.message);

@@ -86,6 +86,10 @@ export default function Dashboard() {
     e.preventDefault();
     navigate("/mmt-report");
   };
+  const handelBotTrayReport = (e) => {
+    e.preventDefault();
+    navigate("/bot-tray-report");
+  };
   const handelInuseWhtTray = (e) => {
     e.preventDefault();
     navigate("/in-use-wht-tray");
@@ -131,7 +135,7 @@ export default function Dashboard() {
           }}
         >
           <div style={{ margin: "12px" }}>
-            <Box
+            {/* <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}
             >
@@ -150,7 +154,7 @@ export default function Dashboard() {
                 Search
               </Link>
             </Box>
-            <hr />
+            <hr /> */}
             <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}
@@ -312,19 +316,6 @@ export default function Dashboard() {
               </Link>
             </Box>
             <hr /> */}
-          </div>
-        </Box>
-        <Box
-          sx={{
-            cursor: "pointer",
-            ml: 1,
-            width: 300,
-            boxShadow: 2,
-            height: "437px",
-            backgroundColor: "#FFFFFF",
-          }}
-        >
-          <div style={{ margin: "12px" }}>
             <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}
@@ -345,6 +336,19 @@ export default function Dashboard() {
               </Link>
             </Box>
             <hr />
+          </div>
+        </Box>
+        <Box
+          sx={{
+            cursor: "pointer",
+            ml: 1,
+            width: 300,
+            boxShadow: 2,
+            height: "437px",
+            backgroundColor: "#FFFFFF",
+          }}
+        >
+          <div style={{ margin: "12px" }}>
             {/* <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}
@@ -488,19 +492,6 @@ export default function Dashboard() {
               </Link>
             </Box>
             <hr />
-          </div>
-        </Box>
-        <Box
-          sx={{
-            cursor: "pointer",
-            ml: 1,
-            width: 300,
-            boxShadow: 2,
-            height: "374px",
-            backgroundColor: "#FFFFFF",
-          }}
-        >
-          <div style={{ margin: "12px" }}>
             <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}
@@ -521,6 +512,19 @@ export default function Dashboard() {
               </Link>
             </Box>
             <hr />
+          </div>
+        </Box>
+        <Box
+          sx={{
+            cursor: "pointer",
+            ml: 1,
+            width: 300,
+            boxShadow: 2,
+            height: "310px",
+            backgroundColor: "#FFFFFF",
+          }}
+        >
+          <div style={{ margin: "12px" }}>
             <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}
@@ -621,6 +625,26 @@ export default function Dashboard() {
               </Link>
             </Box>
             <hr />
+            {/* <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
+            >
+              <ArrowRightIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelBotTrayReport(e);
+                }}
+              >
+                BOT Tray Report
+              </Link>
+            </Box>
+            <hr /> */}
           </div>
         </Box>
       </Box>

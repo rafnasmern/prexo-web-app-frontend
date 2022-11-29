@@ -24,6 +24,7 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
+  Container,
 } from "@mui/material";
 import PropTypes from "prop-types";
 import { useParams } from "react-router-dom";
@@ -34,6 +35,7 @@ import { useNavigate } from "react-router-dom";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { axiosBot } from "../../../axios";
 import Checkbox from "@mui/material/Checkbox";
+import CircularProgress from "@mui/material/CircularProgress";
 // import jwt from "jsonwebtoken"
 import jwt_decode from "jwt-decode";
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
@@ -70,6 +72,7 @@ BootstrapDialogTitle.propTypes = {
   children: PropTypes.node,
   onClose: PropTypes.func.isRequired,
 };
+/******************************************************************************** */
 export default function DialogBox() {
   const [open, setOpen] = React.useState(false);
   const [openApprove, setOpenApprove] = useState(false);
@@ -77,7 +80,7 @@ export default function DialogBox() {
   const [openModelMisMatch, setModelMisMatch] = useState(false);
   const [refresh, setRefresh] = useState(false);
   const navigate = useNavigate();
-  const [employeeData, setEmployeeData] = useState([]);
+  const [bagData, setBagData] = useState([]);
   const { bagId } = useParams();
   const [count, setCount] = useState(0);
   /**************************************************************************** */
@@ -88,8 +91,10 @@ export default function DialogBox() {
   const [stickertThree, setStickerThree] = useState("");
   const [stickerFour, setStickerFour] = useState("");
   const [loading, setLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(false);
   const [awbn, setAwbn] = useState("");
   const [bodyDamage, setBodyDamage] = useState("NO");
+  /******************************************************************************** */
   let admin = localStorage.getItem("prexo-authentication");
   let user_name1;
   if (admin) {
@@ -99,6 +104,7 @@ export default function DialogBox() {
   useEffect(() => {
     const fetchData = async () => {
       setCount(0);
+      setPageLoading(false);
       try {
         let obj = {
           bagId: bagId,
@@ -106,31 +112,38 @@ export default function DialogBox() {
         };
         let response = await axiosBot.post("/getAssignedBagItems", obj);
         if (response.status === 200) {
-          setEmployeeData(response.data.data);
-          //   dataTableFun()
+          setBagData(response.data.data);
+          setPageLoading(true);
         }
       } catch (error) {
-        alert(error);
+        setPageLoading(true);
+        if (error.response.status == 201) {
+          alert(error.response.data.message);
+          navigate("/bot-bag-page");
+        } else {
+          alert(error);
+        }
       }
     };
     fetchData();
   }, [refresh]);
   useEffect(() => {
     setCount(0);
-    if (employeeData?.[1]?.tray !== undefined) {
-      for (let x of employeeData?.[1]?.tray) {
+    if (bagData?.[1]?.tray !== undefined) {
+      for (let x of bagData?.[1]?.tray) {
         setCount(
           (count) =>
             count +
             x?.items.filter(
               (data) =>
                 data.bag_id == bagId &&
-                data.bag_assigned_date == employeeData[0]?.assigned_date
+                data.bag_assigned_date == bagData[0]?.assigned_date
             ).length
         );
       }
     }
-  }, [employeeData]);
+  }, [bagData]);
+  /************************************************************************************* */
   const handleClose = () => {
     setOpen(false);
   };
@@ -163,8 +176,8 @@ export default function DialogBox() {
   const handelClosebag = async () => {
     try {
       setLoading(true);
-      if (employeeData[0]?.actual_items?.length === count) {
-        let botTray = employeeData[1]?.tray?.filter(
+      if (bagData[0]?.actual_items?.length === count) {
+        let botTray = bagData[1]?.tray?.filter(
           (data) => data.type_taxanomy == "BOT"
         );
         let obj = {
@@ -231,7 +244,7 @@ export default function DialogBox() {
   /************************************************************************************************* */
   const traySegrigation = async (e, trayType) => {
     setLoading(true);
-    let tray = employeeData[1].tray?.filter(function (item) {
+    let tray = bagData[1].tray?.filter(function (item) {
       return item.type_taxanomy == trayType && item.sort_id == "Issued";
     });
     try {
@@ -269,7 +282,7 @@ export default function DialogBox() {
             tray_id: tray[0].code,
             bag_id: bagId,
             user_name: user_name1,
-            bag_assigned_date: employeeData[0]?.assigned_date,
+            bag_assigned_date: bagData[0]?.assigned_date,
             uic:
               awabnDetails?.[0]?.uic_code?.code == undefined
                 ? "PENDING"
@@ -278,7 +291,7 @@ export default function DialogBox() {
           let res = await axiosBot.post("/traySegregation", obj);
           if (res.status == 200) {
             setLoading(false);
-            alert("Succssfully Added");
+            alert("Successfully Added");
             setRefresh((refresh) => !refresh);
             setStickerOne("");
             setStickerTwo("");
@@ -324,7 +337,7 @@ export default function DialogBox() {
             status: awabnDetails?.[0].status,
             tray_id: tray[0].code,
             bag_id: bagId,
-            bag_assigned_date: employeeData[0]?.assigned_date,
+            bag_assigned_date: bagData[0]?.assigned_date,
             user_name: user_name1,
             uic:
               awabnDetails?.[0]?.uic_code?.code == undefined
@@ -335,7 +348,7 @@ export default function DialogBox() {
           let res = await axiosBot.post("/traySegregation", obj);
           if (res.status == 200) {
             setLoading(false);
-            alert("Succssfully Added");
+            alert("Successfully Added");
             setRefresh((refresh) => !refresh);
             setStickerOne("");
             setStickerTwo("");
@@ -795,53 +808,67 @@ export default function DialogBox() {
           </LoadingButton>
         </DialogActions>
       </BootstrapDialog>
-      <Box sx={{ mt: 13 }}>
-        <Box>
-          <Grid container spacing={2}>
-            <Grid item xs={4}>
-              <h5 style={{ marginLeft: "10px" }}>Bag Id : -{bagId}</h5>
-              <h5 style={{ marginLeft: "10px" }}>
-                Assigned On : -
-                {new Date(employeeData[0]?.assigned_date).toLocaleString(
-                  "en-GB",
-                  { hour12: true }
-                )}
-              </h5>
-            </Grid>
-            <Grid item xs={8}>
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "row-reverse",
-                  mr: 3,
-                }}
-              >
+      {pageLoading === false ? (
+        <Container>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              flexDirection: "column",
+              pt: 30,
+            }}
+          >
+            <CircularProgress />
+            <p style={{ paddingTop: "10px" }}>Loading...</p>
+          </Box>
+        </Container>
+      ) : (
+        <Box sx={{ mt: 13 }}>
+          <Box>
+            <Grid container spacing={2}>
+              <Grid item xs={4}>
+                <h5 style={{ marginLeft: "10px" }}>Bag Id : -{bagId}</h5>
+                <h5 style={{ marginLeft: "10px" }}>
+                  Assigned On : -
+                  {new Date(bagData[0]?.assigned_date).toLocaleString("en-GB", {
+                    hour12: true,
+                  })}
+                </h5>
+              </Grid>
+              <Grid item xs={8}>
                 <Box
                   sx={{
-                    ml: 2,
+                    display: "flex",
+                    flexDirection: "row-reverse",
+                    mr: 3,
                   }}
                 >
-                  <h5 style={{ paddingLeft: "16px" }}>Sleeves</h5>
-                  <Checkbox
-                    checked={employeeData[0]?.sleaves == "true" ? true : false}
-                    {...label}
-                    sx={{ ml: 3 }}
-                  />
-                </Box>
-                <Box
-                  sx={{
-                    ml: 2,
-                  }}
-                >
-                  <h5 style={{ paddingLeft: "30px" }}>UIC</h5>
-                  <Checkbox
-                    checked={employeeData[0]?.uic == "true" ? true : false}
-                    {...label}
-                    sx={{ ml: 3 }}
-                  />
-                </Box>
+                  <Box
+                    sx={{
+                      ml: 2,
+                    }}
+                  >
+                    <h5 style={{ paddingLeft: "16px" }}>Sleeves</h5>
+                    <Checkbox
+                      checked={bagData[0]?.sleaves == "true" ? true : false}
+                      {...label}
+                      sx={{ ml: 3 }}
+                    />
+                  </Box>
+                  <Box
+                    sx={{
+                      ml: 2,
+                    }}
+                  >
+                    <h5 style={{ paddingLeft: "30px" }}>UIC</h5>
+                    <Checkbox
+                      checked={bagData[0]?.uic == "true" ? true : false}
+                      {...label}
+                      sx={{ ml: 3 }}
+                    />
+                  </Box>
 
-                {/* <Box
+                  {/* <Box
                   sx={{
                     ml: 4,
                   }}
@@ -849,220 +876,220 @@ export default function DialogBox() {
                   <h5>Duplicate</h5>
                   <p style={{ paddingLeft: "34px", fontSize: "22px" }}>
                     {
-                      employeeData[0]?.actual_items?.filter(function (item) {
+                      bagData[0]?.actual_items?.filter(function (item) {
                         return item.status == "Duplicate";
                       }).length
                     }
                   </p>
                 </Box> */}
-                <Box
-                  sx={{
-                    ml: 4,
-                  }}
-                >
-                  <h5>Invalid</h5>
-                  <p style={{ paddingLeft: "23px", fontSize: "22px" }}>
-                    {
-                      employeeData[0]?.actual_items?.filter(function (item) {
-                        return item.status == "Invalid";
-                      }).length
-                    }
-                  </p>
+                  <Box
+                    sx={{
+                      ml: 4,
+                    }}
+                  >
+                    <h5>Invalid</h5>
+                    <p style={{ paddingLeft: "23px", fontSize: "22px" }}>
+                      {
+                        bagData[0]?.actual_items?.filter(function (item) {
+                          return item.status == "Invalid";
+                        }).length
+                      }
+                    </p>
+                  </Box>
+                  <Box
+                    sx={{
+                      ml: 4,
+                    }}
+                  >
+                    <h5>Valid</h5>
+                    <p style={{ paddingLeft: "18px", fontSize: "22px" }}>
+                      {
+                        bagData[0]?.actual_items?.filter(function (item) {
+                          return item.status == "Valid";
+                        }).length
+                      }
+                    </p>
+                  </Box>
+                  <Box
+                    sx={{
+                      ml: 4,
+                    }}
+                  >
+                    <h5>Total</h5>
+                    <p style={{ paddingLeft: "6px", fontSize: "22px" }}>
+                      {count}/
+                      {
+                        bagData[0]?.actual_items?.filter(function (item) {
+                          return item.status != "Duplicate";
+                        }).length
+                      }
+                    </p>
+                  </Box>
                 </Box>
-                <Box
-                  sx={{
-                    ml: 4,
-                  }}
-                >
-                  <h5>Valid</h5>
-                  <p style={{ paddingLeft: "18px", fontSize: "22px" }}>
-                    {
-                      employeeData[0]?.actual_items?.filter(function (item) {
-                        return item.status == "Valid";
-                      }).length
-                    }
-                  </p>
-                </Box>
-                <Box
-                  sx={{
-                    ml: 4,
-                  }}
-                >
-                  <h5>Total</h5>
-                  <p style={{ paddingLeft: "6px", fontSize: "22px" }}>
-                    {count}/
-                    {
-                      employeeData[0]?.actual_items?.filter(function (item) {
-                        return item.status != "Duplicate";
-                      }).length
-                    }
-                  </p>
-                </Box>
-              </Box>
+              </Grid>
             </Grid>
-          </Grid>
-          <hr />
-        </Box>
-        <Box sx={{ maxHeight: "4px" }}>
-          <TextField
-            sx={{ ml: 1 }}
-            id="outlined-password-input"
-            type="text"
-            autoComplete="off"
-            name="doorsteps_diagnostics"
-            label="Please Enter AWBN"
-            value={awbn}
-            onChange={(e) => {
-              setAwbn(e.target.value);
-              handelAwbn(e);
-            }}
-            inputProps={{
-              style: {
-                width: "auto",
-              },
-            }}
-          />
-        </Box>
-        <Box sx={{ mt: 10 }}>
-          <Grid container spacing={2}>
-            {employeeData[1]?.tray?.map((data, index) => (
-              <Grid item xs={12} md={4}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "flex-start",
-                  }}
-                >
-                  <h5 style={{ paddingLeft: "10px" }}>
-                    {" "}
-                    {data.type_taxanomy +
-                      "-" +
-                      data.code +
-                      " (" +
-                      employeeData[1]?.tray?.[index]?.items?.length +
-                      "/" +
-                      data.limit +
-                      ")  "}
-                  </h5>
-                  {data.sort_id == "Closed By Bot" ||
-                  data.sort_id == "Received From BOT" ||
-                  data.sort_id == "Closed By Warehouse" ? (
-                    <h6 style={{ color: "red" }}>-Tray Closed</h6>
-                  ) : (
-                    ""
-                  )}
-                </Box>
-                <Paper sx={{ width: "95%", overflow: "hidden", m: 1 }}>
-                  <TableContainer>
-                    <Table
-                      style={{ width: "100%" }}
-                      id="example"
-                      stickyHeader
-                      aria-label="sticky table"
-                    >
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>S.NO</TableCell>
-                          <TableCell>AWBN Number</TableCell>
-                          <TableCell>Order ID</TableCell>
-                          <TableCell>Order Date</TableCell>
-                          <TableCell>Status</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {data?.items?.map((itemData, index) => (
-                          <TableRow hover role="checkbox" tabIndex={-1}>
-                            <TableCell>{index + 1}</TableCell>
-                            <TableCell>{itemData.awbn_number}</TableCell>
-                            <TableCell>{itemData.order_id}</TableCell>
+            <hr />
+          </Box>
+          <Box sx={{ maxHeight: "4px" }}>
+            <TextField
+              sx={{ ml: 1 }}
+              id="outlined-password-input"
+              type="text"
+              autoComplete="off"
+              name="doorsteps_diagnostics"
+              label="Please Enter AWBN"
+              value={awbn}
+              onChange={(e) => {
+                setAwbn(e.target.value);
+                handelAwbn(e);
+              }}
+              inputProps={{
+                style: {
+                  width: "auto",
+                },
+              }}
+            />
+          </Box>
+          <Box sx={{ mt: 10 }}>
+            <Grid container spacing={2}>
+              {bagData[1]?.tray?.map((data, index) => (
+                <Grid item xs={12} md={4}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "flex-start",
+                    }}
+                  >
+                    <h5 style={{ paddingLeft: "10px" }}>
+                      {" "}
+                      {data.type_taxanomy +
+                        "-" +
+                        data.code +
+                        " (" +
+                        bagData[1]?.tray?.[index]?.items?.length +
+                        "/" +
+                        data.limit +
+                        ")  "}
+                    </h5>
+                    {data.sort_id == "Closed By Bot" ||
+                    data.sort_id == "Received From BOT" ||
+                    data.sort_id == "Closed By Warehouse" ? (
+                      <h6 style={{ color: "red" }}>-Tray Closed</h6>
+                    ) : (
+                      ""
+                    )}
+                  </Box>
+                  <Paper sx={{ width: "95%", overflow: "hidden", m: 1 }}>
+                    <TableContainer>
+                      <Table
+                        style={{ width: "100%" }}
+                        id="example"
+                        stickyHeader
+                        aria-label="sticky table"
+                      >
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>S.NO</TableCell>
+                            <TableCell>AWBN Number</TableCell>
+                            <TableCell>Order ID</TableCell>
+                            <TableCell>Order Date</TableCell>
+                            <TableCell>Status</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {data?.items?.map((itemData, index) => (
+                            <TableRow hover role="checkbox" tabIndex={-1}>
+                              <TableCell>{index + 1}</TableCell>
+                              <TableCell>{itemData.awbn_number}</TableCell>
+                              <TableCell>{itemData.order_id}</TableCell>
 
-                            <TableCell>
-                              {" "}
-                              {itemData.order_date == null
-                                ? "No Order Date"
-                                : new Date(itemData.order_date).toLocaleString(
-                                    "en-GB",
-                                    {
+                              <TableCell>
+                                {" "}
+                                {itemData.order_date == null
+                                  ? "No Order Date"
+                                  : new Date(
+                                      itemData.order_date
+                                    ).toLocaleString("en-GB", {
                                       year: "numeric",
                                       month: "2-digit",
                                       day: "2-digit",
-                                    }
-                                  )}
-                            </TableCell>
-                            <TableCell
-                              style={
-                                itemData.status == "Valid"
-                                  ? { color: "green" }
-                                  : { color: "red" }
-                              }
-                            >
-                              {itemData.status}
-                            </TableCell>
-                            {itemData.status != "Valid" ? (
-                              <TableCell>
-                                <Button
-                                  sx={{
-                                    ml: 2,
-                                  }}
-                                  variant="contained"
-                                  style={{ backgroundColor: "red" }}
-                                  component="span"
-                                  onClick={() => {
-                                    if (window.confirm("Remove the item?")) {
-                                      handelDelete(
-                                        data.code,
-                                        itemData._id,
-                                        itemData.awbn_number
-                                      );
-                                    }
-                                  }}
-                                >
-                                  Remove
-                                </Button>
+                                    })}
                               </TableCell>
-                            ) : null}
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Paper>
-              </Grid>
-            ))}
-          </Grid>
-        </Box>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "end",
-            mt: 2,
-            mr: 3,
-            ml: 3,
-            mb: 2,
-          }}
-        >
-          <Box>
-            <LoadingButton
-              sx={{
-                ml: 2,
-              }}
-              fullwidth
-              variant="contained"
-              loadingPosition="end"
-              loading={loading}
-              style={{ backgroundColor: "red" }}
-              component="span"
-              onClick={(e) => {
-                if (window.confirm("You want to Close?")) {
-                  handelClosebag(e);
-                }
-              }}
-            >
-              Bag Close
-            </LoadingButton>
+                              <TableCell
+                                style={
+                                  itemData.status == "Valid"
+                                    ? { color: "green" }
+                                    : { color: "red" }
+                                }
+                              >
+                                {itemData.status}
+                              </TableCell>
+                              {itemData.status != "Valid" ? (
+                                <TableCell>
+                                  <Button
+                                    sx={{
+                                      ml: 2,
+                                    }}
+                                    variant="contained"
+                                    style={{ backgroundColor: "red" }}
+                                    component="span"
+                                    onClick={() => {
+                                      if (window.confirm("Remove the item?")) {
+                                        handelDelete(
+                                          data.code,
+                                          itemData._id,
+                                          itemData.awbn_number
+                                        );
+                                      }
+                                    }}
+                                  >
+                                    Remove
+                                  </Button>
+                                </TableCell>
+                              ) : null}
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </Paper>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "end",
+              mt: 2,
+              mr: 3,
+              ml: 3,
+              mb: 2,
+            }}
+          >
+            <Box>
+              <LoadingButton
+                sx={{
+                  ml: 2,
+                }}
+                fullwidth
+                variant="contained"
+                loadingPosition="end"
+                loading={loading}
+                style={{ backgroundColor: "red" }}
+                component="span"
+                onClick={(e) => {
+                  if (window.confirm("You want to Close?")) {
+                    handelClosebag(e);
+                  }
+                }}
+              >
+                Bag Close
+              </LoadingButton>
+            </Box>
           </Box>
         </Box>
-      </Box>
+      )}
     </>
   );
 }

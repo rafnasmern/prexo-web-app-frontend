@@ -119,15 +119,14 @@ export default function StickyHeadTable({ props }) {
   const handelOpen = async () => {
     try {
       let admin = localStorage.getItem("prexo-authentication");
-      if(admin){
+      if (admin) {
         let { location } = jwt_decode(admin);
-        let res = await axiosWarehouseIn.post("/botUsers/" +  location);
+        let res = await axiosWarehouseIn.post("/botUsers/" + location);
         if (res.status == 200) {
           setAssignNewTray(true);
           setBotUsers(res.data.data);
         }
       }
-
     } catch (error) {
       alert(error);
     }
@@ -430,7 +429,8 @@ export default function StickyHeadTable({ props }) {
               m: 1,
             }}
             disabled={
-              trayStatus !== "Open" && trayStatus !== "Inuse" && userTray !== ""
+              (trayStatus !== "Open" && trayStatus !== "Inuse") ||
+              userTray !== ""
                 ? true
                 : false || loadingAssign == true
                 ? true

@@ -2,10 +2,6 @@ import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
-  Dialog,
-  DialogContent,
-  DialogActions,
-  DialogTitle,
   IconButton,
   TextField,
   Paper,
@@ -17,8 +13,8 @@ import {
   TableRow,
   Grid,
   InputAdornment,
+  Container,
 } from "@mui/material";
-import PropTypes from "prop-types";
 import { useParams } from "react-router-dom";
 import "yup-phone";
 import { useNavigate } from "react-router-dom";
@@ -27,11 +23,13 @@ import jwt_decode from "jwt-decode";
 import { axiosWarehouseIn } from "../../axios";
 import Checkbox from "@mui/material/Checkbox";
 import SearchIcon from "@mui/icons-material/Search";
+import CircularProgress from "@mui/material/CircularProgress";
 export default function DialogBox() {
   const navigate = useNavigate();
   const [employeeData, setEmployeeData] = useState([]);
   const { bagId } = useParams();
   const [loading, setLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(false);
   /**************************************************************************** */
   const [awbn, setAwbn] = useState("");
   const [uic, setUic] = useState(false);
@@ -50,6 +48,7 @@ export default function DialogBox() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setPageLoading(false);
         let response = await axiosWarehouseIn.post(
           "/getBagItemRequest/" + bagId
         );
@@ -59,6 +58,7 @@ export default function DialogBox() {
         ) {
           setEmployeeData(response.data.data);
           setUic(response.data.data[0]?.uic === "true");
+          setPageLoading(true);
           setSleaves(response.data.data[0]?.sleaves === "true");
           let res = await axiosWarehouseIn.post(
             "/autoFetchAlreadyAssignedTray/" +
@@ -67,8 +67,8 @@ export default function DialogBox() {
           if (res.status == 200) {
             setMmtTray(res.data.mmtTray);
             setPmtTray(res.data.pmtTray);
+            setPageLoading(true);
           }
-          //   dataTableFun()
         } else {
           navigate("/bag-issue-request");
         }
@@ -81,13 +81,16 @@ export default function DialogBox() {
 
   const getitem = async () => {
     try {
+      setPageLoading(false);
       let response = await axiosWarehouseIn.post("/getBagItemRequest/" + bagId);
       if (response.status === 200) {
+        setPageLoading(true);
         setEmployeeData(response.data.data);
         setUic(response.data.data[0]?.uic === "true");
         setSleaves(response.data.data[0]?.sleaves === "true");
         //   dataTableFun()
       } else if (response.status == 201) {
+        setPageLoading(true);
         setEmployeeData(response.data.data);
         setUic(response.data.data[0]?.uic === "true");
         setSleaves(response.data.data[0]?.sleaves === "true");
@@ -289,125 +292,143 @@ export default function DialogBox() {
   const label = { inputProps: { "aria-label": "Checkbox demo" } };
   return (
     <>
-      <Box
-        sx={{
-          mt: 11,
-          height: 70,
-          borderRadius: 1,
-        }}
-      >
-        <Box
-          sx={{
-            float: "left",
-          }}
-        >
-          <h6 style={{ marginLeft: "13px" }}>BAG ID - {bagId}</h6>
-          <h6 style={{ marginLeft: "13px" }}>
-            AGENT NAME - {employeeData[0]?.issued_user_name}
-          </h6>
-        </Box>
-        <Box
-          sx={{
-            float: "right",
-          }}
-        >
-          <h6 style={{ marginRight: "13px" }}>
-            Closed On --{" "}
-            {new Date(employeeData[0]?.status_change_time).toLocaleString(
-              "en-GB",
-              { hour12: true }
-            )}
-          </h6>
-
-          <Checkbox
-            checked={uic}
-            onClick={(e) => {
-              if (
-                window.confirm(uic ? "Already Added" : "You Want to add UIC ?")
-              ) {
-                setUic(true);
-              }
+      {pageLoading === false ? (
+        <Container>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              flexDirection: "column",
+              pt: 30,
             }}
-            {...label}
-          />
-          <label>UIC Label</label>
-          <Checkbox
-            checked={sleaves}
-            onClick={(e) => {
-              if (
-                window.confirm(
-                  sleaves ? "Already Added" : "You Want to add sleeves ?"
-                )
-              ) {
-                setSleaves(true);
-              }
+          >
+            <CircularProgress />
+            <p style={{ paddingTop: "10px" }}>Loading...</p>
+          </Box>
+        </Container>
+      ) : (
+        <>
+          <Box
+            sx={{
+              mt: 11,
+              height: 70,
+              borderRadius: 1,
             }}
-            {...label}
-          />
-          <label>Sleeves</label>
-        </Box>
-      </Box>
-      <Grid container spacing={1}>
-        <Grid item xs={6}>
-          <Paper sx={{ width: "95%", overflow: "hidden", m: 1 }}>
-            <h6>Expected</h6>
-
+          >
             <Box
               sx={{
-                display: "flex",
-                justifyContent: "end",
+                float: "left",
               }}
             >
-              <Box
-                sx={{
-                  m: 2,
+              <h6 style={{ marginLeft: "13px" }}>BAG ID - {bagId}</h6>
+              <h6 style={{ marginLeft: "13px" }}>
+                AGENT NAME - {employeeData[0]?.issued_user_name}
+              </h6>
+            </Box>
+            <Box
+              sx={{
+                float: "right",
+              }}
+            >
+              <h6 style={{ marginRight: "13px" }}>
+                Closed On --{" "}
+                {new Date(employeeData[0]?.status_change_time).toLocaleString(
+                  "en-GB",
+                  { hour12: true }
+                )}
+              </h6>
+
+              <Checkbox
+                checked={uic}
+                onClick={(e) => {
+                  if (
+                    window.confirm(
+                      uic ? "Already Added" : "You Want to add UIC ?"
+                    )
+                  ) {
+                    setUic(true);
+                  }
                 }}
-              >
-                <Box sx={{}}>
-                  <h5>Total</h5>
-                  <p style={{ paddingLeft: "5px", fontSize: "22px" }}>
-                    {
-                      employeeData[0]?.items?.filter(function (item) {
-                        return item.status != "Duplicate";
-                      }).length
-                    }
-                    /{employeeData[0]?.limit}
-                  </p>
-                </Box>
-              </Box>
-              <Box
-                sx={{
-                  m: 2,
+                {...label}
+              />
+              <label>UIC Label</label>
+              <Checkbox
+                checked={sleaves}
+                onClick={(e) => {
+                  if (
+                    window.confirm(
+                      sleaves ? "Already Added" : "You Want to add sleeves ?"
+                    )
+                  ) {
+                    setSleaves(true);
+                  }
                 }}
-              >
-                <Box sx={{}}>
-                  <h5>Valid</h5>
-                  <p style={{ marginLeft: "14px", fontSize: "24px" }}>
-                    {
-                      employeeData[0]?.items?.filter(function (item) {
-                        return item.status == "Valid";
-                      }).length
-                    }
-                  </p>
-                </Box>
-              </Box>
-              <Box
-                sx={{
-                  m: 2,
-                }}
-              >
-                <Box sx={{}}>
-                  <h5>Invalid</h5>
-                  <p style={{ marginLeft: "20px", fontSize: "24px" }}>
-                    {
-                      employeeData[0]?.items?.filter(function (item) {
-                        return item.status == "Invalid";
-                      }).length
-                    }
-                  </p>
-                </Box>
-              </Box>{" "}
-              {/* <Box
+                {...label}
+              />
+              <label>Sleeves</label>
+            </Box>
+          </Box>
+          <Grid container spacing={1}>
+            <Grid item xs={6}>
+              <Paper sx={{ width: "95%", overflow: "hidden", m: 1 }}>
+                <h6>Expected</h6>
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "end",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      m: 2,
+                    }}
+                  >
+                    <Box sx={{}}>
+                      <h5>Total</h5>
+                      <p style={{ paddingLeft: "5px", fontSize: "22px" }}>
+                        {
+                          employeeData[0]?.items?.filter(function (item) {
+                            return item.status != "Duplicate";
+                          }).length
+                        }
+                        /{employeeData[0]?.limit}
+                      </p>
+                    </Box>
+                  </Box>
+                  <Box
+                    sx={{
+                      m: 2,
+                    }}
+                  >
+                    <Box sx={{}}>
+                      <h5>Valid</h5>
+                      <p style={{ marginLeft: "14px", fontSize: "24px" }}>
+                        {
+                          employeeData[0]?.items?.filter(function (item) {
+                            return item.status == "Valid";
+                          }).length
+                        }
+                      </p>
+                    </Box>
+                  </Box>
+                  <Box
+                    sx={{
+                      m: 2,
+                    }}
+                  >
+                    <Box sx={{}}>
+                      <h5>Invalid</h5>
+                      <p style={{ marginLeft: "20px", fontSize: "24px" }}>
+                        {
+                          employeeData[0]?.items?.filter(function (item) {
+                            return item.status == "Invalid";
+                          }).length
+                        }
+                      </p>
+                    </Box>
+                  </Box>{" "}
+                  {/* <Box
                 sx={{
                   m: 2,
                 }}
@@ -423,46 +444,49 @@ export default function DialogBox() {
                   </p>
                 </Box>
               </Box> */}
-            </Box>
-            <TableContainer>
-              <Table
-                style={{ width: "100%" }}
-                id="example"
-                stickyHeader
-                aria-label="sticky table"
-              >
-                <TableHead>
-                  <TableRow>
-                    <TableCell>S.NO</TableCell>
-                    <TableCell>AWBN Number</TableCell>
-                    <TableCell>Order ID</TableCell>
-                    <TableCell>Order Date</TableCell>
-                    <TableCell>Status</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {employeeData[0]?.items?.map((data, index) => (
-                    <TableRow hover role="checkbox" tabIndex={-1}>
-                      <TableCell>{index + 1}</TableCell>
-                      <TableCell>{data?.awbn_number}</TableCell>
-                      <TableCell>{data?.order_id}</TableCell>
-                      <TableCell>
-                        {new Date(data?.order_date).toLocaleString("en-GB", {
-                          year: "numeric",
-                          month: "2-digit",
-                          day: "2-digit",
-                        })}
-                      </TableCell>
-                      <TableCell
-                        style={
-                          data.status == "Valid"
-                            ? { color: "green" }
-                            : { color: "red" }
-                        }
-                      >
-                        {data.status}
-                      </TableCell>
-                      {/* <TableCell>
+                </Box>
+                <TableContainer>
+                  <Table
+                    style={{ width: "100%" }}
+                    id="example"
+                    stickyHeader
+                    aria-label="sticky table"
+                  >
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>S.NO</TableCell>
+                        <TableCell>AWBN Number</TableCell>
+                        <TableCell>Order ID</TableCell>
+                        <TableCell>Order Date</TableCell>
+                        <TableCell>Status</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {employeeData[0]?.items?.map((data, index) => (
+                        <TableRow hover role="checkbox" tabIndex={-1}>
+                          <TableCell>{index + 1}</TableCell>
+                          <TableCell>{data?.awbn_number}</TableCell>
+                          <TableCell>{data?.order_id}</TableCell>
+                          <TableCell>
+                            {new Date(data?.order_date).toLocaleString(
+                              "en-GB",
+                              {
+                                year: "numeric",
+                                month: "2-digit",
+                                day: "2-digit",
+                              }
+                            )}
+                          </TableCell>
+                          <TableCell
+                            style={
+                              data.status == "Valid"
+                                ? { color: "green" }
+                                : { color: "red" }
+                            }
+                          >
+                            {data.status}
+                          </TableCell>
+                          {/* <TableCell>
                         <Button
                           sx={{
                             ml: 2,
@@ -479,91 +503,97 @@ export default function DialogBox() {
                           Remove
                         </Button>
                       </TableCell> */}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Paper>
-        </Grid>
-        <Grid item xs={6}>
-          <Paper sx={{ width: "98%", overflow: "hidden", m: 1 }}>
-            <h6>ACTUAL</h6>
-            <TextField
-              sx={{ m: 1 }}
-              id="outlined-password-input"
-              type="text"
-              name="doorsteps_diagnostics"
-              label="Please Enter AWB Number"
-              value={awbn}
-              // onChange={(e) => setAwbn(e.target.value)}
-              onChange={(e) => {
-                setAwbn(e.target.value);
-                handelAwbn(e);
-              }}
-              inputProps={{
-                style: {
-                  width: "auto",
-                },
-              }}
-            />
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Paper>
+            </Grid>
+            <Grid item xs={6}>
+              <Paper sx={{ width: "98%", overflow: "hidden", m: 1 }}>
+                <h6>ACTUAL</h6>
+                <TextField
+                  sx={{ m: 1 }}
+                  id="outlined-password-input"
+                  type="text"
+                  name="doorsteps_diagnostics"
+                  label="Please Enter AWB Number"
+                  value={awbn}
+                  // onChange={(e) => setAwbn(e.target.value)}
+                  onChange={(e) => {
+                    setAwbn(e.target.value);
+                    handelAwbn(e);
+                  }}
+                  inputProps={{
+                    style: {
+                      width: "auto",
+                    },
+                  }}
+                />
 
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "end",
-              }}
-            >
-              <Box
-                sx={{
-                  m: 2,
-                }}
-              >
-                <Box sx={{}}>
-                  <h5>Total</h5>
-                  <p style={{ marginLeft: "5px", fontSize: "24px" }}>
-                    {
-                      employeeData[0]?.actual_items?.filter(function (item) {
-                        return item.status != "Duplicate";
-                      }).length
-                    }
-                    /{employeeData[0]?.limit}
-                  </p>
-                </Box>
-              </Box>
-              <Box
-                sx={{
-                  m: 2,
-                }}
-              >
-                <Box sx={{}}>
-                  <h5>Valid</h5>
-                  <p style={{ marginLeft: "19px", fontSize: "24px" }}>
-                    {
-                      employeeData[0]?.actual_items?.filter(function (item) {
-                        return item.status == "Valid";
-                      }).length
-                    }
-                  </p>
-                </Box>
-              </Box>
-              <Box
-                sx={{
-                  m: 2,
-                }}
-              >
-                <Box sx={{}}>
-                  <h5>Invalid</h5>
-                  <p style={{ marginLeft: "25px", fontSize: "24px" }}>
-                    {
-                      employeeData[0]?.actual_items?.filter(function (item) {
-                        return item.status == "Invalid";
-                      }).length
-                    }
-                  </p>
-                </Box>
-              </Box>{" "}
-              {/* <Box
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "end",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      m: 2,
+                    }}
+                  >
+                    <Box sx={{}}>
+                      <h5>Total</h5>
+                      <p style={{ marginLeft: "5px", fontSize: "24px" }}>
+                        {
+                          employeeData[0]?.actual_items?.filter(function (
+                            item
+                          ) {
+                            return item.status != "Duplicate";
+                          }).length
+                        }
+                        /{employeeData[0]?.limit}
+                      </p>
+                    </Box>
+                  </Box>
+                  <Box
+                    sx={{
+                      m: 2,
+                    }}
+                  >
+                    <Box sx={{}}>
+                      <h5>Valid</h5>
+                      <p style={{ marginLeft: "19px", fontSize: "24px" }}>
+                        {
+                          employeeData[0]?.actual_items?.filter(function (
+                            item
+                          ) {
+                            return item.status == "Valid";
+                          }).length
+                        }
+                      </p>
+                    </Box>
+                  </Box>
+                  <Box
+                    sx={{
+                      m: 2,
+                    }}
+                  >
+                    <Box sx={{}}>
+                      <h5>Invalid</h5>
+                      <p style={{ marginLeft: "25px", fontSize: "24px" }}>
+                        {
+                          employeeData[0]?.actual_items?.filter(function (
+                            item
+                          ) {
+                            return item.status == "Invalid";
+                          }).length
+                        }
+                      </p>
+                    </Box>
+                  </Box>{" "}
+                  {/* <Box
                 sx={{
                   m: 2,
                 }}
@@ -579,174 +609,179 @@ export default function DialogBox() {
                   </p>
                 </Box>
               </Box> */}
-            </Box>
-            <TableContainer>
-              <Table
-                style={{ width: "100%" }}
-                id="example"
-                stickyHeader
-                aria-label="sticky table"
-              >
-                <TableHead>
-                  <TableRow>
-                    <TableCell>S.NO</TableCell>
-                    <TableCell>AWBN Number</TableCell>
-                    <TableCell>Order ID</TableCell>
-                    <TableCell>Order Date</TableCell>
-                    <TableCell>Status</TableCell>
-                  </TableRow>
-                </TableHead>
+                </Box>
+                <TableContainer>
+                  <Table
+                    style={{ width: "100%" }}
+                    id="example"
+                    stickyHeader
+                    aria-label="sticky table"
+                  >
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>S.NO</TableCell>
+                        <TableCell>AWBN Number</TableCell>
+                        <TableCell>Order ID</TableCell>
+                        <TableCell>Order Date</TableCell>
+                        <TableCell>Status</TableCell>
+                      </TableRow>
+                    </TableHead>
 
-                <TableBody>
-                  {employeeData[0]?.actual_items?.map((data, index) => (
-                    <TableRow hover role="checkbox" tabIndex={-1}>
-                      <TableCell>{index + 1}</TableCell>
-                      <TableCell>{data?.awbn_number}</TableCell>
-                      <TableCell>{data?.order_id}</TableCell>
-                      <TableCell>
-                        {new Date(data?.order_date).toLocaleString("en-GB", {
-                          year: "numeric",
-                          month: "2-digit",
-                          day: "2-digit",
-                        })}
-                      </TableCell>
-                      <TableCell
-                        style={
-                          data.status == "Valid"
-                            ? { color: "green" }
-                            : { color: "red" }
-                        }
-                      >
-                        {data.status}
-                      </TableCell>
-                      <TableCell>
-                        {data.status !== "Valid" ? (
-                          <Button
-                            sx={{
-                              ml: 2,
-                            }}
-                            variant="contained"
-                            style={{ backgroundColor: "red" }}
-                            component="span"
-                            onClick={() => {
-                              if (window.confirm("You want to Remove?")) {
-                                handelDelete(data._id);
+                    <TableBody>
+                      {employeeData[0]?.actual_items?.map((data, index) => (
+                        <TableRow hover role="checkbox" tabIndex={-1}>
+                          <TableCell>{index + 1}</TableCell>
+                          <TableCell>{data?.awbn_number}</TableCell>
+                          <TableCell>{data?.order_id}</TableCell>
+                          <TableCell>
+                            {new Date(data?.order_date).toLocaleString(
+                              "en-GB",
+                              {
+                                year: "numeric",
+                                month: "2-digit",
+                                day: "2-digit",
                               }
-                            }}
+                            )}
+                          </TableCell>
+                          <TableCell
+                            style={
+                              data.status == "Valid"
+                                ? { color: "green" }
+                                : { color: "red" }
+                            }
                           >
-                            Remove
-                          </Button>
-                        ) : null}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Paper>
-        </Grid>
-      </Grid>
-      <Grid container spacing={3} sx={{ mt: 2 }}>
-        <Grid item xs={6}>
-          <TextField
-            sx={{
-              m: 1,
-            }}
-            onChange={(e) => setTrayid({ botTray: e.target.value })}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment>
-                  <IconButton
-                    onClick={(e) => {
-                      handelBotTray(e, trayId.botTray);
-                    }}
-                  >
-                    <SearchIcon />
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-            InputLabelProps={{ shrink: true }}
-            label="BOT Tray"
-            id="standard-size-normal"
-            variant="standard"
-          />
-          <TextField
-            sx={{
-              m: 1,
-            }}
-            onChange={(e) => setTrayid({ pmtTray: e.target.value })}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment>
-                  <IconButton
-                    onClick={(e) => {
-                      handelPmtTray(e, trayId.pmtTray);
-                    }}
-                  >
-                    <SearchIcon />
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-            InputLabelProps={{ shrink: true }}
-            label="PMT Tray"
-            id="standard-size-normal"
-            value={pmtTray}
-            variant="standard"
-          />
+                            {data.status}
+                          </TableCell>
+                          <TableCell>
+                            {data.status !== "Valid" ? (
+                              <Button
+                                sx={{
+                                  ml: 2,
+                                }}
+                                variant="contained"
+                                style={{ backgroundColor: "red" }}
+                                component="span"
+                                onClick={() => {
+                                  if (window.confirm("You want to Remove?")) {
+                                    handelDelete(data._id);
+                                  }
+                                }}
+                              >
+                                Remove
+                              </Button>
+                            ) : null}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Paper>
+            </Grid>
+          </Grid>
+          <Grid container spacing={3} sx={{ mt: 2 }}>
+            <Grid item xs={6}>
+              <TextField
+                sx={{
+                  m: 1,
+                }}
+                onChange={(e) => setTrayid({ botTray: e.target.value })}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment>
+                      <IconButton
+                        onClick={(e) => {
+                          handelBotTray(e, trayId.botTray);
+                        }}
+                      >
+                        <SearchIcon />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+                InputLabelProps={{ shrink: true }}
+                label="BOT Tray"
+                id="standard-size-normal"
+                variant="standard"
+              />
+              <TextField
+                sx={{
+                  m: 1,
+                }}
+                onChange={(e) => setTrayid({ pmtTray: e.target.value })}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment>
+                      <IconButton
+                        onClick={(e) => {
+                          handelPmtTray(e, trayId.pmtTray);
+                        }}
+                      >
+                        <SearchIcon />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+                InputLabelProps={{ shrink: true }}
+                label="PMT Tray"
+                id="standard-size-normal"
+                value={pmtTray}
+                variant="standard"
+              />
 
-          <TextField
-            sx={{
-              m: 1,
-            }}
-            onChange={(e) => setTrayid({ mmtTray: e.target.value })}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment>
-                  <IconButton
-                    onClick={(e) => {
-                      handelMmtTray(e, trayId.mmtTray);
-                    }}
-                  >
-                    <SearchIcon />
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-            InputLabelProps={{ shrink: true }}
-            label="MMT Tray"
-            value={mmtTray}
-            id="standard-size-normal"
-            variant="standard"
-          />
-        </Grid>
+              <TextField
+                sx={{
+                  m: 1,
+                }}
+                onChange={(e) => setTrayid({ mmtTray: e.target.value })}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment>
+                      <IconButton
+                        onClick={(e) => {
+                          handelMmtTray(e, trayId.mmtTray);
+                        }}
+                      >
+                        <SearchIcon />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+                InputLabelProps={{ shrink: true }}
+                label="MMT Tray"
+                value={mmtTray}
+                id="standard-size-normal"
+                variant="standard"
+              />
+            </Grid>
 
-        <Grid item xs={6}>
-          <Box sx={{ float: "right" }}>
-            <textarea
-              onChange={(e) => {
-                setDescription(e.target.value);
-              }}
-              style={{ width: "400px" }}
-              placeholder="Description"
-            ></textarea>
-            <Button
-              sx={{ m: 3, mb: 9 }}
-              variant="contained"
-              disabled={loading == true ? true : false}
-              style={{ backgroundColor: "green" }}
-              onClick={() => {
-                if (window.confirm("You Want to Issue?")) {
-                  handelIssue();
-                }
-              }}
-            >
-              Issue To Agent
-            </Button>
-          </Box>
-        </Grid>
-      </Grid>
+            <Grid item xs={6}>
+              <Box sx={{ float: "right" }}>
+                <textarea
+                  onChange={(e) => {
+                    setDescription(e.target.value);
+                  }}
+                  style={{ width: "400px" }}
+                  placeholder="Description"
+                ></textarea>
+                <Button
+                  sx={{ m: 3, mb: 9 }}
+                  variant="contained"
+                  disabled={loading == true ? true : false}
+                  style={{ backgroundColor: "green" }}
+                  onClick={() => {
+                    if (window.confirm("You Want to Issue?")) {
+                      handelIssue();
+                    }
+                  }}
+                >
+                  Issue To Agent
+                </Button>
+              </Box>
+            </Grid>
+          </Grid>
+        </>
+      )}
     </>
   );
 }

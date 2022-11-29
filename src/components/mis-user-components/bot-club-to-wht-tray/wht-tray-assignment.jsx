@@ -207,7 +207,6 @@ export default function DialogBox() {
     e.preventDefault();
     navigate(-1);
   };
-  console.log(whtTrayId);
   return (
     <>
       <Box

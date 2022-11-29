@@ -92,7 +92,11 @@ export default function DialogBox() {
           navigate("/");
         }
       } catch (error) {
-        alert(error);
+        if (error.response.status === 403) {
+          alert(error.response.data.message);
+        } else {
+          alert(error);
+        }
       }
     };
     fetchData();
@@ -174,7 +178,11 @@ export default function DialogBox() {
         }
       }
     } catch (error) {
-      alert(error);
+      if (error.response.status == 403) {
+        alert(error.response.data.message);
+      } else {
+        alert(error);
+      }
     }
   };
   const handelViewItem = (e, code) => {

@@ -31,7 +31,7 @@ export default function StickyHeadTable({ props }) {
         if (admin) {
           let { location } = jwt_decode(admin);
           let response = await axiosWarehouseIn.post(
-            "/release-bot-tray/" + location
+            "/release-bot-tray/" + location + "/" + "Closed By Sorting Agent"
           );
           if (response.status === 200) {
             setWhtTray(response.data.data);

@@ -88,7 +88,7 @@ export default function Home() {
           count++;
         }
         if (count == isCheck.length) {
-          alert("Successfully Genrated");
+          alert("Successfully Generated");
           setLoading(false);
           setIsCheck([]);
           setRefresh((refresh) => !refresh);

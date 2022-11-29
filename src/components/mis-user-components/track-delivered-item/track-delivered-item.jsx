@@ -40,6 +40,7 @@ export default function CustomizedMenus() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [refresh, setRefresh] = useState(false);
+  const [count, setCount] = useState(0);
   const [search, setSearch] = useState({
     type: "",
     searchData: "",
@@ -48,12 +49,10 @@ export default function CustomizedMenus() {
   const navigate = useNavigate();
   useEffect(() => {
     setData((_) =>
-      item
-        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-        .map((d, index) => {
-          d.id = page * rowsPerPage + index + 1;
-          return d;
-        })
+      item.map((d, index) => {
+        d.id = page * rowsPerPage + index + 1;
+        return d;
+      })
     );
   }, [page, item, rowsPerPage]);
 
@@ -64,8 +63,11 @@ export default function CustomizedMenus() {
       const fetchData = async () => {
         setLoading(false);
         try {
-          let res = await axiosMisUser.post("/getDeliveredOrders/" + location);
+          let res = await axiosMisUser.post(
+            "/getDeliveredOrders/" + location + "/" + page + "/" + rowsPerPage
+          );
           if (res.status == 200) {
+            setCount(res.data.count);
             setLoading(true);
             setItem(res.data.data);
             // dataTableFun();
@@ -78,14 +80,8 @@ export default function CustomizedMenus() {
     } else {
       navigate("/");
     }
-  }, [refresh]);
+  }, [refresh, page]);
 
-  function dataTableFun() {
-    $("#example").DataTable({
-      destroy: true,
-      scrollX: true,
-    });
-  }
   /*************************************PAGINATION**************************************************** */
   function TablePaginationActions(props) {
     const theme = useTheme();
@@ -169,7 +165,7 @@ export default function CustomizedMenus() {
       if (admin) {
         let { location } = jwt_decode(admin);
         if (e.target.value == "") {
-          setRefresh((refresh) => !refresh);
+          window.location.reload(false);
         } else {
           let obj = {
             location: location,
@@ -562,7 +558,7 @@ export default function CustomizedMenus() {
                 <TablePagination
                   rowsPerPageOptions={[10, 50, 100]}
                   colSpan={3}
-                  count={item.length}
+                  count={count}
                   rowsPerPage={rowsPerPage}
                   page={page}
                   SelectProps={{

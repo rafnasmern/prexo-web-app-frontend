@@ -123,7 +123,6 @@ export default function Home() {
           break;
         }
       }
-      console.log(pagination.item);
       let res = await axiosSuperAdminPrexo.post(
         "/bulkValidationBag",
         pagination.item

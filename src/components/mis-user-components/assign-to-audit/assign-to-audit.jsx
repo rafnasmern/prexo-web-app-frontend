@@ -262,6 +262,7 @@ export default function StickyHeadTable({ props }) {
           // fullWidth
           sx={{ m: 1, mt: 3 }}
           style={{ backgroundColor: "#206CE2" }}
+          disabled={true}
           onClick={(e) => {
             if (isCheck.length == 0) {
               alert("Please select atleast one tray");

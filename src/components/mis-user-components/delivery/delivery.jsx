@@ -41,6 +41,7 @@ export default function Home() {
   const [data, setData] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [deliveryCount, setDeliveryCount] = useState([]);
   const [search, setSearch] = useState({
     type: "",
     searchData: "",
@@ -54,11 +55,18 @@ export default function Home() {
         let { location } = jwt_decode(admin);
         const fetchData = async () => {
           setLoading(false);
-          let res = await axiosMisUser.post("/getAllDelivery/" + location);
+          let deliveryCountRes = await axiosMisUser.post(
+            "/getDeliveryCount/" + location
+          );
+          if (deliveryCountRes.status === 200) {
+            setDeliveryCount(deliveryCountRes.data.data);
+          }
+          let res = await axiosMisUser.post(
+            "/getAllDelivery/" + location + "/" + page + "/" + rowsPerPage
+          );
           if (res.status == 200) {
             setLoading(true);
             setItem(res.data.data);
-            // dataTableFun();
           }
         };
         fetchData();
@@ -68,16 +76,14 @@ export default function Home() {
     } catch (error) {
       alert(error);
     }
-  }, [refresh]);
+  }, [page]);
   /*********************************USEEFECT FOR PAGINATION**************************************** */
   useEffect(() => {
     setData((_) =>
-      item
-        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-        .map((d, index) => {
-          d.id = page * rowsPerPage + index + 1;
-          return d;
-        })
+      item.map((d, index) => {
+        d.id = page * rowsPerPage + index + 1;
+        return d;
+      })
     );
   }, [page, item, rowsPerPage]);
 
@@ -104,8 +110,8 @@ export default function Home() {
       if (admin) {
         let { location } = jwt_decode(admin);
         if (e.target.value == "") {
-          setRefresh((refresh) => !refresh);
-        }  else {
+          window.location.reload(false)
+        } else {
           let obj = {
             location: location,
             type: search.type,
@@ -292,7 +298,6 @@ export default function Home() {
         sx={{
           mt: 4,
           mr: 1,
-       
         }}
       >
         <Box
@@ -305,7 +310,6 @@ export default function Home() {
               display: "flex",
               flexDirection: "start",
               mt: 6,
-            
             }}
           >
             <FormControl sx={{ m: 1 }} fullWidth>
@@ -341,7 +345,7 @@ export default function Home() {
             />
           </Box>
         </Box>
-        <Box sx={{ mt: 4, float: "right",mr:2 }}>
+        <Box sx={{ mt: 4, float: "right", mr: 2 }}>
           <Button
             variant="contained"
             sx={{ mt: 5 }}
@@ -350,7 +354,7 @@ export default function Home() {
               handelDelivery(e);
             }}
           >
-            Add Delivery 
+            Add Delivery
           </Button>
           <Button
             variant="contained"
@@ -379,7 +383,7 @@ export default function Home() {
           </Box>
         </Container>
       ) : (
-        <Paper sx={{ width: "100%", overflow: "hidden",mt:2,mb:2 }}>
+        <Paper sx={{ width: "100%", overflow: "hidden", mt: 2, mb: 2 }}>
           <TableContainer sx={{ maxHeight: 1000 }}>
             {tableData}
             <TableFooter>
@@ -387,7 +391,7 @@ export default function Home() {
                 <TablePagination
                   rowsPerPageOptions={[10, 50, 100]}
                   colSpan={3}
-                  count={item.length}
+                  count={deliveryCount}
                   rowsPerPage={rowsPerPage}
                   page={page}
                   SelectProps={{

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import * as XLSX from "xlsx";
 import * as FileSaver from "file-saver";
-import { useParams } from "react-router-dom";
 import {
   Paper,
   Table,
@@ -23,7 +22,7 @@ import {
   Container,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { axiosMisUser, axiosSuperAdminPrexo } from "../../../axios";
+import { axiosMisUser } from "../../../axios";
 import Checkbox from "@mui/material/Checkbox";
 import { styled, alpha } from "@mui/material/styles";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
@@ -53,6 +52,7 @@ export default function Home() {
   const [stateOfPage, setStateOfPage] = useState("");
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [count, setCount] = useState(0);
   const [uicGenloading, setUicGenLoading] = useState(false);
   const [search, setSearch] = useState({
     type: "",
@@ -67,12 +67,22 @@ export default function Home() {
         let { location } = jwt_decode(admin);
         const fetchData = async () => {
           setLoading(false);
-          let res = await axiosMisUser.post("/uicPageData/" + location);
-          if (res.status == 200) {
-            setStateOfPage("All");
-            setLoading(true);
-            setItem(res.data.data);
-            // dataTableFun();
+          if (stateOfPage == "Created") {
+            handelUicGeneratedOpt("Created", "top");
+          } else if (stateOfPage == "Pending") {
+            handelUicGeneratedOpt("Pending", "top");
+          } else if (stateOfPage == "Printed") {
+            handelUicGeneratedOpt("Printed", "top");
+          } else {
+            let res = await axiosMisUser.post(
+              "/uicPageData/" + location + "/" + page + "/" + rowsPerPage
+            );
+            if (res.status == 200) {
+              setStateOfPage("All");
+              setLoading(true);
+              setItem(res.data.data);
+              setCount(res.data.count);
+            }
           }
         };
         fetchData();
@@ -82,21 +92,18 @@ export default function Home() {
     } catch (error) {
       alert(error);
     }
-  }, [refresh]);
+  }, [refresh, page]);
   /*********************************USEEFECT FOR PAGINATION**************************************** */
   useEffect(() => {
     setData((_) =>
-      item
-        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-        .map((d, index) => {
-          d.id = page * rowsPerPage + index + 1;
-          return d;
-        })
+      item.map((d, index) => {
+        d.id = page * rowsPerPage + index + 1;
+        return d;
+      })
     );
   }, [page, item, rowsPerPage]);
   const handelUicGen = (e) => {
     e.preventDefault();
-
     if (isCheck.length == 0) {
       alert("Please Select Atleast One Delivered Data");
     } else {
@@ -130,7 +137,7 @@ export default function Home() {
             setUicGenLoading(false);
             alert("Successfully Generated");
             setIsCheck([]);
-            setRefresh((refresh) => !refresh);
+            window.location.reload(false);
           }
         };
         addUic();
@@ -195,14 +202,9 @@ export default function Home() {
     const data = new Blob([excelBuffer], { type: fileType });
     FileSaver.saveAs(data, fileName + fileExtension);
     setIsCheck([]);
-    setRefresh((refresh) => !refresh);
+    window.location.reload(false);
   }
-  // function dataTableFun() {
-  //   $("#example").DataTable({
-  //     destroy: true,
-  //     scrollX: true,
-  //   });
-  // }
+
   const handleSelectAll = (e) => {
     setIsCheckAll(!isCheckAll);
     setIsCheck(item.map((li, index) => index.toString()));
@@ -259,87 +261,37 @@ export default function Home() {
       },
     },
   }));
+  const handelUicGeneratedOpt = async (type, pos) => {
+    try {
+      if (pos == "bellow") {
+        setPage(0);
+      }
+      setLoading(false);
+      let admin = localStorage.getItem("prexo-authentication");
+      if (admin) {
+        let { location } = jwt_decode(admin);
+        // $("#example").DataTable().destroy();
+        let obj = {
+          status: type,
+          location: location,
+          page: page,
+          size: rowsPerPage,
+        };
+        let res = await axiosMisUser.post("/uicGeneratedRecon", obj);
+        if (res.status == 200) {
+          setLoading(true);
+          setItem(res.data.data);
+          setCount(res.data.count);
+          setStateOfPage(type);
+          // dataTableFun();
+        }
+      }
+    } catch (error) {
+      setLoading(true);
+      alert(error);
+    }
+  };
 
-  const handelUicAll = async () => {
-    try {
-      // $("#example").DataTable().destroy();
-      let admin = localStorage.getItem("prexo-authentication");
-      if (admin) {
-        let { location } = jwt_decode(admin);
-        let res = await axiosMisUser.post("/uicPageData/" + location);
-        if (res.status == 200) {
-          setStateOfPage("All");
-          setItem(res.data.data);
-          // dataTableFun();
-        }
-      }
-    } catch (error) {
-      alert(error);
-    }
-  };
-  const handelUicGenerated = async () => {
-    try {
-      let admin = localStorage.getItem("prexo-authentication");
-      if (admin) {
-        let { location } = jwt_decode(admin);
-        // $("#example").DataTable().destroy();
-        let obj = {
-          status: "Created",
-          location: location,
-        };
-        let res = await axiosMisUser.post("/uicGeneratedRecon", obj);
-        if (res.status == 200) {
-          setItem(res.data.data);
-          setStateOfPage("Created");
-
-          // dataTableFun();
-        }
-      }
-    } catch (error) {
-      alert(error);
-    }
-  };
-  const handelUicNotGenrated = async () => {
-    try {
-      let admin = localStorage.getItem("prexo-authentication");
-      if (admin) {
-        let { location } = jwt_decode(admin);
-        // $("#example").DataTable().destroy();
-        let obj = {
-          status: "Pending",
-          location: location,
-        };
-        let res = await axiosMisUser.post("/uicGeneratedRecon", obj);
-        if (res.status == 200) {
-          setItem(res.data.data);
-          setStateOfPage("Pending");
-        }
-      }
-    } catch (error) {
-      alert(error);
-    }
-  };
-  const handelUicDownloaded = async () => {
-    try {
-      let admin = localStorage.getItem("prexo-authentication");
-      if (admin) {
-        let { location } = jwt_decode(admin);
-        // $("#example").DataTable().destroy();
-        let obj = {
-          status: "Printed",
-          location: location,
-        };
-        let res = await axiosMisUser.post("/uicGeneratedRecon", obj);
-        if (res.status == 200) {
-          setItem(res.data.data);
-          setStateOfPage("Printed");
-          // dataTableFun();
-        }
-      }
-    } catch (error) {
-      alert(error);
-    }
-  };
   const handleOptions = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -351,15 +303,8 @@ export default function Home() {
       if (admin) {
         let { location } = jwt_decode(admin);
         if (e.target.value == "") {
-          if (stateOfPage == "All") {
-            handelUicAll();
-          } else if (stateOfPage == "Pending") {
-            handelUicNotGenrated();
-          } else if (stateOfPage == "Created") {
-            handelUicGenerated();
-          } else {
-            handelUicDownloaded();
-          }
+          setItem([]);
+          window.location.reload(false);
         } else if (search.type == "") {
           alert("Please add input");
         } else {
@@ -426,7 +371,6 @@ export default function Home() {
     const handleLastPageButtonClick = (event) => {
       onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
     };
-
     return (
       <Box sx={{ flexShrink: 0, ml: 2.5 }}>
         <IconButton
@@ -814,16 +758,36 @@ export default function Home() {
                 open={open}
                 onClose={handleClose}
               >
-                <MenuItem onClick={handelUicAll} disableRipple>
+                <MenuItem
+                  onClick={(e) => {
+                    window.location.reload(false);
+                  }}
+                  disableRipple
+                >
                   All
                 </MenuItem>
-                <MenuItem onClick={handelUicGenerated} disableRipple>
+                <MenuItem
+                  onClick={(e) => {
+                    handelUicGeneratedOpt("Created", "bellow");
+                  }}
+                  disableRipple
+                >
                   UIC Generated
                 </MenuItem>
-                <MenuItem onClick={handelUicNotGenrated} disableRipple>
+                <MenuItem
+                  onClick={(e) => {
+                    handelUicGeneratedOpt("Pending", "bellow");
+                  }}
+                  disableRipple
+                >
                   UIC Not Generated
                 </MenuItem>
-                <MenuItem onClick={handelUicDownloaded} disableRipple>
+                <MenuItem
+                  onClick={(e) => {
+                    handelUicGeneratedOpt("Printed", "bellow");
+                  }}
+                  disableRipple
+                >
                   UIC Downloaded
                 </MenuItem>
               </StyledMenu>
@@ -849,14 +813,14 @@ export default function Home() {
           </Box>
         </Container>
       ) : (
-        <Paper sx={{ width: "100%", overflow: "hidden" }}>
+        <Paper sx={{ width: "100%", overflow: "hidden", mb: 2 }}>
           <TableContainer>
             {tabelData}
             <TableFooter>
               <TablePagination
                 rowsPerPageOptions={[10, 50, 100]}
                 colSpan={3}
-                count={item.length}
+                count={count}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 SelectProps={{

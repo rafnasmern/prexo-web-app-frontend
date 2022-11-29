@@ -10,9 +10,6 @@ import {
   Box,
   TableFooter,
   TablePagination,
-  FormControl,
-  MenuItem,
-  InputLabel,
   Select,
   TextField,
   Container,
@@ -38,6 +35,7 @@ export default function CustomizedMenus() {
   const [item, setItem] = useState([]);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [data, setData] = useState([]);
+  const [count, setCount] = useState(0);
   const [refresh, setRefresh] = useState(false);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState({
@@ -49,12 +47,10 @@ export default function CustomizedMenus() {
 
   useEffect(() => {
     setData((_) =>
-      item
-        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-        .map((d, index) => {
-          d.id = page * rowsPerPage + index + 1;
-          return d;
-        })
+      item.map((d, index) => {
+        d.id = page * rowsPerPage + index + 1;
+        return d;
+      })
     );
   }, [page, item, rowsPerPage]);
   useEffect(() => {
@@ -63,10 +59,13 @@ export default function CustomizedMenus() {
       const fetchData = async () => {
         try {
           setLoading(false);
-          let res = await axiosSuperAdminPrexo.post("/itemTracking");
+          let res = await axiosSuperAdminPrexo.post(
+            "/itemTracking/" + page + "/" + rowsPerPage
+          );
           if (res.status == 200) {
             setLoading(true);
             setItem(res.data.data);
+            setCount(res.data.count);
             // dataTableFun();
           }
         } catch (error) {
@@ -77,14 +76,8 @@ export default function CustomizedMenus() {
     } else {
       navigate("/");
     }
-  }, [refresh]);
+  }, [refresh, page]);
 
-  function dataTableFun() {
-    $("#example").DataTable({
-      destroy: true,
-      scrollX: true,
-    });
-  }
   /*************************************PAGINATION**************************************************** */
   function TablePaginationActions(props) {
     const theme = useTheme();
@@ -168,7 +161,7 @@ export default function CustomizedMenus() {
       if (admin) {
         let { location } = jwt_decode(admin);
         if (e.target.value == "") {
-          setRefresh((refresh) => !refresh);
+          window.location.reload(false);
         } else {
           let obj = {
             location: location,
@@ -556,15 +549,15 @@ export default function CustomizedMenus() {
           </Box>
         </Container>
       ) : (
-        <Paper sx={{ overflow: "hidden", m: 3 }}>
-          <TableContainer sx={{ maxHeight: 1000 }}>
+        <Paper sx={{ overflow: "hidden", mt: 2, mb: 2 }}>
+          <TableContainer>
             {tableData}
             <TableFooter>
               <TableRow>
                 <TablePagination
                   rowsPerPageOptions={[10, 50, 100]}
                   colSpan={3}
-                  count={item.length}
+                  count={count}
                   rowsPerPage={rowsPerPage}
                   page={page}
                   SelectProps={{

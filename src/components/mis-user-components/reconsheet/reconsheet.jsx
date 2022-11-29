@@ -18,7 +18,7 @@ import {
   Box,
   TablePagination,
   TextField,
-  Container
+  Container,
 } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { useNavigate } from "react-router-dom";
@@ -86,13 +86,12 @@ export default function CustomizedMenus() {
   const [item, setItem] = useState([]);
   const [allOrders, setAllOrders] = useState(false);
   const [deliveredOrders, setDeliveredOrders] = useState(false);
-  const [deliverdBut, setDeliveredBut] = useState(false);
-  const [noOrders, setNoOrders] = useState(false);
   const navigate = useNavigate();
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [data, setData] = useState([]);
-  const [refresh, setRefresh] = useState(false);
+  const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [currentOption, setCurrentOption] = useState("");
   const [page, setPage] = React.useState(0);
   const [search, setSearch] = useState({
     type: "",
@@ -117,77 +116,94 @@ export default function CustomizedMenus() {
   /*********************************USEEFECT FOR PAGINATION**************************************** */
   useEffect(() => {
     setData((_) =>
-      item
-        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-        .map((d, index) => {
-          d.id = page * rowsPerPage + index + 1;
-          return d;
-        })
+      item.map((d, index) => {
+        d.id = page * rowsPerPage + index + 1;
+        return d;
+      })
     );
   }, [page, item, rowsPerPage]);
-
   let admin = localStorage.getItem("prexo-authentication");
   let location1;
   if (admin) {
     let { location } = jwt_decode(admin);
     location1 = location;
   }
-  const handelAllOrders = async () => {
-    try {
-      // $("#example").DataTable().destroy();
-      setLoading(true);
-      let res = await axiosMisUser.post("/getOrders/" + location1);
-      if (res.status == 200) {
-        setDeliveredOrders(false);
-        setLoading(false);
-        setAllOrders(true);
-        setItem(res.data.data);
-        // dataTableFun();
-      }
-    } catch (error) {
-      alert(error);
-    }
-  };
-  const handeNewOrders = async () => {
-    try {
-      // $("#example").DataTable().destroy();
-      let res = await axiosMisUser.post("/newOrders/" + location1);
-      if (res.status == 200) {
-        setDeliveredBut(false);
-        setNoOrders(false);
+  useEffect(() => {
+    let admin = localStorage.getItem("prexo-authentication");
+    if (admin) {
+      let { location } = jwt_decode(admin);
+      try {
+        const fetchData = async () => {
+          setLoading(true);
+          let orderCount = await axiosMisUser.post(
+            "/getOrdersCount/" + location1
+          );
+          if (orderCount.status === 200) {
+            setCount(orderCount.data.data);
+          }
 
-        setItem(res.data.data);
-        // dataTableFun();
+          let res = await axiosMisUser.post(
+            "/getOrders/" + location1 + "/" + page + "/" + rowsPerPage
+          );
+          if (res.status == 200) {
+            setDeliveredOrders(false);
+            setLoading(false);
+            setAllOrders(true);
+            setItem(res.data.data);
+          }
+        };
+        if (currentOption == "DeliveredOrders") {
+          handelDeliverdOrders("top");
+        } else if (currentOption == "notDelivered") {
+          handelNotDelivered("top");
+        } else {
+          fetchData();
+        }
+      } catch (error) {
+        alert(error);
       }
-    } catch (error) {
-      alert(error);
     }
-  };
-  const handelDeliverdOrders = async () => {
+  }, [page]);
+
+  const handelDeliverdOrders = async (pos) => {
     try {
       // $("#example").DataTable().destroy();
+      if (pos == "bellow") {
+        setPage(0);
+      }
       setLoading(true);
-      let res = await axiosMisUser.post("/getDeliveredOrders/" + location1);
+      let res = await axiosMisUser.post(
+        "/getDeliveredOrders/" + location1 + "/" + page + "/" + rowsPerPage
+      );
       if (res.status == 200) {
+        setCount(res.data.count);
         setAllOrders(false);
         setLoading(false);
         setDeliveredOrders(true);
         setItem(res.data.data);
+        setCurrentOption("DeliveredOrders");
         // dataTableFun();
       }
     } catch (error) {
       alert(error);
     }
   };
-  const handelNotDelivered = async () => {
+  const handelNotDelivered = async (pos) => {
     try {
+      if (pos == "bellow") {
+        setPage(0);
+      }
       // $("#example").DataTable().destroy();
       setLoading(true);
-      let res = await axiosMisUser.post("/notDeliveredOrders/" + location1);
+      let res = await axiosMisUser.post(
+        "/notDeliveredOrders/" + location1 + "/" + page + "/" + rowsPerPage
+      );
       if (res.status == 200) {
+        setCount(res.data.count);
         setDeliveredOrders(false);
         setLoading(false);
         setAllOrders(false);
+        setCurrentOption("notDelivered");
         setItem(res.data.data);
         // dataTableFun();
       }
@@ -195,25 +211,7 @@ export default function CustomizedMenus() {
       alert(error);
     }
   };
-  const handelDeliveredNoOrders = async () => {
-    try {
-      // $("#example").DataTable().destroy();
-      let res = await axiosMisUser.post("/deliveredNoOrderId/" + location1);
-      if (res.status == 200) {
-        setDeliveredBut(false);
-        setItem(res.data.data);
-        // dataTableFun();
-      }
-    } catch (error) {
-      alert(error);
-    }
-  };
-  function dataTableFun() {
-    $("#example").DataTable({
-      destroy: true,
-      scrollX: true,
-    });
-  }
+
   /*************************************PAGINATION**************************************************** */
   function TablePaginationActions(props) {
     const theme = useTheme();
@@ -298,13 +296,7 @@ export default function CustomizedMenus() {
       if (admin) {
         let { location } = jwt_decode(admin);
         if (e.target.value == "") {
-          if (deliveredOrders) {
-            handelDeliverdOrders();
-          } else if (allOrders) {
-            handelAllOrders();
-          } else {
-            handelNotDelivered();
-          }
+          window.location.reload(false);
         } else {
           let obj = {
             location: location,
@@ -535,7 +527,7 @@ export default function CustomizedMenus() {
     );
   }, [item, data]);
   return (
-    <div style={{ marginTop: "100px", }}>
+    <div style={{ marginTop: "100px" }}>
       <Box>
         <Box
           sx={{
@@ -612,16 +604,31 @@ export default function CustomizedMenus() {
             open={open}
             onClose={handleClose}
           >
-            <MenuItem onClick={handelAllOrders} disableRipple>
+            <MenuItem
+              onClick={(e) => {
+                window.location.reload(false);
+              }}
+              disableRipple
+            >
               All Orders
             </MenuItem>
             {/* <MenuItem onClick={handeNewOrders} disableRipple>
           New Orders
         </MenuItem> */}
-            <MenuItem onClick={handelDeliverdOrders} disableRipple>
+            <MenuItem
+              onClick={(e) => {
+                handelDeliverdOrders("bellow");
+              }}
+              disableRipple
+            >
               Delivered Orders
             </MenuItem>
-            <MenuItem onClick={handelNotDelivered} disableRipple>
+            <MenuItem
+              onClick={(e) => {
+                handelNotDelivered("bellow");
+              }}
+              disableRipple
+            >
               Not Delivered Orders
             </MenuItem>
             {/* <MenuItem onClick={handelDeliveredNoOrders} disableRipple>
@@ -630,48 +637,46 @@ export default function CustomizedMenus() {
           </StyledMenu>
         </Box>
       </Box>
-      {
-        loading === true ? 
-          <Container>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                flexDirection: "column",
-                pt: 30,
-              }}
-            >
-              <CircularProgress />
-              <p style={{ paddingTop: "10px" }}>Loading...</p>
-            </Box>
-          </Container>
-          :
-
-      <Paper sx={{ width: "100%", overflow: "hidden", mt: 3 }}>
-        <TableContainer sx={{ maxHeight: 1000 }}>
-          {" "}
-          {tableData}
-          <TableFooter>
-            <TablePagination
-              rowsPerPageOptions={[10, 50, 100]}
-              colSpan={3}
-              count={item.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              SelectProps={{
-                inputProps: {
-                  "aria-label": "rows per page",
-                },
-                native: true,
-              }}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-              ActionsComponent={TablePaginationActions}
-            />
-          </TableFooter>
-        </TableContainer>
-      </Paper>
-      }
+      {loading === true ? (
+        <Container>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              flexDirection: "column",
+              pt: 30,
+            }}
+          >
+            <CircularProgress />
+            <p style={{ paddingTop: "10px" }}>Loading...</p>
+          </Box>
+        </Container>
+      ) : (
+        <Paper sx={{ width: "100%", overflow: "hidden", mt: 3, mb: 2 }}>
+          <TableContainer sx={{ maxHeight: 1000 }}>
+            {" "}
+            {tableData}
+            <TableFooter>
+              <TablePagination
+                rowsPerPageOptions={[10, 50, 100]}
+                colSpan={3}
+                count={count}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                SelectProps={{
+                  inputProps: {
+                    "aria-label": "rows per page",
+                  },
+                  native: true,
+                }}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                ActionsComponent={TablePaginationActions}
+              />
+            </TableFooter>
+          </TableContainer>
+        </Paper>
+      )}
     </div>
   );
 }

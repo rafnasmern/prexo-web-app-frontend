@@ -97,6 +97,7 @@ import PmtReport from "./pages/warehouse-page/report/pmt-report";
 import MmtReport from "./pages/warehouse-page/report/mmt-report";
 import InuseWhtTray from "./pages/warehouse-page/in-use-wht-tray/wht-tray";
 import InusePmtMmtTray from "./pages/warehouse-page/in-use-pmt-mmt/tray-page";
+import BotTrayReport from "./pages/warehouse-page/bot-tray-report/view-tray"
 /**********************************CHARGING PANEL************************************* */
 import ChargingPanelDashboard from "./pages/charging-pages/charging-dashboard";
 import ViewAssignedTrayCharging from "./pages/charging-pages/view-assigned-tray";
@@ -313,6 +314,7 @@ function App() {
           <Route path="/mmt-report" element={<MmtReport />} />
           <Route path="/in-use-pmt-mmt" element={<InusePmtMmtTray />} />
           <Route path="/wht-tray-merge" element={<WhtTrayMerge />} />
+          <Route path="/bot-tray-report" element={<BotTrayReport />} />
         </Routes>
       </BrowserRouter>
     </>

@@ -6,7 +6,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  TablePagination,
+  Container,
   TableRow,
   Box,
   Button,
@@ -17,23 +17,28 @@ import jwt_decode from "jwt-decode";
 //Datatable Modules
 import $ from "jquery";
 import "datatables.net";
-import { useNavigate,useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import CircularProgress from "@mui/material/CircularProgress";
+
 export default function StickyHeadTable({ props }) {
   const [whtTray, setWhtTray] = useState([]);
-  const [isCheckAll, setIsCheckAll] = useState(false);
-  const [isCheck, setIsCheck] = useState([]);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const {type}=useParams()
+  const { type } = useParams();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(false);
         let admin = localStorage.getItem("prexo-authentication");
         if (admin) {
           let { location } = jwt_decode(admin);
-          let response = await axiosWarehouseIn.post("/whtTray/" + location + "/" + type);
+          let response = await axiosWarehouseIn.post(
+            "/whtTray/" + location + "/" + type
+          );
           if (response.status === 200) {
             setWhtTray(response.data.data);
+            setLoading(true);
             dataTableFun();
           }
         } else {
@@ -57,18 +62,32 @@ export default function StickyHeadTable({ props }) {
   }
   return (
     <>
-      <Box>
-        <Box
-          sx={{
-            top: { sm: 60, xs: 20 },
-            left: { sm: 250 },
-            m: 3,
-            mt: 13,
-            display: "flex",
-            flexDirection: "cloumn",
-            justifyContent: "center",
-          }}
-        >
+      <Box
+        sx={{
+          top: { sm: 60, xs: 20 },
+          left: { sm: 250 },
+          m: 3,
+          mt: 13,
+          display: "flex",
+          flexDirection: "cloumn",
+          justifyContent: "center",
+        }}
+      >
+        {loading == false ? (
+          <Container>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                flexDirection: "column",
+                pt: 30,
+              }}
+            >
+              <CircularProgress />
+              <p style={{ paddingTop: "10px" }}>Loading...</p>
+            </Box>
+          </Container>
+        ) : (
           <Paper sx={{ width: "100%", overflow: "auto" }}>
             <TableContainer>
               <Table
@@ -135,7 +154,7 @@ export default function StickyHeadTable({ props }) {
               </Table>
             </TableContainer>
           </Paper>
-        </Box>
+        )}
       </Box>
     </>
   );
