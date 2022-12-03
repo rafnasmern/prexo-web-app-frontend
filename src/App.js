@@ -21,6 +21,8 @@ import UsersHistory from "./pages/super-admin-pages/users-history";
 import AuditTray from "./pages/super-admin-pages/audit-tray-page";
 import ItemTracking from "./pages/super-admin-pages/item-tracking-page";
 import Warehouse from "./pages/super-admin-pages/warehouse";
+import ReadyForCharging from "./pages/super-admin-pages/ready-for-charging";
+
 /*--------------------------------------------------------------------------------------------
 MIS
 ---------------------------------------------------------------------------------------------- */
@@ -47,6 +49,10 @@ import ViewItemClubBot from "./pages/mis-pages/view-bot-item-club";
 import BotClubDataAssignToWht from "./pages/mis-pages/bot-club-to-wht";
 import ViewBotTraySentToSorting from "./pages/mis-pages/bot-sent-to-sorting";
 import WhtTrayMerge from "./pages/mis-pages/wht-tray-merge";
+import BagTransfer from "./pages/mis-pages/bag-transaction/bag-transfer";
+import BagRecive from "./pages/mis-pages/bag-transaction/bag-recieve";
+import ViewItemBagTranscation from "./pages/mis-pages/bag-transaction/view-item";
+import MmtMerge from "./pages/mis-pages/mmt-merge/mmt-tray";
 /*--------------------------------------------------------------------------------------------
 BOT
 ---------------------------------------------------------------------------------------------- */
@@ -96,8 +102,13 @@ import IssuedMmtPmtTray from "./pages/warehouse-page/issued-pmt-mmt";
 import PmtReport from "./pages/warehouse-page/report/pmt-report";
 import MmtReport from "./pages/warehouse-page/report/mmt-report";
 import InuseWhtTray from "./pages/warehouse-page/in-use-wht-tray/wht-tray";
-import InusePmtMmtTray from "./pages/warehouse-page/in-use-pmt-mmt/tray-page";
-import BotTrayReport from "./pages/warehouse-page/bot-tray-report/view-tray"
+import MmttrayMerge from "./pages/warehouse-page/mmt-merge-request/tray-page";
+import BotTrayReport from "./pages/warehouse-page/bot-tray-report/view-tray";
+import BotTrayItemDetailsReport from "./pages/warehouse-page/bot-tray-report/view-item";
+import MmtFromAndToTrayView from "./pages/warehouse-page/mmt-merge-approve/from-and-to-tray";
+import ReturnFromMmtMerge from "./pages/warehouse-page/return-from-merge/view-tray";
+import ReturnFromMergeMmtTrayClose from "./pages/warehouse-page/return-from-merge/mmt-tray-close";
+import InusePmtMmt from "./pages/warehouse-page/inuse-pmt-mmt/inuse-pmt-mmt";
 /**********************************CHARGING PANEL************************************* */
 import ChargingPanelDashboard from "./pages/charging-pages/charging-dashboard";
 import ViewAssignedTrayCharging from "./pages/charging-pages/view-assigned-tray";
@@ -113,6 +124,8 @@ import SortingAgentDashboard from "./pages/sorting-agent-pages/dashboard";
 import ViewAssignedSortingRequests from "./pages/sorting-agent-pages/view-sorting-requests";
 import StartSorting from "./pages/sorting-agent-pages/start-sorting";
 import ViewAssignedWhtTray from "./pages/sorting-agent-pages/view-assigned-wht";
+import ViewAssignedMmt from "./pages/sorting-agent-pages/mmt-merge/view-assigned";
+import StartMmtMerge from "./pages/sorting-agent-pages/mmt-merge/start-mmt-merge";
 /************************************************************************************** */
 import Login from "./pages/Login";
 import ChangePassword from "./pages/change-password";
@@ -312,9 +325,36 @@ function App() {
           <Route path="/issued-mmt-pmt" element={<IssuedMmtPmtTray />} />
           <Route path="/pmt-report" element={<PmtReport />} />
           <Route path="/mmt-report" element={<MmtReport />} />
-          <Route path="/in-use-pmt-mmt" element={<InusePmtMmtTray />} />
+          <Route path="/mmt-merge-request" element={<MmttrayMerge />} />
           <Route path="/wht-tray-merge" element={<WhtTrayMerge />} />
           <Route path="/bot-tray-report" element={<BotTrayReport />} />
+          <Route path="/bag-transfer" element={<BagTransfer />} />
+          <Route path="/bag-receive" element={<BagRecive />} />
+          <Route
+            path="/view-bag-item/:bagId"
+            element={<ViewItemBagTranscation />}
+          />
+          <Route
+            path="/bot-tray-report-details/:trayId/:muic"
+            element={<BotTrayItemDetailsReport />}
+          />
+          <Route path="/mmt-merge" element={<MmtMerge />} />
+          <Route
+            path="/mmt-merge-approve/:mmtTrayId"
+            element={<MmtFromAndToTrayView />}
+          />
+          <Route path="/merge-mmt-tray" element={<ViewAssignedMmt />} />
+          <Route path="/start-mmt-merge/:trayId" element={<StartMmtMerge />} />
+          <Route
+            path="/return-from-mmt-merge"
+            element={<ReturnFromMmtMerge />}
+          />
+          <Route
+            path="/return-from-mmt-merge-close/:trayId"
+            element={<ReturnFromMergeMmtTrayClose />}
+          />
+          <Route path="/ready-for-charging" element={<ReadyForCharging />} />
+          <Route path="/inuse-pmt-mmt" element={<InusePmtMmt />} />
         </Routes>
       </BrowserRouter>
     </>

@@ -28,6 +28,10 @@ export default function Dashboard() {
     e.preventDefault();
     navigate("/sorting-view-assigned-wht");
   };
+  const handelMmtMerge = (e) => {
+    e.preventDefault();
+    navigate("/merge-mmt-tray");
+  };
   return (
     <div>
       <h4 style={{ marginTop: "100px", marginLeft: "27px", color: "#495057" }}>
@@ -39,7 +43,7 @@ export default function Dashboard() {
           m: 3,
           width: 300,
           boxShadow: 2,
-          height: "172px",
+          height: "237px",
           backgroundColor: "#FFFFFF",
         }}
       >
@@ -88,6 +92,26 @@ export default function Dashboard() {
               }}
             >
               WHT Tray
+            </Link>
+          </Box>
+          <hr />
+          <Box
+            style={{ marginBottom: "12px", marginTop: "20" }}
+            sx={{ display: "flex", flexDirection: "start" }}
+          >
+            <ArrowRightIcon sx={{ marginTop: "4px" }} />
+            <Link
+              style={{
+                textDecoration: "none",
+                color: "black",
+                fontSize: "20px",
+                marginLeft: "5px",
+              }}
+              onClick={(e) => {
+                handelMmtMerge(e);
+              }}
+            >
+              MMT Merge
             </Link>
           </Box>
           <hr />

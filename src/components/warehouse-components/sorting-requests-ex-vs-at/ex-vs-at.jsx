@@ -186,8 +186,18 @@ export default function DialogBox() {
                       <TableRow>
                         <TableCell>S.NO</TableCell>
                         <TableCell>UIC</TableCell>
-                        <TableCell>MUIC</TableCell>
-                        <TableCell>BOT Tray</TableCell>
+                        {trayData?.type_taxanomy === "MMT" &&
+                        trayData?.prefix == "tray-master" ? (
+                          <TableCell>AWBN Number</TableCell>
+                        ) : (
+                          <TableCell>MUIC</TableCell>
+                        )}
+                        {trayData?.type_taxanomy === "MMT" &&
+                        trayData?.prefix == "tray-master" ? (
+                          <TableCell>Bag ID</TableCell>
+                        ) : (
+                          <TableCell>BOT Tray</TableCell>
+                        )}
                         {/* <TableCell>Tracking Number</TableCell> */}
                       </TableRow>
                     </TableHead>
@@ -196,8 +206,18 @@ export default function DialogBox() {
                         <TableRow hover role="checkbox" tabIndex={-1}>
                           <TableCell>{index + 1}</TableCell>
                           <TableCell>{data?.uic}</TableCell>
-                          <TableCell>{data?.muic}</TableCell>
-                          <TableCell>{data?.tray_id}</TableCell>
+                          {trayData?.type_taxanomy === "MMT" &&
+                          trayData?.prefix == "tray-master" ? (
+                            <TableCell>{data?.awbn_number}</TableCell>
+                          ) : (
+                            <TableCell>{data?.muic}</TableCell>
+                          )}
+                          {trayData?.type_taxanomy === "MMT" &&
+                          trayData?.prefix == "tray-master" ? (
+                            <TableCell>{data?.bag_id}</TableCell>
+                          ) : (
+                            <TableCell>{data?.tray_id}</TableCell>
+                          )}
                         </TableRow>
                       ))}
                     </TableBody>
@@ -264,9 +284,19 @@ export default function DialogBox() {
                       <TableRow>
                         <TableCell>S.NO</TableCell>
                         <TableCell>UIC</TableCell>
-                        <TableCell>MUIC</TableCell>
-                        <TableCell>BOT Tray</TableCell>
-                        <TableCell>BOT Agent</TableCell>
+                        {trayData?.type_taxanomy === "MMT" &&
+                        trayData?.prefix == "tray-master" ? (
+                          <TableCell>AWBN Number</TableCell>
+                        ) : (
+                          <TableCell>MUIC</TableCell>
+                        )}
+                        {trayData?.type_taxanomy === "MMT" &&
+                        trayData?.prefix == "tray-master" ? (
+                          <TableCell>Bag ID</TableCell>
+                        ) : (
+                          <TableCell>BOT Tray</TableCell>
+                        )}
+                        {/* <TableCell>Tracking Number</TableCell> */}
                       </TableRow>
                     </TableHead>
 
@@ -275,9 +305,18 @@ export default function DialogBox() {
                         <TableRow hover role="checkbox" tabIndex={-1}>
                           <TableCell>{index + 1}</TableCell>
                           <TableCell>{data?.uic}</TableCell>
-                          <TableCell>{data?.muic}</TableCell>
-                          <TableCell>{data?.tray_id}</TableCell>
-                          <TableCell>{data?.user_name}</TableCell>
+                          {trayData?.type_taxanomy === "MMT" &&
+                          trayData?.prefix == "tray-master" ? (
+                            <TableCell>{data?.awbn_number}</TableCell>
+                          ) : (
+                            <TableCell>{data?.muic}</TableCell>
+                          )}
+                          {trayData?.type_taxanomy === "MMT" &&
+                          trayData?.prefix == "tray-master" ? (
+                            <TableCell>{data?.bag_id}</TableCell>
+                          ) : (
+                            <TableCell>{data?.tray_id}</TableCell>
+                          )}
                         </TableRow>
                       ))}
                     </TableBody>

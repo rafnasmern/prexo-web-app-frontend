@@ -99,7 +99,13 @@ export default function DialogBox() {
       .nullable(),
     body_condition: Yup.string().required("Required*").nullable(),
     display_condition: Yup.string().required("Required*").nullable(),
-    lock_status: Yup.string().required("Required*").nullable(),
+    lock_status: Yup.string()
+      .when("battery_status", (battery_status, schema) => {
+        if (battery_status == "Charge" || battery_status == "Heat Problem") {
+          return schema.required("Required");
+        }
+      })
+      .nullable(),
     charging_jack_type: Yup.string().required("Required*").nullable(),
     cimei_1: Yup.string()
       .when(
@@ -294,7 +300,10 @@ export default function DialogBox() {
                 helperText={errors.battery_status?.message}
                 sx={{ mt: 2 }}
               >
-                <MenuItem value="Charge failed" onClick={(e) => setCharge("")}>
+                <MenuItem
+                  value="Charge failed"
+                  onClick={(e) => setCharge("Charge failed")}
+                >
                   Charge failed
                 </MenuItem>
                 <MenuItem value="Charge" onClick={(e) => setCharge("Charge")}>
@@ -308,11 +317,14 @@ export default function DialogBox() {
                 </MenuItem>
                 <MenuItem
                   value="Battery Bulging"
-                  onClick={(e) => setCharge("")}
+                  onClick={(e) => setCharge("Battery Bulging")}
                 >
                   Battery Bulging
                 </MenuItem>
-                <MenuItem value="No-battery" onClick={(e) => setCharge("")}>
+                <MenuItem
+                  value="No-battery"
+                  onClick={(e) => setCharge("No-battery")}
+                >
                   No-battery
                 </MenuItem>
               </Select>
@@ -387,26 +399,28 @@ export default function DialogBox() {
                 </MenuItem>
               </Select>
             </FormControl>
-            <FormControl fullWidth>
-              <InputLabel sx={{ pt: 2 }} id="demo-simple-select-label">
-                Lock Status
-              </InputLabel>
-              <Select
-                labelId="demo-simple-select-label"
-                fullWidth
-                label="Lock Status"
-                {...register("lock_status")}
-                error={errors.lock_status ? true : false}
-                helperText={errors.lock_status?.message}
-                sx={{ mt: 2 }}
-              >
-                <MenuItem value="Unlocked">Unlocked</MenuItem>
-                <MenuItem value="Pin/Pattern Lock">Pin/Pattern Lock</MenuItem>
-                <MenuItem value="Google Locked">Google Locked</MenuItem>
-                <MenuItem value="iCloud Locked">iCloud Locked</MenuItem>
-                <MenuItem value="Software Issue">Software Issue</MenuItem>
-              </Select>
-            </FormControl>
+            {charge === "Heat Problem" || charge === "Charge" ? (
+              <FormControl fullWidth>
+                <InputLabel sx={{ pt: 2 }} id="demo-simple-select-label">
+                  Lock Status
+                </InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  fullWidth
+                  label="Lock Status"
+                  {...register("lock_status")}
+                  error={errors.lock_status ? true : false}
+                  helperText={errors.lock_status?.message}
+                  sx={{ mt: 2 }}
+                >
+                  <MenuItem value="Unlocked">Unlocked</MenuItem>
+                  <MenuItem value="Pin/Pattern Lock">Pin/Pattern Lock</MenuItem>
+                  <MenuItem value="Google Locked">Google Locked</MenuItem>
+                  <MenuItem value="iCloud Locked">iCloud Locked</MenuItem>
+                  <MenuItem value="Software Issue">Software Issue</MenuItem>
+                </Select>
+              </FormControl>
+            ) : null}
 
             <FormControl fullWidth>
               <InputLabel sx={{ pt: 2 }} id="demo-simple-select-label">

@@ -10,7 +10,7 @@ import {
   Box,
   Button,
 } from "@mui/material";
-import { axiosWarehouseIn } from "../../../axios";
+import { axiosBot, axiosWarehouseIn } from "../../../axios";
 // import jwt from "jsonwebtoken"
 import jwt_decode from "jwt-decode";
 import { useNavigate } from "react-router-dom";
@@ -26,7 +26,9 @@ export default function StickyHeadTable({ props }) {
       if (token) {
         const { location } = jwt_decode(token);
         const fetchData = async () => {
-          let res = await axiosWarehouseIn.post("/inuse-mmt-pmt/" + location + "/" + "Inuse");
+          let res = await axiosWarehouseIn.post(
+            "/inuse-mmt-pmt/" + location + "/" + "Inuse"
+          );
           if (res.status == 200) {
             setInfraData(res.data.data);
             dataTableFun();
@@ -81,6 +83,7 @@ export default function StickyHeadTable({ props }) {
                   <TableRow>
                     <TableCell>S.NO</TableCell>
                     <TableCell>Tray Id</TableCell>
+                    <TableCell>Agent Name</TableCell>
                     <TableCell>Quantity</TableCell>
                     <TableCell>Tray Type</TableCell>
                     <TableCell>Status</TableCell>
@@ -93,6 +96,7 @@ export default function StickyHeadTable({ props }) {
                     <TableRow hover role="checkbox" tabIndex={-1}>
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>{data.code}</TableCell>
+                      <TableCell>{data.issued_user_name}</TableCell>
                       <TableCell>
                         {data.items.length + "/" + data.limit}
                       </TableCell>

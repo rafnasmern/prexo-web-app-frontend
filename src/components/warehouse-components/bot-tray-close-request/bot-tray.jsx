@@ -15,12 +15,11 @@ import {
   IconButton,
   DialogContent,
   DialogActions,
+  TextField,
 } from "@mui/material";
 import { axiosWarehouseIn } from "../../../axios";
 import PropTypes from "prop-types";
 import CloseIcon from "@mui/icons-material/Close";
-import Checkbox from "@mui/material/Checkbox";
-import * as Yup from "yup";
 
 //Datatable Modules
 import $ from "jquery";
@@ -65,8 +64,8 @@ BootstrapDialogTitle.propTypes = {
 export default function StickyHeadTable({ props }) {
   const [open, setOpen] = React.useState(false);
   const [bot, setBot] = useState([]);
-  const [receiveCheck, setReceiveCheck] = useState("");
   const [trayId, setTrayId] = useState("");
+  const [counts, setCounts] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -116,26 +115,26 @@ export default function StickyHeadTable({ props }) {
   const label = { inputProps: { "aria-label": "Checkbox demo" } };
   // HANDEL RECEIVED TRY
   const handelTrayReceived = async () => {
-    if (receiveCheck === "") {
-      alert("Please confirm counts");
-    } else {
-      setLoading(true);
-      try {
-        let obj = {
-          trayId: trayId,
-          check: receiveCheck,
-        };
-        let res = await axiosWarehouseIn.post("/receivedTray", obj);
-        if (res.status == 200) {
-          setLoading(false);
-          alert(res.data.message);
-          setOpen(false);
-          window.location.reload(false);
-        }
-      } catch (error) {
+    setLoading(true);
+    try {
+      let obj = {
+        trayId: trayId,
+        count: counts,
+      };
+      let res = await axiosWarehouseIn.post("/receivedTray", obj);
+      if (res.status == 200) {
         setLoading(false);
+        alert(res.data.message);
+        setOpen(false);
+        window.location.reload(false);
+      }
+    } catch (error) {
+      if (error.response.status === 403) {
+        alert(error.response.data.message);
+      } else {
         alert(error);
       }
+      setLoading(false);
     }
   };
 
@@ -151,22 +150,24 @@ export default function StickyHeadTable({ props }) {
           id="customized-dialog-title"
           onClose={handleClose}
         >
-          RECEVIED
+          Please verify the count of - {trayId}
         </BootstrapDialogTitle>
         <DialogContent dividers>
-          <h6>
-            {" "}
-            <Checkbox
-              onClick={(e) => {
-                receiveCheck == ""
-                  ? setReceiveCheck("I have validated the counts")
-                  : receiveCheck("");
-              }}
-              {...label}
-              sx={{ ml: 3 }}
-            />
-            I have validated the counts
-          </h6>
+          <TextField
+            label="Enter Item Count"
+            variant="outlined"
+            onChange={(e) => {
+              setCounts(e.target.value);
+            }}
+            inputProps={{ maxLength: 3 }}
+            onKeyPress={(event) => {
+              if (!/[0-9]/.test(event.key)) {
+                event.preventDefault();
+              }
+            }}
+            fullWidth
+            sx={{ mt: 2 }}
+          />
         </DialogContent>
         <DialogActions>
           <Button
@@ -174,6 +175,7 @@ export default function StickyHeadTable({ props }) {
               m: 1,
             }}
             variant="contained"
+            disabled={counts === "" ? true : false}
             style={{ backgroundColor: "green" }}
             onClick={(e) => {
               handelTrayReceived(e);
@@ -231,7 +233,6 @@ export default function StickyHeadTable({ props }) {
                     <TableCell>S.NO</TableCell>
                     <TableCell>Tray Id</TableCell>
                     <TableCell>Bag Id</TableCell>
-                    <TableCell>Quantity</TableCell>
                     <TableCell>Tray Type</TableCell>
                     <TableCell>Status</TableCell>
                     <TableCell>Assigned Date</TableCell>
@@ -246,9 +247,6 @@ export default function StickyHeadTable({ props }) {
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>{data.code}</TableCell>
                       <TableCell>{data?.items?.[0]?.bag_id}</TableCell>
-                      <TableCell>
-                        {data?.items?.length + "/" + data.limit}
-                      </TableCell>
                       <TableCell>{data.type_taxanomy}</TableCell>
                       <TableCell>{data.sort_id}</TableCell>
                       <TableCell>

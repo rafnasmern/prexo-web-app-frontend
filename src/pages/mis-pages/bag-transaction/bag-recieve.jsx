@@ -1,16 +1,16 @@
 import React from "react";
 import Header from "../../../components/header/Header";
-import InusePmtMmt from "../../../components/warehouse-components/in-use-pmt-mmt/tray";
+import BagRecieve from "../../../components/mis-user-components/bag-transcation/bag-receive";
 import Footer from "../../../components/footer/footer";
 import "../../../App.css";
-const InusePmtMmtPage = () => {
+const BagRecievePage = () => {
   return (
     <div className="App">
       <Header />
-      <InusePmtMmt />
+      <BagRecieve />
       <Footer />
     </div>
   );
 };
 
-export default InusePmtMmtPage;
+export default BagRecievePage;

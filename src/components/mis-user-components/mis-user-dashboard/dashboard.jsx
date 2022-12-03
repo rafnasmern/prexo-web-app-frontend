@@ -61,6 +61,18 @@ export default function Dashboard() {
     e.preventDefault();
     navigate("/wht-tray-merge");
   };
+  const handelBagTransfer = (e) => {
+    e.preventDefault();
+    navigate("/bag-transfer");
+  };
+  const handelReceive = (e) => {
+    e.preventDefault();
+    navigate("/bag-receive");
+  };
+  const handelMmtMerge =(e)=>{
+    e.preventDefault();
+    navigate("/mmt-merge");
+  }
   return (
     <div style={{ marginBottom: "20px" }}>
       <h4 style={{ marginTop: "100px", marginLeft: "27px", color: "#495057" }}>
@@ -246,7 +258,7 @@ export default function Dashboard() {
             ml: 1,
             width: 300,
             boxShadow: 2,
-            height: "247px",
+            height: "437px",
             backgroundColor: "#FFFFFF",
           }}
         >
@@ -332,6 +344,67 @@ export default function Dashboard() {
               </Link>
             </Box>
             <hr />
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
+            >
+              <ArrowRightIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelBagTransfer(e);
+                }}
+              >
+                Bag Transfer
+              </Link>
+            </Box>
+            <hr />
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
+            >
+              <ArrowRightIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelReceive(e);
+                }}
+              >
+                Bag Recieve
+              </Link>
+            </Box>
+            <hr />
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
+            >
+              <ArrowRightIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelMmtMerge(e);
+                }}
+              >
+                MMT Merge
+              </Link>
+            </Box>
+            <hr />
+
             <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}

@@ -12,6 +12,7 @@ import {
   DialogActions,
   DialogTitle,
   IconButton,
+  TablePagination,
   TableRow,
   Box,
   Button,
@@ -20,50 +21,14 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
-import { axiosMisUser, axiosWarehouseIn } from "../../../axios";
+import { axiosSuperAdminPrexo } from "../../../axios";
 import Checkbox from "@mui/material/Checkbox";
 import PropTypes from "prop-types";
-// import jwt from "jsonwebtoken"
-import jwt_decode from "jwt-decode";
 //Datatable Modules
 import $ from "jquery";
 import "datatables.net";
 import CloseIcon from "@mui/icons-material/Close";
 import { useNavigate } from "react-router-dom";
-const BootstrapDialog = styled(Dialog)(({ theme }) => ({
-  "& .MuiDialogContent-root": {
-    padding: theme.spacing(2),
-  },
-  "& .MuiDialogActions-root": {
-    padding: theme.spacing(1),
-  },
-}));
-const BootstrapDialogTitle = (props) => {
-  const { children, onClose, ...other } = props;
-  return (
-    <DialogTitle sx={{ m: 0, p: 2 }} {...other}>
-      {children}
-      {onClose ? (
-        <IconButton
-          aria-label="close"
-          onClick={onClose}
-          sx={{
-            position: "absolute",
-            right: 8,
-            top: 8,
-            color: (theme) => theme.palette.grey[500],
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
-      ) : null}
-    </DialogTitle>
-  );
-};
-BootstrapDialogTitle.propTypes = {
-  children: PropTypes.node,
-  onClose: PropTypes.func.isRequired,
-};
 
 export default function StickyHeadTable({ props }) {
   const [whtTray, setWhtTray] = useState([]);
@@ -71,24 +36,14 @@ export default function StickyHeadTable({ props }) {
   const [isCheck, setIsCheck] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const [open, setOpen] = useState(false);
-  const [bqcPerson, setBqcPerson] = useState("");
-  const [chargingArr, setChrgingArr] = useState([]);
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const handleClose = () => {
-    setOpen(false);
-  };
-
   useEffect(() => {
     const fetchData = async () => {
       try {
         $("#example").DataTable().destroy();
         let admin = localStorage.getItem("prexo-authentication");
         if (admin) {
-          let { location } = jwt_decode(admin);
-          let response = await axiosWarehouseIn.post(
-            "/wht-tray/" + "Ready to BQC/" + location
-          );
+          let response = await axiosSuperAdminPrexo.post("/getInuseWht");
           if (response.status === 200) {
             setWhtTray(response.data.data);
             dataTableFun();
@@ -102,28 +57,6 @@ export default function StickyHeadTable({ props }) {
     };
     fetchData();
   }, [refresh]);
-
-  useEffect(() => {
-    try {
-      const fetchData = async () => {
-        let admin = localStorage.getItem("prexo-authentication");
-        if (admin) {
-          let { location } = jwt_decode(admin);
-          let res = await axiosMisUser.post(
-            "/get-charging-users/" + "BQC/" + location
-          );
-          if (res.status == 200) {
-            setChrgingArr(res.data.data);
-          }
-        } else {
-          navigate("/");
-        }
-      };
-      fetchData();
-    } catch (error) {
-      alert(error);
-    }
-  }, []);
 
   const handelViewItem = (id) => {
     navigate("/wht-tray-item/" + id);
@@ -149,106 +82,32 @@ export default function StickyHeadTable({ props }) {
       setIsCheck(isCheck.filter((item) => item !== id));
     }
   };
-
-  /***************************************CHECKBOX LABEL****************************************** */
-  const label = { inputProps: { "aria-label": "Checkbox demo" } };
-  /******************************************************************************************* */
-  /*****************************************ASSING TO CHARGING REQUEST WILL GO TO MIS PANEL****** */
-  const handelAssignToCharging = async (e) => {
+  /* READY FOR CHARGING */
+  const handelReadyForCharging = async () => {
     try {
-      setLoading(true);
       let obj = {
-        tray: isCheck,
-        user_name: bqcPerson,
-        sort_id: "Send for BQC",
+        ischeck: isCheck,
       };
-      let res = await axiosMisUser.post("/wht-sendTo-wharehouse", obj);
+      let res = await axiosSuperAdminPrexo.post("/ready-for-charging", obj);
       if (res.status === 200) {
-        setLoading(false);
-        setRefresh((refresh) => !refresh);
         alert(res.data.message);
-        setOpen(false);
+        window.location.reload(false);
       }
     } catch (error) {
-      if (error.response.status == 403) {
-        setLoading(false);
+      if (error.response.status === 403) {
         alert(error.response.data.message);
       } else {
         alert(error);
       }
     }
   };
+  /***************************************CHECKBOX LABEL****************************************** */
+  const label = { inputProps: { "aria-label": "Checkbox demo" } };
+  /******************************************************************************************* */
+  /*****************************************ASSING TO CHARGING REQUEST WILL GO TO MIS PANEL****** */
 
   return (
     <>
-      <BootstrapDialog
-        aria-labelledby="customized-dialog-title"
-        open={open}
-        fullWidth
-        maxWidth="xs"
-      >
-        <BootstrapDialogTitle
-          id="customized-dialog-title"
-          onClose={handleClose}
-        >
-          Please select user
-        </BootstrapDialogTitle>
-        <DialogContent dividers>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "flex-start",
-              flexDirection: "column",
-              p: 1,
-              m: 1,
-              bgcolor: "background.paper",
-              borderRadius: 1,
-            }}
-          >
-            <FormControl fullWidth>
-              <InputLabel sx={{ pt: 2 }} id="demo-simple-select-label">
-                Select user
-              </InputLabel>
-              <Select
-                labelId="demo-simple-select-label"
-                label="Cpc"
-                fullWidth
-                sx={{ mt: 2 }}
-              >
-                {chargingArr.map((data) => (
-                  <MenuItem
-                    value={data.user_name}
-                    onClick={(e) => {
-                      setBqcPerson(data.user_name);
-                    }}
-                  >
-                    {data.user_name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            sx={{
-              ml: 2,
-            }}
-            fullwidth
-            variant="contained"
-            style={{ backgroundColor: "green" }}
-            disabled={bqcPerson == "" || loading == true ? true : false}
-            component="span"
-            onClick={(e) => {
-              if (window.confirm("You Want to assign?")) {
-                handelAssignToCharging();
-              }
-            }}
-          >
-            Assign
-          </Button>
-        </DialogActions>
-      </BootstrapDialog>
       <Box
         sx={{
           display: "flex",
@@ -262,16 +121,13 @@ export default function StickyHeadTable({ props }) {
           variant="contained"
           // fullWidth
           sx={{ m: 1, mt: 3 }}
+          disabled={isCheck.length === 0}
           style={{ backgroundColor: "#206CE2" }}
           onClick={(e) => {
-            if (isCheck.length == 0) {
-              alert("Please select atleast one tray");
-            } else {
-              setOpen(true);
-            }
+            handelReadyForCharging(e);
           }}
         >
-          ASSIGN TO BQC
+          Ready For Charging
         </Button>
       </Box>
       <Box>

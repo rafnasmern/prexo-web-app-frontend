@@ -12,7 +12,6 @@ import {
   TableHead,
   TableRow,
   Button,
- 
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { axiosMisUser, axiosSuperAdminPrexo } from "../../../axios";

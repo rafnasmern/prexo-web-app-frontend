@@ -183,6 +183,7 @@ export default function DialogBox() {
         let obj = {
           bagId: bagId,
           trayId: botTray[0].code,
+          username: botTray[0].issued_user_name,
         };
         let res = await axiosBot.post("/closeBag", obj);
         if (res.status === 200) {

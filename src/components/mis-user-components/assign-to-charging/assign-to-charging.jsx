@@ -292,19 +292,7 @@ export default function StickyHeadTable({ props }) {
               >
                 <TableHead>
                   <TableRow>
-                    <TableCell>
-                      {" "}
-                      <Checkbox
-                        {...label}
-                        onClick={(e) => {
-                          handleSelectAll();
-                        }}
-                        checked={
-                          whtTray.length == isCheck.length ? true : false
-                        }
-                      />{" "}
-                      Select All
-                    </TableCell>
+                    <TableCell>Select</TableCell>
                     <TableCell>Record.NO</TableCell>
                     <TableCell>Tray Id</TableCell>
                     <TableCell>Warehouse</TableCell>

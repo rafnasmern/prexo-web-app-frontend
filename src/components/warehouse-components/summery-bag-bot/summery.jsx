@@ -30,14 +30,7 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 }));
 
 export default function StickyHeadTable({ props }) {
-  const [open, setOpen] = React.useState(false);
-  const [assingNewTray, setAssignNewTray] = useState(false);
-  const [infraData, setInfraData] = useState([]);
   const [bot, setBot] = useState([]);
-  const [receiveCheck, setReceiveCheck] = useState("");
-  const [botUsers, setBotUsers] = useState([]);
-  const [trayId, setTrayId] = useState("");
-  const navigate = useNavigate();
   const { bagId } = useParams();
 
   useEffect(() => {

@@ -53,6 +53,10 @@ export default function Dashboard() {
     e.preventDefault();
     navigate("/track-item");
   };
+  const handelReadyForCharging = (e) => {
+    e.preventDefault();
+    navigate("/ready-for-charging");
+  };
 
   return (
     <div style={{ marginBottom: "20px" }}>
@@ -239,11 +243,28 @@ export default function Dashboard() {
             ml: 1,
             width: 300,
             boxShadow: 2,
-            height: "62px",
+            height: "128px",
             backgroundColor: "#FFFFFF",
           }}
         >
           <div style={{ margin: "12px" }}>
+            <Box style={{ marginBottom: "12px", marginTop: "20" }}>
+              <TrendingFlatIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelReadyForCharging(e);
+                }}
+              >
+                Ready For Charging
+              </Link>
+            </Box>
+            <hr />
             <Box style={{ marginBottom: "12px", marginTop: "20" }}>
               <TrendingFlatIcon sx={{ marginTop: "4px" }} />
               <Link

@@ -20,9 +20,6 @@ import { axiosWarehouseIn } from "../../../axios";
 import PropTypes from "prop-types";
 import CloseIcon from "@mui/icons-material/Close";
 import Checkbox from "@mui/material/Checkbox";
-import * as Yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useForm } from "react-hook-form";
 // import jwt from "jsonwebtoken"
 import jwt_decode from "jwt-decode";
 //Datatable Modules
@@ -65,46 +62,11 @@ BootstrapDialogTitle.propTypes = {
 };
 export default function StickyHeadTable({ props }) {
   const [open, setOpen] = React.useState(false);
-  const [assingNewTray, setAssignNewTray] = useState(false);
-  const [infraData, setInfraData] = useState([]);
+  const [mmtTray, setMmtTray] = useState([]);
   const [receiveCheck, setReceiveCheck] = useState("");
-  const [botUsers, setBotUsers] = useState([]);
   const [trayId, setTrayId] = useState("");
-  const [userTray, setUserTray] = useState("");
-  const [trayStatus, setTrayStatus] = useState("");
-  const [trayIdCheck, setTrayIdCheck] = useState("");
+
   const navigate = useNavigate();
-  // YUP SCHEMA
-  const schema = Yup.object().shape({
-    user_name: Yup.string().required("Required*").nullable(),
-    tray_type: Yup.string().required("Required*").nullable(),
-    tray_Id: Yup.string().required("Required*").nullable(),
-  });
-  // ON SUBMIT FOR ASSIGN NEW TRAY
-  const onSubmit = async (values) => {
-    try {
-      let res = await axiosWarehouseIn.post("/assignNewTray", values);
-      if (res.status === 200) {
-        alert(res.data.message);
-        setAssignNewTray(false);
-        setUserTray("");
-        setTrayStatus("");
-      }
-    } catch (error) {
-      if (error.response.status == 403) {
-        alert(error.response.data.message);
-      }
-    }
-  };
-  const {
-    register,
-    handleSubmit,
-    getValues,
-    formState: { errors },
-    reset,
-  } = useForm({
-    resolver: yupResolver(schema),
-  });
 
   useEffect(() => {
     try {
@@ -113,10 +75,10 @@ export default function StickyHeadTable({ props }) {
         if (admin) {
           let { location } = jwt_decode(admin);
           let res = await axiosWarehouseIn.post(
-            "/wht-return-from-charging/" + location
+            "/returnFromMerging/" + location
           );
           if (res.status == 200) {
-            setInfraData(res.data.data);
+            setMmtTray(res.data.data);
             dataTableFun();
           }
         } else {
@@ -140,11 +102,11 @@ export default function StickyHeadTable({ props }) {
   }
   const handelViewTray = (e, id) => {
     e.preventDefault();
-    navigate("/view-charging-done-item/" + id);
+    navigate("/tray-details/" + id);
   };
   const handelViewDetailTray = (e, id) => {
     e.preventDefault();
-    navigate("/charge-done-item-verify/" + id);
+    navigate("/return-from-mmt-merge-close/" + id);
   };
   const label = { inputProps: { "aria-label": "Checkbox demo" } };
   // HANDEL RECEIVED TRY
@@ -156,7 +118,7 @@ export default function StickyHeadTable({ props }) {
         let obj = {
           trayId: trayId,
           check: receiveCheck,
-          type: "charging",
+          type: "Merging Done",
         };
         let res = await axiosWarehouseIn.post("/receivedTray", obj);
         if (res.status == 200) {
@@ -169,58 +131,7 @@ export default function StickyHeadTable({ props }) {
       }
     }
   };
-  // CHECK TRAY
-  const handelBotTrayCheck = async (username, trayType) => {
-    if (username === "") {
-      alert("Please select user");
-      reset({
-        user_name: null,
-      });
-    } else {
-      try {
-        setUserTray("");
-        let obj = {
-          username: username,
-          trayType: trayType,
-        };
-        let res = await axiosWarehouseIn.post("/checkBotUserTray", obj);
-        if (res.status === 200) {
-        }
-      } catch (error) {
-        if (error.response.status == 403) {
-          setUserTray(error.response.data.message);
-        }
-      }
-    }
-  };
-  const handelTrayId = async (e) => {
-    try {
-      if (getValues("user_name") === "" || getValues("tray_type") === "") {
-        alert("Please select user and tray type");
-      } else if (trayIdCheck == "") {
-        alert("Please add tray id");
-      } else {
-        if (getValues("tray_type") == "MMT") {
-          let res = await axiosWarehouseIn.post("/checkMmtTray/" + trayIdCheck);
-          if (res.status == 200) {
-            setTrayStatus(res.data.status);
-          }
-        } else if (getValues("tray_type") == "PMT") {
-          let res = await axiosWarehouseIn.post("/checkPmtTray/" + trayIdCheck);
-          if (res.status == 200) {
-            setTrayStatus(res.data.status);
-          }
-        } else {
-          let res = await axiosWarehouseIn.post("/checkBotTray/" + trayIdCheck);
-          if (res.status == 200) {
-            setTrayStatus(res.data.status);
-          }
-        }
-      }
-    } catch (error) {
-      alert(error.response.data.message);
-    }
-  };
+
   return (
     <>
       <BootstrapDialog
@@ -265,7 +176,6 @@ export default function StickyHeadTable({ props }) {
           </Button>
         </DialogActions>
       </BootstrapDialog>
-
       <Box>
         <Box
           sx={{
@@ -293,18 +203,18 @@ export default function StickyHeadTable({ props }) {
                     <TableCell>Quantity</TableCell>
                     <TableCell>Tray Type</TableCell>
                     <TableCell>Status</TableCell>
-                    <TableCell>Charging Done Date</TableCell>
+                    <TableCell>BQC Done Date</TableCell>
                     <TableCell>Agent Name</TableCell>
                     <TableCell>Action</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {infraData.map((data, index) => (
+                  {mmtTray.map((data, index) => (
                     <TableRow hover role="checkbox" tabIndex={-1}>
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>{data.code}</TableCell>
                       <TableCell>
-                        {data?.actual_items?.length + "/" + data.limit}
+                        {data?.items?.length + "/" + data.limit}
                       </TableCell>
                       <TableCell>{data.type_taxanomy}</TableCell>
                       <TableCell>{data.sort_id}</TableCell>
@@ -329,7 +239,7 @@ export default function StickyHeadTable({ props }) {
                         >
                           View
                         </Button>
-                        {data.sort_id != "Received From Charging" ? (
+                        {data.sort_id != "Received From Merging" ? (
                           <Button
                             sx={{
                               m: 1,

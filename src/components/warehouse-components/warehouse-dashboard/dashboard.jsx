@@ -94,9 +94,17 @@ export default function Dashboard() {
     e.preventDefault();
     navigate("/in-use-wht-tray");
   };
+  const handelMmtMerge = (e) => {
+    e.preventDefault();
+    navigate("/mmt-merge-request");
+  };
+  const handeMergeDone = (e) => {
+    e.preventDefault();
+    navigate("/return-from-mmt-merge");
+  };
   const handelInusePmtMmtTray = (e) => {
     e.preventDefault();
-    navigate("/in-use-pmt-mmt");
+    navigate("/inuse-pmt-mmt");
   };
   return (
     <div style={{ marginBottom: "20px" }}>
@@ -108,7 +116,7 @@ export default function Dashboard() {
           background: "#495057",
           height: "52px",
           marginLeft: "23px",
-          width: "918px",
+          width: "1225px",
           marginTop: "19px",
         }}
       >
@@ -135,7 +143,7 @@ export default function Dashboard() {
           }}
         >
           <div style={{ margin: "12px" }}>
-            {/* <Box
+            <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}
             >
@@ -154,7 +162,7 @@ export default function Dashboard() {
                 Search
               </Link>
             </Box>
-            <hr /> */}
+            <hr />
             <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}
@@ -316,26 +324,6 @@ export default function Dashboard() {
               </Link>
             </Box>
             <hr /> */}
-            <Box
-              style={{ marginBottom: "12px", marginTop: "20" }}
-              sx={{ display: "flex", flexDirection: "start" }}
-            >
-              <ArrowRightIcon sx={{ marginTop: "4px" }} />
-              <Link
-                style={{
-                  textDecoration: "none",
-                  color: "black",
-                  fontSize: "20px",
-                  marginLeft: "5px",
-                }}
-                onClick={(e) => {
-                  handelInSortingWhtTray(e);
-                }}
-              >
-                In-Sorting WHT
-              </Link>
-            </Box>
-            <hr />
           </div>
         </Box>
         <Box
@@ -520,7 +508,7 @@ export default function Dashboard() {
             ml: 1,
             width: 300,
             boxShadow: 2,
-            height: "310px",
+            height: "437px",
             backgroundColor: "#FFFFFF",
           }}
         >
@@ -625,7 +613,7 @@ export default function Dashboard() {
               </Link>
             </Box>
             <hr />
-            {/* <Box
+            <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}
             >
@@ -644,7 +632,80 @@ export default function Dashboard() {
                 BOT Tray Report
               </Link>
             </Box>
-            <hr /> */}
+            <hr />
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
+            >
+              <ArrowRightIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelMmtMerge(e);
+                }}
+              >
+                MMT Merge Request
+              </Link>
+            </Box>
+            <hr />
+          </div>
+        </Box>
+        <Box
+          sx={{
+            cursor: "pointer",
+            ml: 1,
+            width: 300,
+            boxShadow: 2,
+            height: "122px",
+            backgroundColor: "#FFFFFF",
+          }}
+        >
+          <div style={{ margin: "12px" }}>
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
+            >
+              <ArrowRightIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handelInSortingWhtTray(e);
+                }}
+              >
+                In-Sorting WHT
+              </Link>
+            </Box>
+            <hr />
+            <Box
+              style={{ marginBottom: "12px", marginTop: "20" }}
+              sx={{ display: "flex", flexDirection: "start" }}
+            >
+              <ArrowRightIcon sx={{ marginTop: "4px" }} />
+              <Link
+                style={{
+                  textDecoration: "none",
+                  color: "black",
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
+                onClick={(e) => {
+                  handeMergeDone(e);
+                }}
+              >
+                Return From MMT Merge
+              </Link>
+            </Box>
+            <hr />
           </div>
         </Box>
       </Box>

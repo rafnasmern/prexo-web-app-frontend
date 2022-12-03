@@ -18,8 +18,6 @@ import $ from "jquery";
 import "datatables.net";
 import { useNavigate } from "react-router-dom";
 import CircularProgress from "@mui/material/CircularProgress";
-
-
 export default function StickyHeadTable({ props }) {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -105,103 +103,102 @@ export default function StickyHeadTable({ props }) {
             justifyContent: "center",
           }}
         >
-          {
-            loading == false ?
+          {loading == false ? (
             <Container>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                flexDirection: "column",
-              }}
-            >
-              <CircularProgress />
-              <p style={{ paddingTop: "10px" }}>Loading...</p>
-            </Box>
-          </Container>
-          :
-          <Paper sx={{ width: "100%", overflow: "hidden" }}>
-            <TableContainer>
-              <Table
-                id="example"
-                style={{ width: "100%" }}
-                stickyHeader
-                aria-label="sticky table"
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  flexDirection: "column",
+                }}
               >
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Record.NO</TableCell>
-                    <TableCell>Bag Id</TableCell>
-                    <TableCell>Location</TableCell>
-                    <TableCell>Warehouse</TableCell>
-                    <TableCell>Bag Category</TableCell>
-                    <TableCell>Bag Display Name</TableCell>
-                    <TableCell>Bag Limit</TableCell>
-                    <TableCell>Bag Display</TableCell>
-                    <TableCell>status</TableCell>
-                    <TableCell>Created Time</TableCell>
-                    <TableCell>Actions</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {props.bagData.map((data, index) => (
-                    <TableRow hover role="checkbox" tabIndex={-1}>
-                      <TableCell>{index + 1}</TableCell>
-                      <TableCell>{data.code}</TableCell>
-                      <TableCell>{data.cpc}</TableCell>
-                      <TableCell>{data.warehouse}</TableCell>
-                      <TableCell>{data.type_taxanomy}</TableCell>
-                      <TableCell>{data.name}</TableCell>
-                      <TableCell>{data.limit}</TableCell>
-                      <TableCell>{data.display}</TableCell>
-                      <TableCell>{data.sort_id}</TableCell>
-                      <TableCell>
-                        {new Date(data.created_at).toLocaleString("en-GB", {
-                          hour12: true,
-                        })}
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          sx={{
-                            m: 1,
-                          }}
-                          variant="contained"
-                          onClick={() => props.editbag(data._id)}
-                          style={{ backgroundColor: "#206CE2" }}
-                          component="span"
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          sx={{
-                            m: 1,
-                          }}
-                          variant="contained"
-                          onClick={() => handelAudit(data.code)}
-                          style={{ backgroundColor: "green" }}
-                          component="span"
-                        >
-                          Audit
-                        </Button>
-                        <Button
-                          sx={{
-                            m: 1,
-                          }}
-                          variant="contained"
-                          style={{ backgroundColor: "red" }}
-                          component="span"
-                          onClick={() => handelDelete(data._id)}
-                        >
-                          Delete
-                        </Button>
-                      </TableCell>
+                <CircularProgress />
+                <p style={{ paddingTop: "10px" }}>Loading...</p>
+              </Box>
+            </Container>
+          ) : (
+            <Paper sx={{ width: "100%", overflow: "hidden" }}>
+              <TableContainer>
+                <Table
+                  id="example"
+                  style={{ width: "100%" }}
+                  stickyHeader
+                  aria-label="sticky table"
+                >
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Record.NO</TableCell>
+                      <TableCell>Bag Id</TableCell>
+                      <TableCell>Location</TableCell>
+                      <TableCell>Warehouse</TableCell>
+                      <TableCell>Bag Category</TableCell>
+                      <TableCell>Bag Display Name</TableCell>
+                      <TableCell>Bag Limit</TableCell>
+                      <TableCell>Bag Display</TableCell>
+                      <TableCell>status</TableCell>
+                      <TableCell>Created Time</TableCell>
+                      <TableCell>Actions</TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Paper>
-          }
+                  </TableHead>
+                  <TableBody>
+                    {props.bagData.map((data, index) => (
+                      <TableRow hover role="checkbox" tabIndex={-1}>
+                        <TableCell>{index + 1}</TableCell>
+                        <TableCell>{data.code}</TableCell>
+                        <TableCell>{data.cpc}</TableCell>
+                        <TableCell>{data.warehouse}</TableCell>
+                        <TableCell>{data.type_taxanomy}</TableCell>
+                        <TableCell>{data.name}</TableCell>
+                        <TableCell>{data.limit}</TableCell>
+                        <TableCell>{data.display}</TableCell>
+                        <TableCell>{data.sort_id}</TableCell>
+                        <TableCell>
+                          {new Date(data.created_at).toLocaleString("en-GB", {
+                            hour12: true,
+                          })}
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            sx={{
+                              m: 1,
+                            }}
+                            variant="contained"
+                            onClick={() => props.editbag(data._id)}
+                            style={{ backgroundColor: "#206CE2" }}
+                            component="span"
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            sx={{
+                              m: 1,
+                            }}
+                            variant="contained"
+                            onClick={() => handelAudit(data.code)}
+                            style={{ backgroundColor: "green" }}
+                            component="span"
+                          >
+                            Audit
+                          </Button>
+                          <Button
+                            sx={{
+                              m: 1,
+                            }}
+                            variant="contained"
+                            style={{ backgroundColor: "red" }}
+                            component="span"
+                            onClick={() => handelDelete(data._id)}
+                          >
+                            Delete
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Paper>
+          )}
         </Box>
       </Box>
     </>

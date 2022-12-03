@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { styled, alpha } from "@mui/material/styles";
 import {
   Paper,
   Table,
@@ -7,37 +6,31 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  TablePagination,
   TableRow,
   Box,
   Button,
-  MenuItem,
-  Menu,
 } from "@mui/material";
-import { axiosBot, axiosMisUser, axiosSuperAdminPrexo } from "../../../axios";
-import Swal from "sweetalert2";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import { useNavigate } from "react-router-dom";
+import { axiosSortingAgent } from "../../../axios";
 // import jwt from "jsonwebtoken"
 import jwt_decode from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 //Datatable Modules
 import $ from "jquery";
 import "datatables.net";
 export default function StickyHeadTable({ props }) {
-  const [infraData, setInfraData] = useState([]);
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [mmtTray, setMmttray] = useState([]);
   const navigate = useNavigate();
-
-  const open = Boolean(anchorEl);
   useEffect(() => {
     try {
       let token = localStorage.getItem("prexo-authentication");
       if (token) {
         const { user_name } = jwt_decode(token);
         const fetchData = async () => {
-          let res = await axiosBot.post("/assignedTray/" + user_name);
+          let res = await axiosSortingAgent.post(
+            "/getAssignedFromTray/" + user_name
+          );
           if (res.status == 200) {
-            setInfraData(res.data.data);
+            setMmttray(res.data.data);
             dataTableFun();
           }
         };
@@ -58,25 +51,9 @@ export default function StickyHeadTable({ props }) {
       scrollX: true,
     });
   }
-  const handelViewTray = (e, id) => {
+  const handelApprove = (e, id) => {
     e.preventDefault();
-    navigate("/tray-details/" + id);
-  };
-  // TRAY CLOSE
-  const handelCloseTray = async (trayid) => {
-    try {
-      let res = await axiosBot.post("/trayClose/" + trayid);
-      if (res.status == 200) {
-        alert(res.data.message);
-        window.location.reload(false);
-      }
-    } catch (error) {
-      if (error.response.status == 403) {
-        alert(error.response.data.message);
-      } else {
-        alert(error);
-      }
-    }
+    navigate("/start-mmt-merge/" + id);
   };
 
   return (
@@ -91,6 +68,7 @@ export default function StickyHeadTable({ props }) {
             display: "flex",
             flexDirection: "cloumn",
             justifyContent: "center",
+            mb: 2,
           }}
         >
           <Paper sx={{ width: "100%", overflow: "hidden" }}>
@@ -98,6 +76,7 @@ export default function StickyHeadTable({ props }) {
               <Table
                 style={{ width: "100%" }}
                 id="example"
+                P
                 stickyHeader
                 aria-label="sticky table"
               >
@@ -106,53 +85,41 @@ export default function StickyHeadTable({ props }) {
                     <TableCell>S.NO</TableCell>
                     <TableCell>Tray Id</TableCell>
                     <TableCell>Quantity</TableCell>
-                    <TableCell>Tray Type</TableCell>
+                    <TableCell>Sorting Agent</TableCell>
+                    <TableCell>To Tray</TableCell>
                     <TableCell>Status</TableCell>
                     <TableCell>Assigned Date</TableCell>
                     <TableCell>Action</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {infraData.map((data, index) => (
+                  {mmtTray.map((data, index) => (
                     <TableRow hover role="checkbox" tabIndex={-1}>
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>{data.code}</TableCell>
                       <TableCell>
                         {data.items.length + "/" + data.limit}
                       </TableCell>
-                      <TableCell>{data.type_taxanomy}</TableCell>
+                      <TableCell>{data.issued_user_name}</TableCell>
+                      <TableCell>{data.to_mmt_merge}</TableCell>
                       <TableCell>{data.sort_id}</TableCell>
                       <TableCell>
-                        {new Date(data.status_change_time).toLocaleString(
-                          "en-GB",
-                          { hour12: true }
-                        )}
+                        {new Date(data.assigned_date).toLocaleString("en-GB", {
+                          hourCycle: "h12",
+                        })}
                       </TableCell>
                       <TableCell>
                         <Button
                           sx={{ m: 1 }}
                           type="submit"
                           variant="contained"
-                          style={{ backgroundColor: "#206CE2" }}
+                          style={{ backgroundColor: "green" }}
                           onClick={(e) => {
-                            handelViewTray(e, data.code);
+                            handelApprove(e, data.code);
                           }}
                         >
-                          View
+                          Merge
                         </Button>
-                        {/* <Button
-                          sx={{ m: 1 }}
-                          type="submit"
-                          variant="contained"
-                          style={{ backgroundColor: "red" }}
-                          onClick={(e) => {
-                            if (window.confirm("You Want to Close?")) {
-                              handelCloseTray(data.code);
-                            }
-                          }}
-                        >
-                          Close
-                        </Button> */}
                       </TableCell>
                     </TableRow>
                   ))}

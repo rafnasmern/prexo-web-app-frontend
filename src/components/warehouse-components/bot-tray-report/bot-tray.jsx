@@ -48,7 +48,12 @@ export default function StickyHeadTable({ props }) {
         }
       }
     } catch (error) {
-      alert(error);
+      if (error.response.status === 403) {
+        alert(error.response.data.message);
+        window.location.reload(false);
+      } else {
+        alert(error);
+      }
     }
   };
   function dataTableFun() {
@@ -57,9 +62,9 @@ export default function StickyHeadTable({ props }) {
       scrollX: true,
     });
   }
-  const handelViewTray = (e, id) => {
+  const handelViewTray = (e, muic) => {
     e.preventDefault();
-    navigate("/bot-release-view-item/" + id);
+    navigate("/bot-tray-report-details/" + trayId + "/" + muic);
   };
   return (
     <>
@@ -113,7 +118,7 @@ export default function StickyHeadTable({ props }) {
           justifyContent: "center",
         }}
       >
-        <Paper sx={{ width: "100%", overflow: "auto" }}>
+        <Paper sx={{ width: "100%", overflow: "auto", mb: 2 }}>
           <TableContainer>
             <Table
               id="example"
@@ -124,8 +129,8 @@ export default function StickyHeadTable({ props }) {
                 <TableRow>
                   <TableCell>Record.NO</TableCell>
                   <TableCell>MUIC</TableCell>
-                  <TableCell>Model Name</TableCell>
                   <TableCell>Brand Name</TableCell>
+                  <TableCell>Model Name</TableCell>
                   <TableCell>Units</TableCell>
                   <TableCell>Open WHT</TableCell>
                   <TableCell>Actions</TableCell>
@@ -136,11 +141,10 @@ export default function StickyHeadTable({ props }) {
                   <TableRow hover role="checkbox" tabIndex={-1}>
                     <TableCell>{index + 1}</TableCell>
                     <TableCell>{data.muic}</TableCell>
-                    <TableCell>{data.model}</TableCell>
                     <TableCell>{data.brand}</TableCell>
-
+                    <TableCell>{data.model}</TableCell>
                     <TableCell>{data.item.length}</TableCell>
-                    <TableCell>{data.item.length}</TableCell>
+                    <TableCell>{data.wht_tray?.join(", ")}</TableCell>
 
                     <TableCell>
                       <Button
@@ -150,7 +154,7 @@ export default function StickyHeadTable({ props }) {
                         variant="contained"
                         style={{ backgroundColor: "green" }}
                         onClick={(e) => {
-                          handelViewTray(e, data.code);
+                          handelViewTray(e, data.muic);
                         }}
                       >
                         Details

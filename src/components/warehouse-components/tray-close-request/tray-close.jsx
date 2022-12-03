@@ -25,7 +25,6 @@ import {
 import { axiosWarehouseIn } from "../../../axios";
 import PropTypes from "prop-types";
 import CloseIcon from "@mui/icons-material/Close";
-import Checkbox from "@mui/material/Checkbox";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
@@ -74,7 +73,7 @@ export default function StickyHeadTable({ props }) {
   const [open, setOpen] = React.useState(false);
   const [assingNewTray, setAssignNewTray] = useState(false);
   const [infraData, setInfraData] = useState([]);
-  const [receiveCheck, setReceiveCheck] = useState("");
+  const [counts, setCounts] = useState("");
   const [botUsers, setBotUsers] = useState([]);
   const [trayId, setTrayId] = useState("");
   const [userTray, setUserTray] = useState("");
@@ -184,26 +183,26 @@ export default function StickyHeadTable({ props }) {
   const label = { inputProps: { "aria-label": "Checkbox demo" } };
   // HANDEL RECEIVED TRY
   const handelTrayReceived = async () => {
-    if (receiveCheck === "") {
-      alert("Please confirm counts");
-    } else {
-      setLoadinRecieved(true);
-      try {
-        let obj = {
-          trayId: trayId,
-          check: receiveCheck,
-        };
-        let res = await axiosWarehouseIn.post("/receivedTray", obj);
-        if (res.status == 200) {
-          setLoadinRecieved(false);
-          alert(res.data.message);
-          setOpen(false);
-          window.location.reload(false);
-        }
-      } catch (error) {
+    setLoadinRecieved(true);
+    try {
+      let obj = {
+        trayId: trayId,
+        count: counts,
+      };
+      let res = await axiosWarehouseIn.post("/receivedTray", obj);
+      if (res.status == 200) {
         setLoadinRecieved(false);
+        alert(res.data.message);
+        setOpen(false);
+        window.location.reload(false);
+      }
+    } catch (error) {
+      if (error.response.status === 403) {
+        alert(error.response.data.message);
+      } else {
         alert(error);
       }
+      setLoadinRecieved(false);
     }
   };
   // CHECK TRAY
@@ -280,10 +279,10 @@ export default function StickyHeadTable({ props }) {
           id="customized-dialog-title"
           onClose={handleClose}
         >
-          RECEIVED
+          Please verify the count of - {trayId}
         </BootstrapDialogTitle>
         <DialogContent dividers>
-          <h6>
+          {/* <h6>
             {" "}
             <Checkbox
               onClick={(e) => {
@@ -295,7 +294,22 @@ export default function StickyHeadTable({ props }) {
               sx={{ ml: 3 }}
             />
             I have validated the counts
-          </h6>
+          </h6> */}
+          <TextField
+            label="Enter Item Count"
+            variant="outlined"
+            onChange={(e) => {
+              setCounts(e.target.value);
+            }}
+            inputProps={{ maxLength: 3 }}
+            onKeyPress={(event) => {
+              if (!/[0-9]/.test(event.key)) {
+                event.preventDefault();
+              }
+            }}
+            fullWidth
+            sx={{ mt: 2 }}
+          />
         </DialogContent>
         <DialogActions>
           <Button
@@ -303,6 +317,7 @@ export default function StickyHeadTable({ props }) {
               m: 1,
             }}
             variant="contained"
+            disabled={counts === "" ? true : false}
             style={{ backgroundColor: "green" }}
             onClick={(e) => {
               handelTrayReceived(e);
@@ -490,7 +505,6 @@ export default function StickyHeadTable({ props }) {
                   <TableRow>
                     <TableCell>S.NO</TableCell>
                     <TableCell>Tray Id</TableCell>
-                    <TableCell>Quantity</TableCell>
                     <TableCell>Tray Type</TableCell>
                     <TableCell>Status</TableCell>
                     <TableCell>Assigned Date</TableCell>
@@ -504,9 +518,6 @@ export default function StickyHeadTable({ props }) {
                     <TableRow hover role="checkbox" tabIndex={-1}>
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>{data.code}</TableCell>
-                      <TableCell>
-                        {data?.items?.length + "/" + data.limit}
-                      </TableCell>
                       <TableCell>{data.type_taxanomy}</TableCell>
                       <TableCell>{data.sort_id}</TableCell>
                       <TableCell>

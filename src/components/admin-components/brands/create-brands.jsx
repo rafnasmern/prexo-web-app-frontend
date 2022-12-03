@@ -12,10 +12,9 @@ import {
 import PropTypes from "prop-types";
 import "yup-phone";
 import CloseIcon from "@mui/icons-material/Close";
-import { styled, alpha } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import Table from "./view-brands";
-import LoadingButton from "@mui/lab/LoadingButton";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
@@ -124,7 +123,7 @@ export default function DialogBox() {
           showConfirmButton: false,
         });
         const timer = setTimeout(() => {
-          window.location.reload(false)
+          window.location.reload(false);
         }, 2000);
         setRefresh(true);
         setOpen(false);
@@ -175,7 +174,7 @@ export default function DialogBox() {
           showConfirmButton: false,
         });
         const timer = setTimeout(() => {
-          window.location.reload(false)
+          window.location.reload(false);
         }, 2000);
         setRefresh(true);
       }
@@ -209,7 +208,6 @@ export default function DialogBox() {
   return (
     <>
       <BootstrapDialog
-      
         aria-labelledby="customized-dialog-title"
         open={open}
         fullWidth

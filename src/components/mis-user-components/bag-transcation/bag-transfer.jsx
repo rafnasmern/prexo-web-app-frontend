@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { styled, alpha } from "@mui/material/styles";
 import {
   Paper,
@@ -20,7 +20,7 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
-import { axiosMisUser, axiosWarehouseIn } from "../../../axios";
+import { axiosMisUser } from "../../../axios";
 import Checkbox from "@mui/material/Checkbox";
 import PropTypes from "prop-types";
 // import jwt from "jsonwebtoken"
@@ -66,7 +66,7 @@ BootstrapDialogTitle.propTypes = {
 };
 
 export default function StickyHeadTable({ props }) {
-  const [whtTray, setWhtTray] = useState([]);
+  const [bag, setbag] = useState([]);
   const [isCheckAll, setIsCheckAll] = useState(false);
   const [isCheck, setIsCheck] = useState([]);
   const [refresh, setRefresh] = useState(false);
@@ -86,11 +86,11 @@ export default function StickyHeadTable({ props }) {
         let admin = localStorage.getItem("prexo-authentication");
         if (admin) {
           let { location } = jwt_decode(admin);
-          let response = await axiosWarehouseIn.post(
-            "/wht-tray/" + "Ready to BQC/" + location
+          let response = await axiosMisUser.post(
+            "/getBag-for-transaction/" + location
           );
           if (response.status === 200) {
-            setWhtTray(response.data.data);
+            setbag(response.data.data);
             dataTableFun();
           }
         } else {
@@ -126,7 +126,7 @@ export default function StickyHeadTable({ props }) {
   }, []);
 
   const handelViewItem = (id) => {
-    navigate("/wht-tray-item/" + id);
+    navigate("/view-bag-item/" + id);
   };
   function dataTableFun() {
     $("#example").DataTable({
@@ -137,7 +137,7 @@ export default function StickyHeadTable({ props }) {
   /***************************************SELECT CHECKBOX******************************************/
   const handleSelectAll = (e) => {
     setIsCheckAll(!isCheckAll);
-    setIsCheck(whtTray.map((li, index) => li.code));
+    setIsCheck(bag.map((li, index) => li.code));
     if (isCheckAll) {
       setIsCheck([]);
     }
@@ -178,7 +178,90 @@ export default function StickyHeadTable({ props }) {
       }
     }
   };
-
+  const tabelData = useMemo(() => {
+    return (
+      <Table id="example" style={{ width: "100%" }} aria-label="sticky table">
+        <TableHead>
+          <TableRow>
+            <TableCell>
+              {" "}
+              <Checkbox
+                {...label}
+                onClick={(e) => {
+                  handleSelectAll();
+                }}
+                checked={bag.length == isCheck.length ? true : false}
+              />{" "}
+              Select All
+            </TableCell>
+            <TableCell>Record.NO</TableCell>
+            <TableCell>Tray Id</TableCell>
+            <TableCell>Warehouse</TableCell>
+            <TableCell>Tray Category</TableCell>
+            <TableCell>Tray Name</TableCell>
+            <TableCell>Quantity</TableCell>
+            <TableCell>Tray Display</TableCell>
+            <TableCell>status</TableCell>
+            <TableCell>Creation Time</TableCell>
+            <TableCell>Clousre Time</TableCell>
+            <TableCell>Actions</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {bag.map((data, index) => (
+            <TableRow hover role="checkbox" tabIndex={-1}>
+              <TableCell>
+                {" "}
+                <Checkbox
+                  {...label}
+                  onClick={(e) => {
+                    handleClick(e);
+                  }}
+                  id={data.code}
+                  key={data.code}
+                  checked={isCheck.includes(data.code)}
+                />
+              </TableCell>
+              <TableCell>{index + 1}</TableCell>
+              <TableCell>{data.code}</TableCell>
+              <TableCell>{data.warehouse}</TableCell>
+              <TableCell>{data.type_taxanomy}</TableCell>
+              <TableCell>{data.name}</TableCell>
+              <TableCell>
+                {" "}
+                {data.items.length}/{data.limit}
+              </TableCell>
+              <TableCell>{data.display}</TableCell>
+              <TableCell>{data.sort_id}</TableCell>
+              <TableCell>
+                {new Date(data.created_at).toLocaleString("en-GB", {
+                  hour12: true,
+                })}
+              </TableCell>
+              <TableCell>
+                {new Date(data.status_change_time).toLocaleString("en-GB", {
+                  hour12: true,
+                })}
+              </TableCell>
+              <TableCell>
+                <Button
+                  sx={{
+                    m: 1,
+                  }}
+                  variant="contained"
+                  onClick={() => handelViewItem(data.code)}
+                  style={{ backgroundColor: "green" }}
+                  component="span"
+                >
+                  View
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    );
+  }, [bag, isCheck]);
   return (
     <>
       <BootstrapDialog
@@ -287,80 +370,7 @@ export default function StickyHeadTable({ props }) {
           }}
         >
           <Paper sx={{ width: "100%", overflow: "auto" }}>
-            <TableContainer>
-              <Table
-                id="example"
-                style={{ width: "100%" }}
-                aria-label="sticky table"
-              >
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Select</TableCell>
-                    <TableCell>Record.NO</TableCell>
-                    <TableCell>Tray Id</TableCell>
-                    <TableCell>Warehouse</TableCell>
-                    <TableCell>Tray Category</TableCell>
-                    <TableCell>Tray Brand</TableCell>
-                    <TableCell>Tray Model</TableCell>
-                    <TableCell>Tray Name</TableCell>
-                    <TableCell>Quantity</TableCell>
-                    <TableCell>Tray Display</TableCell>
-                    <TableCell>status</TableCell>
-                    <TableCell>Creation Time</TableCell>
-                    <TableCell>Actions</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {whtTray.map((data, index) => (
-                    <TableRow hover role="checkbox" tabIndex={-1}>
-                      <TableCell>
-                        {" "}
-                        <Checkbox
-                          {...label}
-                          onClick={(e) => {
-                            handleClick(e);
-                          }}
-                          id={data.code}
-                          key={data.code}
-                          checked={isCheck.includes(data.code)}
-                        />
-                      </TableCell>
-                      <TableCell>{index + 1}</TableCell>
-                      <TableCell>{data.code}</TableCell>
-                      <TableCell>{data.warehouse}</TableCell>
-                      <TableCell>{data.type_taxanomy}</TableCell>
-                      <TableCell>{data.brand}</TableCell>
-                      <TableCell>{data.model}</TableCell>
-                      <TableCell>{data.name}</TableCell>
-                      <TableCell>
-                        {" "}
-                        {data.items.length}/{data.limit}
-                      </TableCell>
-                      <TableCell>{data.display}</TableCell>
-                      <TableCell>{data.sort_id}</TableCell>
-                      <TableCell>
-                        {new Date(data.created_at).toLocaleString("en-GB", {
-                          hour12: true,
-                        })}
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          sx={{
-                            m: 1,
-                          }}
-                          variant="contained"
-                          onClick={() => handelViewItem(data.code)}
-                          style={{ backgroundColor: "green" }}
-                          component="span"
-                        >
-                          View
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+            <TableContainer>{tabelData}</TableContainer>
           </Paper>
         </Box>
       </Box>

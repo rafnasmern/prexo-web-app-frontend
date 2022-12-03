@@ -33,7 +33,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 export default function CustomizedMenus() {
   const [page, setPage] = React.useState(0);
   const [item, setItem] = useState([]);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [rowsPerPage, setRowsPerPage] = React.useState(50);
   const [data, setData] = useState([]);
   const [count, setCount] = useState(0);
   const [refresh, setRefresh] = useState(false);
@@ -66,6 +66,7 @@ export default function CustomizedMenus() {
             setLoading(true);
             setItem(res.data.data);
             setCount(res.data.count);
+            dataTableFun();
             // dataTableFun();
           }
         } catch (error) {
@@ -183,9 +184,18 @@ export default function CustomizedMenus() {
       alert(error);
     }
   };
+  function dataTableFun() {
+    $("#example").DataTable({
+      destroy: true,
+      scrollX: true,
+      paging: false,
+      ordering: false,
+      info: false,
+    });
+  }
   const tableData = useMemo(() => {
     return (
-      <Table stickyHeader aria-label="sticky table">
+      <Table id="example" stickyHeader aria-label="sticky table">
         <TableHead>
           <TableRow>
             <TableCell>Record.NO</TableCell>
