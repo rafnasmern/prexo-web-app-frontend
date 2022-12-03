@@ -17,8 +17,6 @@ import { useParams } from "react-router-dom";
 import "yup-phone";
 // import jwt from "jsonwebtoken"
 import jwt_decode from "jwt-decode";
-import CloseIcon from "@mui/icons-material/Close";
-import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 
 import { axiosSortingAgent, axiosWarehouseIn } from "../../../axios";
@@ -192,7 +190,7 @@ export default function DialogBox() {
                   <TableRow>
                     <TableCell>S.NO</TableCell>
                     <TableCell>UIC</TableCell>
-                    <TableCell>IMEI</TableCell>
+                    <TableCell>Order Id</TableCell>
                     <TableCell>AWBN</TableCell>
                   </TableRow>
                 </TableHead>
@@ -201,7 +199,7 @@ export default function DialogBox() {
                     <TableRow hover role="checkbox" tabIndex={-1}>
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>{data?.uic}</TableCell>
-                      <TableCell>{data?.imei}</TableCell>
+                      <TableCell>{data?.order_id}</TableCell>
                       <TableCell>{data?.awbn_number}</TableCell>
                     </TableRow>
                   ))}
@@ -243,7 +241,7 @@ export default function DialogBox() {
                   <TableRow>
                     <TableCell>S.NO</TableCell>
                     <TableCell>UIC</TableCell>
-                    <TableCell>IMEI</TableCell>
+                    <TableCell>Order Id</TableCell>
                     <TableCell>AWBN</TableCell>
                   </TableRow>
                 </TableHead>
@@ -253,7 +251,7 @@ export default function DialogBox() {
                     <TableRow hover role="checkbox" tabIndex={-1}>
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>{data?.uic}</TableCell>
-                      <TableCell>{data?.imei}</TableCell>
+                      <TableCell>{data?.order_id}</TableCell>
                       <TableCell>{data?.awbn_number}</TableCell>
                     </TableRow>
                   ))}

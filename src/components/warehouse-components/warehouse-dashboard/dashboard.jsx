@@ -533,7 +533,7 @@ export default function Dashboard() {
               </Link>
             </Box>
             <hr />
-            <Box
+            {/* <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}
             >
@@ -552,7 +552,7 @@ export default function Dashboard() {
                 Inuse PMT/MMT
               </Link>
             </Box>
-            <hr />
+            <hr /> */}
             <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}
@@ -653,19 +653,6 @@ export default function Dashboard() {
               </Link>
             </Box>
             <hr />
-          </div>
-        </Box>
-        <Box
-          sx={{
-            cursor: "pointer",
-            ml: 1,
-            width: 300,
-            boxShadow: 2,
-            height: "122px",
-            backgroundColor: "#FFFFFF",
-          }}
-        >
-          <div style={{ margin: "12px" }}>
             <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}
@@ -686,6 +673,19 @@ export default function Dashboard() {
               </Link>
             </Box>
             <hr />
+          </div>
+        </Box>
+        <Box
+          sx={{
+            cursor: "pointer",
+            ml: 1,
+            width: 300,
+            boxShadow: 2,
+            height: "58px",
+            backgroundColor: "#FFFFFF",
+          }}
+        >
+          <div style={{ margin: "12px" }}>
             <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}
