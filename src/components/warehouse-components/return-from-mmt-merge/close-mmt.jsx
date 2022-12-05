@@ -145,7 +145,7 @@ export default function DialogBox() {
         if (res.status === 200) {
           alert(res.data.message);
           setLoading(false);
-          navigate("/return-from-mmt-merge");
+          navigate("/tray-return-from-merging");
         }
       }
     } catch (error) {

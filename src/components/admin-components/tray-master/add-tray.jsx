@@ -72,8 +72,6 @@ export default function DialogBox() {
   const [allModel, setAllModel] = useState([]);
   const [loading, setLoading] = useState(false);
   const [cpc, setCpc] = useState([]);
-
-
   useEffect(() => {
     try {
       const fetchData = async () => {

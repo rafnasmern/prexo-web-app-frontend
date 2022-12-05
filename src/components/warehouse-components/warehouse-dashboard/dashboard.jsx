@@ -96,11 +96,11 @@ export default function Dashboard() {
   };
   const handelMmtMerge = (e) => {
     e.preventDefault();
-    navigate("/mmt-merge-request");
+    navigate("/tray-merge-request");
   };
   const handeMergeDone = (e) => {
     e.preventDefault();
-    navigate("/return-from-mmt-merge");
+    navigate("/tray-return-from-merging");
   };
   const handelInusePmtMmtTray = (e) => {
     e.preventDefault();
@@ -649,7 +649,7 @@ export default function Dashboard() {
                   handelMmtMerge(e);
                 }}
               >
-                MMT Merge Request
+                Tray Merge Request
               </Link>
             </Box>
             <hr />
@@ -702,7 +702,7 @@ export default function Dashboard() {
                   handeMergeDone(e);
                 }}
               >
-                Return From MMT Merge
+                Tray Return From Merging
               </Link>
             </Box>
             <hr />

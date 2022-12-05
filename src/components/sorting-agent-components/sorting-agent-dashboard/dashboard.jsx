@@ -30,7 +30,7 @@ export default function Dashboard() {
   };
   const handelMmtMerge = (e) => {
     e.preventDefault();
-    navigate("/merge-mmt-tray");
+    navigate("/tray-merge");
   };
   return (
     <div>
@@ -111,7 +111,7 @@ export default function Dashboard() {
                 handelMmtMerge(e);
               }}
             >
-              MMT Merge
+              Tray Merge
             </Link>
           </Box>
           <hr />

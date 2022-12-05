@@ -89,7 +89,8 @@ export default function DialogBox() {
   const [stickerOne, setStickerOne] = useState("");
   const [stickerTwo, setStickerTwo] = useState("");
   const [stickertThree, setStickerThree] = useState("");
-  const [stickerFour, setStickerFour] = useState("");
+  const [bodyDamageDes, setBodyDamageDes] = useState("");
+  const [itemRecievedDet, setItemRecieveDet] = useState("");
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(false);
   const [awbn, setAwbn] = useState("");
@@ -151,7 +152,8 @@ export default function DialogBox() {
     setStickerOne("");
     setStickerTwo("");
     setStickerThree("");
-    setStickerFour("");
+    setItemRecieveDet("");
+    setBodyDamageDes("");
     setOpneProductMisMatch(false);
     setBodyDamage("NO");
   };
@@ -159,7 +161,8 @@ export default function DialogBox() {
     setStickerOne("");
     setStickerTwo("");
     setStickerThree("");
-    setStickerFour("");
+    setBodyDamageDes("");
+    setItemRecieveDet("");
     setOpenApprove(false);
     setBodyDamage("NO");
   };
@@ -167,7 +170,8 @@ export default function DialogBox() {
     setStickerOne("");
     setStickerTwo("");
     setStickerThree("");
-    setStickerFour("");
+    setItemRecieveDet("");
+    setBodyDamageDes("");
     setModelMisMatch(false);
     setBodyDamage("NO");
   };
@@ -250,15 +254,7 @@ export default function DialogBox() {
     });
     try {
       if (trayType == "MMT" && tray?.length !== 0) {
-        if (
-          stickerOne == "" ||
-          stickerTwo == "" ||
-          stickertThree == "" ||
-          stickerFour == ""
-        ) {
-          setLoading(false);
-          alert("Please Confirm All Stickers");
-        } else if (tray[0]?.limit <= tray?.[0]?.items?.length) {
+        if (tray[0]?.limit <= tray?.[0]?.items?.length) {
           if (tray[0]?.sort_id == "Issued") {
             alert("Tray Is Full");
             if (window.confirm("You Want to Close Tray?")) {
@@ -278,11 +274,13 @@ export default function DialogBox() {
             stickerOne: stickerOne,
             stickerTwo: stickerTwo,
             stickerThree: stickertThree,
-            stickerFour: stickerFour,
             status: awabnDetails?.[0].status,
             tray_id: tray[0].code,
             bag_id: bagId,
             user_name: user_name1,
+            body_damage: bodyDamage,
+            body_damage_des: bodyDamageDes,
+            model_brand: itemRecievedDet,
             bag_assigned_date: bagData[0]?.assigned_date,
             uic:
               awabnDetails?.[0]?.uic_code?.code == undefined
@@ -297,19 +295,12 @@ export default function DialogBox() {
             setStickerOne("");
             setStickerTwo("");
             setStickerThree("");
-            setStickerFour("");
             setBodyDamage("NO");
             setModelMisMatch(false);
           }
         }
       } else if (tray?.length !== 0) {
-        if (stickerOne == "" || stickerTwo == "" || stickertThree == "") {
-          alert("Please Confirm All Stickers");
-          setLoading(false);
-        } else if (
-          tray[0].limit <= tray?.[0]?.items?.length &&
-          trayType == "BOT"
-        ) {
+        if (tray[0].limit <= tray?.[0]?.items?.length && trayType == "BOT") {
           setLoading(false);
           alert("Tray Is Full");
         } else if (
@@ -333,8 +324,6 @@ export default function DialogBox() {
             imei: awabnDetails?.[0]?.imei,
             stickerOne: stickerOne,
             stickerTwo: stickerTwo,
-            stickerThree: stickertThree,
-            stickerFour: stickerFour,
             status: awabnDetails?.[0].status,
             tray_id: tray[0].code,
             bag_id: bagId,
@@ -345,6 +334,8 @@ export default function DialogBox() {
                 ? "PENDING"
                 : awabnDetails?.[0]?.uic_code?.code,
             body_damage: bodyDamage,
+            body_damage_des: bodyDamageDes,
+            item_recieved: itemRecievedDet,
           };
           let res = await axiosBot.post("/traySegregation", obj);
           if (res.status == 200) {
@@ -353,8 +344,8 @@ export default function DialogBox() {
             setRefresh((refresh) => !refresh);
             setStickerOne("");
             setStickerTwo("");
-            setStickerThree("");
-            setStickerFour("");
+            setItemRecieveDet("");
+            setBodyDamageDes("");
             setOpenApprove(false);
             setBodyDamage("NO");
             setOpneProductMisMatch(false);
@@ -365,10 +356,11 @@ export default function DialogBox() {
         setStickerOne("");
         setStickerTwo("");
         setStickerThree("");
-        setStickerFour("");
         setOpenApprove(false);
         setModelMisMatch(false);
         setBodyDamage("NO");
+        setItemRecieveDet("");
+        setBodyDamageDes("");
         setOpneProductMisMatch(false);
         setLoading(false);
       }
@@ -532,7 +524,7 @@ export default function DialogBox() {
                     : setStickerOne("");
                 }}
                 {...label}
-                sx={{ ml: 3 }}
+                sx={{ ml: 1 }}
               />
               UIC Pasted On Device
             </h6>
@@ -545,11 +537,11 @@ export default function DialogBox() {
                     : setStickerTwo("");
                 }}
                 {...label}
-                sx={{ ml: 3 }}
+                sx={{ ml: 1 }}
               />
               Device Putin Sleeve
             </h6>
-            <h6>
+            {/* <h6>
               {" "}
               <Checkbox
                 onClick={(e) => {
@@ -561,9 +553,9 @@ export default function DialogBox() {
                 sx={{ ml: 3 }}
               />
               UIC Pasted On Sleeve
-            </h6>
-            <FormControl sx={{ ml: 5 }}>
-              <FormLabel id="demo-radio-buttons-group-label" sx={{ mt: 2 }}>
+            </h6> */}
+            <FormControl sx={{ ml: 3 }}>
+              <FormLabel id="demo-radio-buttons-group-label">
                 Any Damage
               </FormLabel>
               <RadioGroup
@@ -591,6 +583,16 @@ export default function DialogBox() {
                 </Box>
               </RadioGroup>
             </FormControl>
+            {bodyDamage == "YES" ? (
+              <textarea
+                placeholder="Details of damage parts"
+                maxWidth="50px"
+                onChange={(e) => {
+                  setBodyDamageDes(e.target.value);
+                }}
+                style={{ width: "300px", marginLeft: "22px", height: "60px" }}
+              />
+            ) : null}
           </Box>
         </DialogContent>
         <DialogActions>
@@ -601,7 +603,12 @@ export default function DialogBox() {
             fullwidth
             variant="contained"
             style={{ backgroundColor: "green" }}
-            disabled={loading}
+            disabled={
+              loading ||
+              stickerOne == "" ||
+              stickerTwo == "" ||
+              (bodyDamage === "YES" && bodyDamageDes === "")
+            }
             component="span"
             onClick={(e) => {
               setLoading(true);
@@ -640,7 +647,7 @@ export default function DialogBox() {
               borderRadius: 1,
             }}
           >
-            <h6>
+            {/* <h6>
               {" "}
               <Checkbox
                 onClick={(e) => {
@@ -652,8 +659,8 @@ export default function DialogBox() {
                 sx={{ ml: 3 }}
               />
               UIC Pasted On Device
-            </h6>
-            <h6>
+            </h6> */}
+            {/* <h6>
               {" "}
               <Checkbox
                 onClick={(e) => {
@@ -665,31 +672,39 @@ export default function DialogBox() {
                 sx={{ ml: 3 }}
               />
               Device Putin Sleeve
-            </h6>
+            </h6> */}
+
             <h6>
               {" "}
               <Checkbox
                 onClick={(e) => {
-                  stickertThree == ""
-                    ? setStickerThree("UIC Pasted On Sleeve")
-                    : setStickerThree("");
+                  stickerOne == ""
+                    ? setStickerOne("UIC Pasted On Sleeve")
+                    : setStickerOne("");
                 }}
                 {...label}
-                sx={{ ml: 3 }}
+                sx={{ ml: 1 }}
               />
               UIC Pasted On Sleeve
             </h6>
+            <TextField
+              label="Item received in packet"
+              variant="outlined"
+              onChange={(e) => {
+                setItemRecieveDet(e.target.value);
+              }}
+              sx={{ mt: 1, ml: 2 }}
+            />
           </Box>
         </DialogContent>
         <DialogActions>
-          <LoadingButton
+          <Button
             sx={{
               ml: 2,
             }}
             fullwidth
             variant="contained"
-            loadingPosition="end"
-            loading={loading}
+            disabled={loading || stickerOne === "" || itemRecievedDet === ""}
             style={{ backgroundColor: "green" }}
             component="span"
             onClick={(e) => {
@@ -702,7 +717,7 @@ export default function DialogBox() {
             }}
           >
             Add To PMT
-          </LoadingButton>
+          </Button>
         </DialogActions>
       </BootstrapDialog>
       <BootstrapDialog
@@ -771,7 +786,7 @@ export default function DialogBox() {
               />
               Device Put On Sleeve
             </h6>
-            <h6>
+            {/* <h6>
               {" "}
               <Checkbox
                 onClick={(e) => {
@@ -782,18 +797,74 @@ export default function DialogBox() {
                 {...label}
               />
               Blank UIC Pasted On Sleeve
-            </h6>
+            </h6> */}
+            <FormControl sx={{ ml: 2 }}>
+              <FormLabel id="demo-radio-buttons-group-label">
+                Any Damage
+              </FormLabel>
+              <RadioGroup
+                aria-labelledby="demo-radio-buttons-group-label"
+                defaultValue="NO"
+                name="radio-buttons-group"
+              >
+                <Box>
+                  <FormControlLabel
+                    value="YES"
+                    onClick={(e) => {
+                      setBodyDamage("YES");
+                    }}
+                    control={<Radio />}
+                    label="YES"
+                  />
+                  <FormControlLabel
+                    value="NO"
+                    control={<Radio />}
+                    onClick={(e) => {
+                      setBodyDamage("NO");
+                    }}
+                    label="NO"
+                  />
+                </Box>
+              </RadioGroup>
+            </FormControl>
+            {bodyDamage == "YES" ? (
+              <textarea
+                placeholder="Details of damage parts"
+                maxWidth="50px"
+                onChange={(e) => {
+                  setBodyDamageDes(e.target.value);
+                }}
+                style={{ width: "300px", marginLeft: "18px", height: "60px" }}
+              />
+            ) : null}
+            <TextField
+              label="Mismatched model brand name"
+              variant="outlined"
+              onChange={(e) => {
+                setItemRecieveDet(e.target.value);
+              }}
+              inputProps={{
+                width: "300px",
+              }}
+              sx={{ mt: 1, ml: 2 }}
+            />
           </Box>
         </DialogContent>
         <DialogActions>
-          <LoadingButton
+          <Button
             sx={{
               ml: 2,
             }}
             fullwidth
             variant="contained"
-            loadingPosition="end"
-            loading={loading}
+            disabled={
+              loading ||
+              stickerOne === "" ||
+              stickerTwo === "" ||
+              stickertThree === "" ||
+              itemRecievedDet === "" ||
+              (bodyDamage === "YES" && bodyDamageDes === "")
+            }
             style={{ backgroundColor: "green" }}
             component="span"
             onClick={(e) => {
@@ -806,7 +877,7 @@ export default function DialogBox() {
             }}
           >
             Add To MMT
-          </LoadingButton>
+          </Button>
         </DialogActions>
       </BootstrapDialog>
       {pageLoading === false ? (

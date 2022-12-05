@@ -132,7 +132,7 @@ export default function DialogBox() {
         if (res.status === 200) {
           alert(res.data.message);
           setLoading2(false);
-          navigate("/merge-mmt-tray");
+          navigate("/tray-merge");
         }
       }
     } catch (error) {
@@ -200,7 +200,11 @@ export default function DialogBox() {
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>{data?.uic}</TableCell>
                       <TableCell>{data?.order_id}</TableCell>
-                      <TableCell>{data?.awbn_number}</TableCell>
+                      <TableCell>
+                        {data?.awbn_number == undefined
+                          ? data?.tracking_id
+                          : data?.awbn_number}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -252,7 +256,11 @@ export default function DialogBox() {
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>{data?.uic}</TableCell>
                       <TableCell>{data?.order_id}</TableCell>
-                      <TableCell>{data?.awbn_number}</TableCell>
+                      <TableCell>
+                        {data?.awbn_number == undefined
+                          ? data?.tracking_id
+                          : data?.awbn_number}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
