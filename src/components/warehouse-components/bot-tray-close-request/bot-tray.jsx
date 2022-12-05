@@ -282,6 +282,7 @@ export default function StickyHeadTable({ props }) {
                             m: 1,
                           }}
                           variant="contained"
+                          disabled={data.sort_id === "Closed By Bot"}
                           style={{ backgroundColor: "#206CE2" }}
                           onClick={(e) => {
                             handelViewTray(e, data.code);
