@@ -258,12 +258,12 @@ export default function Dashboard() {
             ml: 1,
             width: 300,
             boxShadow: 2,
-            height: "374px",
+            height: "310px",
             backgroundColor: "#FFFFFF",
           }}
         >
           <div style={{ margin: "12px" }}>
-            <Box
+            {/* <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}
             >
@@ -282,7 +282,7 @@ export default function Dashboard() {
                 WHT Merge
               </Link>
             </Box>
-            <hr />
+            <hr /> */}
             <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}
