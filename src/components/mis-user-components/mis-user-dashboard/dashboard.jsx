@@ -69,10 +69,10 @@ export default function Dashboard() {
     e.preventDefault();
     navigate("/bag-receive");
   };
-  const handelMmtMerge =(e)=>{
+  const handelMmtMerge = (e) => {
     e.preventDefault();
     navigate("/mmt-merge");
-  }
+  };
   return (
     <div style={{ marginBottom: "20px" }}>
       <h4 style={{ marginTop: "100px", marginLeft: "27px", color: "#495057" }}>
@@ -258,12 +258,12 @@ export default function Dashboard() {
             ml: 1,
             width: 300,
             boxShadow: 2,
-            height: "310px",
+            height: "374px",
             backgroundColor: "#FFFFFF",
           }}
         >
           <div style={{ margin: "12px" }}>
-            {/* <Box
+            <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}
             >
@@ -282,7 +282,7 @@ export default function Dashboard() {
                 WHT Merge
               </Link>
             </Box>
-            <hr /> */}
+            <hr />
             <Box
               style={{ marginBottom: "12px", marginTop: "20" }}
               sx={{ display: "flex", flexDirection: "start" }}

@@ -9,43 +9,76 @@ import {
   TableRow,
   Box,
   Button,
+  Container,
+  Dialog,
+  DialogContent,
+  DialogActions,
+  DialogTitle,
+  IconButton,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
-  Container,
 } from "@mui/material";
-import {
-  axiosMisUser,
-  axiosSuperAdminPrexo,
-  axiosWarehouseIn,
-} from "../../../axios";
+import { axiosMisUser, axiosWarehouseIn } from "../../../axios";
 // import jwt from "jsonwebtoken"
 import jwt_decode from "jwt-decode";
-import Checkbox from "@mui/material/Checkbox";
+import CloseIcon from "@mui/icons-material/Close";
+import PropTypes from "prop-types";
 //Datatable Modules
 import $ from "jquery";
 import "datatables.net";
 import { useNavigate } from "react-router-dom";
 import CircularProgress from "@mui/material/CircularProgress";
+import { styled } from "@mui/material/styles";
 
-/******************************************************************************* */
+/*********************************************************** */
+const BootstrapDialog = styled(Dialog)(({ theme }) => ({
+  "& .MuiDialogContent-root": {
+    padding: theme.spacing(2),
+  },
+  "& .MuiDialogActions-root": {
+    padding: theme.spacing(1),
+  },
+}));
+const BootstrapDialogTitle = (props) => {
+  const { children, onClose, ...other } = props;
+  return (
+    <DialogTitle sx={{ m: 0, p: 2 }} {...other}>
+      {children}
+      {onClose ? (
+        <IconButton
+          aria-label="close"
+          onClick={onClose}
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
+            color: (theme) => theme.palette.grey[500],
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+      ) : null}
+    </DialogTitle>
+  );
+};
+BootstrapDialogTitle.propTypes = {
+  children: PropTypes.node,
+  onClose: PropTypes.func.isRequired,
+};
 export default function StickyHeadTable({ props }) {
   const [whtTray, setWhtTray] = useState([]);
-  const [brand, setbrand] = useState([]);
-  const [model, setModel] = useState([]);
+  const [sortingAgent, setSortingAgent] = useState([]);
+  const [toWhtTray, setToWhatTray] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [mergreData, setMergeData] = useState({
+    fromTray: "",
+    toTray: "",
+    sort_agent: "",
+  });
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [isCheckAll, setIsCheckAll] = useState(false);
-  const [isCheck, setIsCheck] = useState([]);
-  const [selectBut, setSelectBut] = useState(false);
-  const [readyForMerge, setReadyForMerge] = useState(true);
-  const [afterSelectDis, setAfterSelectDis] = useState(false);
-  const [search, setSearch] = useState({
-    brand: "",
-    model: "",
-    location: "",
-  });
   /******************************************************************************* */
   useEffect(() => {
     const fetchData = async () => {
@@ -55,16 +88,12 @@ export default function StickyHeadTable({ props }) {
           setLoading(false);
           let { location } = jwt_decode(admin);
           let response = await axiosWarehouseIn.post(
-            "/wht-tray/" + "Inuse/" + location
+            "/wht-tray/" + "wht-merge/" + location
           );
           if (response.status === 200) {
             setWhtTray(response.data.data);
             setLoading(true);
             dataTableFun();
-          }
-          let brandRes = await axiosSuperAdminPrexo.post("/getBrands");
-          if (brandRes.status == 200) {
-            setbrand(brandRes.data.data);
           }
         } else {
           navigate("/");
@@ -75,30 +104,60 @@ export default function StickyHeadTable({ props }) {
     };
     fetchData();
   }, []);
-
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setReadyForMerge(true);
-        setAfterSelectDis(false);
-        if (isCheck.length == 2) {
-          let res = await axiosMisUser.post("/check-ready-for-merge", isCheck);
-          if (res.status == 200) {
-            setReadyForMerge(false);
-            setAfterSelectDis(true);
+    try {
+      let token = localStorage.getItem("prexo-authentication");
+      if (token) {
+        const { location } = jwt_decode(token);
+        const fetchData = async () => {
+          let res = await axiosMisUser.post(
+            "/getSortingAgentMergeMmt/" + location
+          );
+          if (res.status === 200) {
+            setSortingAgent(res.data.data);
           }
-        }
-      } catch (error) {
-        if (error.response.status === 403) {
-          alert(error.response.data.message);
-        }
+        };
+        fetchData();
       }
-    };
-    fetchData();
-  }, [isCheck]);
-
+    } catch (error) {
+      if (error.response.status === 403) {
+        alert(error.response.data.message);
+      }
+    }
+  }, []);
+  /* OPEN DIALOG BOX */
+  const handelMerge = async (e, model, brand, trayId, itemCount) => {
+    e.preventDefault();
+    try {
+      let token = localStorage.getItem("prexo-authentication");
+      if (token) {
+        const { location } = jwt_decode(token);
+        let obj = {
+          location: location,
+          model: model,
+          brand: brand,
+          fromTray: trayId,
+          itemCount: itemCount,
+        };
+        let res = await axiosMisUser.post("/toWhtTrayForMerge", obj);
+        if (res.status === 200) {
+          setOpen(true);
+          setToWhatTray(res.data.data);
+        }
+        setMergeData((p) => ({ ...p, fromTray: trayId }));
+      }
+    } catch (error) {
+      if (error.response.status == 403) {
+        alert(error.response.data.message);
+      } else {
+        alert(error);
+      }
+    }
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
   /******************************************************************************* */
-
   const handelViewItem = (id) => {
     navigate("/wht-tray-item/" + id);
   };
@@ -108,86 +167,25 @@ export default function StickyHeadTable({ props }) {
       scrollX: true,
     });
   }
-  /******************************************************************************* */
-  /* GET MODEL NAME */
-  const getModel = async (e, brandName) => {
+  /* REQUEST SEND TO WAREHOUSE */
+  const handelSendRequest = async (e) => {
     e.preventDefault();
     try {
-      let res = await axiosSuperAdminPrexo.post(
-        "/get-product-model/" + brandName
-      );
-      if (res.status == 200) {
-        setModel(res.data.data);
+      let res = await axiosMisUser.post("/TrayMergeRequestSend", mergreData);
+      if (res.status === 200) {
+        alert(res.data.message);
+        window.location.reload(false);
       }
     } catch (error) {
       alert(error);
     }
   };
-  /*********************************************GET WHT TRAY BASED ON THE BRAND AND MODEL********************************** */
-  const handelGetWhtTray = async () => {
-    try {
-      let admin = localStorage.getItem("prexo-authentication");
-      setLoading(false);
-      setSelectBut(false);
-      if (admin) {
-        let { location } = jwt_decode(admin);
-        let obj = {
-          brand: search.brand,
-          model: search.model,
-          location: location,
-        };
-        let res = await axiosMisUser.post("/sort-wht-tray-brand-model", obj);
-        $("#example").DataTable().destroy();
-        if (res.status === 200) {
-          setWhtTray(res.data.data);
-          setSelectBut(true);
-          setLoading(true);
-          dataTableFun();
-        }
-      }
-    } catch (error) {
-      alert(error);
-    }
-  };
-  /************************************SELECT TRAY********************************* */
-  // const handleSelectAll = (e) => {
-  //   setIsCheckAll(!isCheckAll);
-  //   setIsCheck(whtTray?.[0]?.delivery?.map((li, index) => index.toString()));
-  //   if (isCheckAll) {
-  //     setIsCheck([]);
-  //   }
-  // };
-  const handleClick = (e) => {
-    const { id, checked } = e.target;
-    setIsCheck([...isCheck, id]);
-    if (!checked) {
-      setIsCheck(isCheck.filter((item) => item !== id));
-    }
-  };
-  const label = { inputProps: { "aria-label": "Checkbox demo" } };
-  /***********************************FUNCTION FOR CHECK READY FOR MERGE**************************************************** */
-  // const checkReadyforMerge = async (e) => {
-  //   try {
-  //     if (isCheck.length == 2) {
-  //       e.preventDefault();
-  //       let res = await axiosMisUser.post("/check-ready-for-merge", isCheck);
-  //       if (res.status == 200) {
-  //       }
-  //     }
-  //   } catch (error) {
-  //     if (error.response.status === 403) {
-  //       alert(error.response.data.message);
-  //     }
-  //   }
-  // };
-
   const tableData = useMemo(() => {
     return (
       <TableContainer>
         <Table id="example" style={{ width: "100%" }} aria-label="sticky table">
           <TableHead>
             <TableRow>
-              {selectBut === true ? <TableCell>Select</TableCell> : null}
               <TableCell>Record.NO</TableCell>
               <TableCell>Tray Id</TableCell>
               <TableCell>Warehouse</TableCell>
@@ -205,21 +203,6 @@ export default function StickyHeadTable({ props }) {
           <TableBody>
             {whtTray.map((data, index) => (
               <TableRow hover role="checkbox" tabIndex={-1}>
-                {selectBut === true ? (
-                  <TableCell>
-                    {" "}
-                    <Checkbox
-                      {...label}
-                      onClick={(e) => {
-                        handleClick(e);
-                      }}
-                      id={data.code}
-                      key={data.code}
-                      checked={isCheck.includes(data.code)}
-                      disabled={afterSelectDis}
-                    />
-                  </TableCell>
-                ) : null}
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>{data.code}</TableCell>
                 <TableCell>{data.warehouse}</TableCell>
@@ -242,17 +225,38 @@ export default function StickyHeadTable({ props }) {
                   })}
                 </TableCell>
                 <TableCell>
-                  <Button
+                  <Box
                     sx={{
-                      m: 1,
+                      display: "flex",
+                      flexDirection: "column",
                     }}
-                    variant="contained"
-                    onClick={() => handelViewItem(data.code)}
-                    style={{ backgroundColor: "green" }}
-                    component="span"
                   >
-                    View
-                  </Button>
+                    <Button
+                      variant="contained"
+                      onClick={() => handelViewItem(data.code)}
+                      style={{ backgroundColor: "#206CE2" }}
+                      component="span"
+                    >
+                      View
+                    </Button>
+                    <Button
+                      sx={{ mt: 1 }}
+                      type="submit"
+                      variant="contained"
+                      style={{ backgroundColor: "green" }}
+                      onClick={(e) => {
+                        handelMerge(
+                          e,
+                          data.model,
+                          data.brand,
+                          data.code,
+                          data.items.length
+                        );
+                      }}
+                    >
+                      Merge
+                    </Button>
+                  </Box>
                 </TableCell>
               </TableRow>
             ))}
@@ -260,136 +264,110 @@ export default function StickyHeadTable({ props }) {
         </Table>
       </TableContainer>
     );
-  }, [whtTray, isCheck, selectBut, afterSelectDis]);
+  }, [whtTray]);
   /******************************************************************************* */
   return (
     <>
+      <BootstrapDialog
+        aria-labelledby="customized-dialog-title"
+        open={open}
+        fullWidth
+        maxWidth="xs"
+      >
+        <BootstrapDialogTitle
+          id="customized-dialog-title"
+          onClose={handleClose}
+        >
+          Tray Merge
+        </BootstrapDialogTitle>
+
+        <DialogContent dividers>
+          <FormControl fullWidth>
+            <InputLabel sx={{ pt: 2 }} id="demo-simple-select-label">
+              To MMT Tray
+            </InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              label="Cpc"
+              fullWidth
+              sx={{ mt: 2 }}
+            >
+              {toWhtTray.map((data) => (
+                <MenuItem
+                  onClick={(e) => {
+                    setMergeData((p) => ({ ...p, toTray: data.code }));
+                  }}
+                  value={data.code}
+                >
+                  {data.code} - ({data.items.length})
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl fullWidth>
+            <InputLabel sx={{ pt: 2 }} id="demo-simple-select-label">
+              Sorting Agent
+            </InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              label="Cpc"
+              fullWidth
+              sx={{ mt: 2 }}
+            >
+              {sortingAgent.map((data) => (
+                <MenuItem
+                  onClick={(e) => {
+                    setMergeData((p) => ({ ...p, sort_agent: data.user_name }));
+                  }}
+                  value={data.user_name}
+                >
+                  {data.user_name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={mergreData.sort_agent === "" || mergreData.toTray === ""}
+            style={{ backgroundColor: "green" }}
+            onClick={(e) => {
+              handelSendRequest(e);
+            }}
+          >
+            SUBMIT
+          </Button>
+        </DialogActions>
+      </BootstrapDialog>
       <Box
         sx={{
           top: { sm: 60, xs: 20 },
           left: { sm: 250 },
           m: 3,
-          mt: 11,
+          mt: 15,
         }}
       >
-        <Box
-          sx={{
-            float: "left",
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "start",
-            }}
-          >
-            <FormControl sx={{ mt: 1, minWidth: 150 }} fullWidth>
-              <InputLabel s id="demo-simple-select-label">
-                Brand
-              </InputLabel>
-              <Select
-                labelId="demo-simple-select-label"
-                fullWidth
-                label="Select search field"
-                onChange={(e) => {
-                  setSearch((p) => ({ ...p, brand: e.target.value }));
-                }}
-              >
-                {brand.map((data) => (
-                  <MenuItem
-                    value={data.brand_name}
-                    onClick={(e) => {
-                      getModel(e, data.brand_name);
-                    }}
-                  >
-                    {data.brand_name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <FormControl sx={{ mt: 1, ml: 2, minWidth: 150 }} fullWidth>
-              <InputLabel sx={{ pl: 1 }} id="demo-simple-select-label">
-                Model
-              </InputLabel>
-              <Select
-                labelId="demo-simple-select-label"
-                fullWidth
-                disabled={search.brand == "" ? true : false}
-                label="Select search field"
-                onChange={(e) => {
-                  setSearch((p) => ({ ...p, model: e.target.value }));
-                }}
-              >
-                {model.map((data) => (
-                  <MenuItem value={data.model_name}>{data.model_name}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <Button
+        {loading === false ? (
+          <Container>
+            <Box
               sx={{
-                m: 1,
-                ml: 3,
-                mt: 2,
-              }}
-              variant="contained"
-              style={{ backgroundColor: "#206CE2" }}
-              component="span"
-              fullWidth
-              disabled={search.model == "" ? true : false}
-              onClick={(e) => {
-                handelGetWhtTray(e);
+                display: "flex",
+                alignItems: "center",
+                flexDirection: "column",
+                pt: 30,
               }}
             >
-              Sort
-            </Button>
-          </Box>
-        </Box>
-        <Box
-          sx={{
-            float: "right",
-          }}
-        >
-          <Button
-            sx={{
-              mt: 2,
-              height: "48px",
-              width: "200px",
-            }}
-            variant="contained"
-            style={{ backgroundColor: "green" }}
-            component="span"
-            disabled={readyForMerge}
-            // onClick={(e) => {
-            //   handelAssignForSorting(e);
-            // }}
-          >
-            Assign For Sorting
-          </Button>
-        </Box>
-        <Box
-          sx={{
-            mt: 12,
-            mb: 2,
-          }}
-        >
-          {loading === false ? (
-            <Container>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  flexDirection: "column",
-                  pt: 30,
-                }}
-              >
-                <CircularProgress />
-                <p style={{ paddingTop: "10px" }}>Loading...</p>
-              </Box>
-            </Container>
-          ) : (
-            <Paper sx={{ width: "100%", overflow: "auto" }}>{tableData}</Paper>
-          )}
-        </Box>
+              <CircularProgress />
+              <p style={{ paddingTop: "10px" }}>Loading...</p>
+            </Box>
+          </Container>
+        ) : (
+          <Paper sx={{ width: "100%", overflow: "auto", mb: 2 }}>
+            {tableData}
+          </Paper>
+        )}
       </Box>
     </>
   );

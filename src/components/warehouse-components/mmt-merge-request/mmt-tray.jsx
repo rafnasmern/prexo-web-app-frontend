@@ -99,7 +99,7 @@ export default function StickyHeadTable({ props }) {
                         {data.items.length + "/" + data.limit}
                       </TableCell>
                       <TableCell>{data.issued_user_name}</TableCell>
-                      <TableCell>{data.to_mmt_merge}</TableCell>
+                      <TableCell>{data.to_merge}</TableCell>
                       <TableCell>{data.sort_id}</TableCell>
                       <TableCell>
                         {new Date(data.status_change_time).toLocaleString(

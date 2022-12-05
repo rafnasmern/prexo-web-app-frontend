@@ -18,6 +18,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Container,
 } from "@mui/material";
 import { axiosMisUser } from "../../../axios";
 import CloseIcon from "@mui/icons-material/Close";
@@ -26,6 +27,7 @@ import PropTypes from "prop-types";
 import jwt_decode from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/material/styles";
+import CircularProgress from "@mui/material/CircularProgress";
 //Datatable Modules
 import $ from "jquery";
 import "datatables.net";
@@ -67,12 +69,13 @@ BootstrapDialogTitle.propTypes = {
 
 export default function StickyHeadTable({ props }) {
   const [mmtTray, setMmtTray] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [sortingAgent, setSortingAgent] = useState([]);
   const [toMmtTray, setToMmtTray] = useState([]);
   const [mergreData, setMergeData] = useState({
-    mmtTrayFrom: "",
-    toMmtTray: "",
+    fromTray: "",
+    toTray: "",
     sort_agent: "",
   });
 
@@ -81,11 +84,13 @@ export default function StickyHeadTable({ props }) {
     try {
       let token = localStorage.getItem("prexo-authentication");
       if (token) {
+        setLoading(false);
         const { location } = jwt_decode(token);
         const fetchData = async () => {
           let res = await axiosMisUser.post("/getClosedMmtTray/" + location);
           if (res.status == 200) {
             setMmtTray(res.data.data);
+            setLoading(true);
             dataTableFun();
           }
         };
@@ -148,7 +153,7 @@ export default function StickyHeadTable({ props }) {
           setOpen(true);
           setToMmtTray(res.data.data);
         }
-        setMergeData((p) => ({ ...p, mmtTrayFrom: trayId }));
+        setMergeData((p) => ({ ...p, fromTray: trayId }));
       }
     } catch (error) {
       if (error.response.status == 403) {
@@ -162,15 +167,16 @@ export default function StickyHeadTable({ props }) {
   const handelSendRequest = async (e) => {
     e.preventDefault();
     try {
-      let res = await axiosMisUser.post("/mmtTrayMergeRequestSend", mergreData);
+      let res = await axiosMisUser.post("/TrayMergeRequestSend", mergreData);
       if (res.status === 200) {
         alert(res.data.message);
-        window.location.reload(false)
+        window.location.reload(false);
       }
     } catch (error) {
       alert(error);
     }
   };
+
   return (
     <>
       <BootstrapDialog
@@ -200,7 +206,7 @@ export default function StickyHeadTable({ props }) {
               {toMmtTray.map((data) => (
                 <MenuItem
                   onClick={(e) => {
-                    setMergeData((p) => ({ ...p, toMmtTray: data.code }));
+                    setMergeData((p) => ({ ...p, toTray: data.code }));
                   }}
                   value={data.code}
                 >
@@ -237,7 +243,7 @@ export default function StickyHeadTable({ props }) {
             type="submit"
             variant="contained"
             disabled={
-              mergreData.sort_agent === "" || mergreData.toMmtTray === ""
+              mergreData.sort_agent === "" || mergreData.toTray === ""
             }
             style={{ backgroundColor: "green" }}
             onClick={(e) => {
@@ -261,72 +267,88 @@ export default function StickyHeadTable({ props }) {
             mb: 2,
           }}
         >
-          <Paper sx={{ width: "100%", overflow: "hidden" }}>
-            <TableContainer>
-              <Table
-                style={{ width: "100%" }}
-                id="example"
-                P
-                stickyHeader
-                aria-label="sticky table"
+          {loading === false ? (
+            <Container>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  flexDirection: "column",
+                  pt: 30,
+                }}
               >
-                <TableHead>
-                  <TableRow>
-                    <TableCell>S.NO</TableCell>
-                    <TableCell>Tray Id</TableCell>
-                    <TableCell>Quantity</TableCell>
-                    <TableCell>Tray Type</TableCell>
-                    <TableCell>Status</TableCell>
-                    <TableCell>Closed Time Warehouse</TableCell>
-                    <TableCell>Action</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {mmtTray.map((data, index) => (
-                    <TableRow hover role="checkbox" tabIndex={-1}>
-                      <TableCell>{index + 1}</TableCell>
-                      <TableCell>{data.code}</TableCell>
-                      <TableCell>
-                        {data.items.length + "/" + data.limit}
-                      </TableCell>
-                      <TableCell>{data.type_taxanomy}</TableCell>
-                      <TableCell>{data.sort_id}</TableCell>
-                      <TableCell>
-                        {new Date(data.closed_time_wharehouse).toLocaleString(
-                          "en-GB",
-                          { hour12: true }
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          sx={{ m: 1 }}
-                          type="submit"
-                          variant="contained"
-                          style={{ backgroundColor: "#206CE2" }}
-                          onClick={(e) => {
-                            handelViewTray(e, data.code);
-                          }}
-                        >
-                          View
-                        </Button>
-                        <Button
-                          sx={{ m: 1 }}
-                          type="submit"
-                          variant="contained"
-                          style={{ backgroundColor: "green" }}
-                          onClick={(e) => {
-                            handelMerge(e, data.code, data.items.length);
-                          }}
-                        >
-                          Merge
-                        </Button>
-                      </TableCell>
+                <CircularProgress />
+                <p style={{ paddingTop: "10px" }}>Loading...</p>
+              </Box>
+            </Container>
+          ) : (
+            <Paper sx={{ width: "100%", overflow: "hidden" }}>
+              <TableContainer>
+                <Table
+                  style={{ width: "100%" }}
+                  id="example"
+                  P
+                  stickyHeader
+                  aria-label="sticky table"
+                >
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>S.NO</TableCell>
+                      <TableCell>Tray Id</TableCell>
+                      <TableCell>Quantity</TableCell>
+                      <TableCell>Tray Type</TableCell>
+                      <TableCell>Status</TableCell>
+                      <TableCell>Closed Time Warehouse</TableCell>
+                      <TableCell>Action</TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Paper>
+                  </TableHead>
+                  <TableBody>
+                    {mmtTray.map((data, index) => (
+                      <TableRow hover role="checkbox" tabIndex={-1}>
+                        <TableCell>{index + 1}</TableCell>
+                        <TableCell>{data.code}</TableCell>
+                        <TableCell>
+                          {data.items.length + "/" + data.limit}
+                        </TableCell>
+                        <TableCell>{data.type_taxanomy}</TableCell>
+                        <TableCell>{data.sort_id}</TableCell>
+                        <TableCell>
+                          {new Date(data.closed_time_wharehouse).toLocaleString(
+                            "en-GB",
+                            { hour12: true }
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            sx={{ m: 1 }}
+                            type="submit"
+                            variant="contained"
+                            style={{ backgroundColor: "#206CE2" }}
+                            onClick={(e) => {
+                              handelViewTray(e, data.code);
+                            }}
+                          >
+                            View
+                          </Button>
+                          <Button
+                            sx={{ m: 1 }}
+                            type="submit"
+                            variant="contained"
+                            style={{ backgroundColor: "green" }}
+                            onClick={(e) => {
+                              handelMerge(e, data.code, data.items.length);
+                            }}
+                          >
+                            Merge
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Paper>
+          )}
         </Box>
       </Box>
     </>
