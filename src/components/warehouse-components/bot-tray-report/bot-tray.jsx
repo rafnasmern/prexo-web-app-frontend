@@ -26,7 +26,26 @@ export default function StickyHeadTable({ props }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    dataTableFun();
+    try {
+      const fetchData = async () => {
+        setLoading(true);
+        let admin = localStorage.getItem("prexo-authentication");
+        if (admin) {
+          let { location } = jwt_decode(admin);
+          let res = await axiosWarehouseIn.post(
+            "/getBotTrayReportScreen/" + location
+          );
+          if (res.status === 200) {
+            setBotTray(res.data.data);
+            setLoading(false);
+            dataTableFun();
+          }
+        }
+      };
+      fetchData();
+    } catch (error) {
+      alert(error);
+    }
   }, []);
 
   const handelSearch = async (e) => {
@@ -62,13 +81,17 @@ export default function StickyHeadTable({ props }) {
       scrollX: true,
     });
   }
-  const handelViewTray = (e, muic) => {
+  const handelViewTray = (e, id) => {
     e.preventDefault();
-    navigate("/bot-tray-report-details/" + trayId + "/" + muic);
+    navigate("/tray-details/" + id);
   };
+  // const handelViewTray = (e, muic) => {
+  //   e.preventDefault();
+  //   navigate("/bot-tray-report-details/" + trayId + "/" + muic);
+  // };
   return (
     <>
-      <Box
+      {/* <Box
         sx={{
           float: "left",
           mt: 10,
@@ -106,13 +129,13 @@ export default function StickyHeadTable({ props }) {
             Search
           </Button>
         </Box>
-      </Box>
+      </Box> */}
       <Box
         sx={{
           top: { sm: 60, xs: 20 },
           left: { sm: 250 },
           m: 3,
-          mt: 2,
+          mt: 12,
           display: "flex",
           flexDirection: "cloumn",
           justifyContent: "center",
@@ -128,11 +151,11 @@ export default function StickyHeadTable({ props }) {
               <TableHead>
                 <TableRow>
                   <TableCell>Record.NO</TableCell>
-                  <TableCell>MUIC</TableCell>
-                  <TableCell>Brand Name</TableCell>
-                  <TableCell>Model Name</TableCell>
-                  <TableCell>Units</TableCell>
-                  <TableCell>Open WHT</TableCell>
+                  <TableCell>Tray Id</TableCell>
+                  <TableCell>Quantity</TableCell>
+                  <TableCell>Agent Name</TableCell>
+                  <TableCell>Status</TableCell>
+                  <TableCell>SKU Count</TableCell>
                   <TableCell>Actions</TableCell>
                 </TableRow>
               </TableHead>
@@ -140,13 +163,26 @@ export default function StickyHeadTable({ props }) {
                 {botTray.map((data, index) => (
                   <TableRow hover role="checkbox" tabIndex={-1}>
                     <TableCell>{index + 1}</TableCell>
-                    <TableCell>{data.muic}</TableCell>
-                    <TableCell>{data.brand}</TableCell>
-                    <TableCell>{data.model}</TableCell>
-                    <TableCell>{data.item.length}</TableCell>
-                    <TableCell>{data.wht_tray?.join(", ")}</TableCell>
-
+                    <TableCell>{data.code}</TableCell>
                     <TableCell>
+                      {data.items.length}/ {data.limit}
+                    </TableCell>
+                    <TableCell>{data.issued_user_name}</TableCell>
+                    <TableCell>{data.sort_id}</TableCell>
+                    <TableCell>{data.temp_array.length}</TableCell>
+                    <TableCell>
+                      <Button
+                        sx={{
+                          m: 1,
+                        }}
+                        variant="contained"
+                        style={{ backgroundColor: "#206CE2" }}
+                        onClick={(e) => {
+                          handelViewTray(e, data.code);
+                        }}
+                      >
+                        View Item
+                      </Button>
                       <Button
                         sx={{
                           m: 1,
@@ -157,7 +193,7 @@ export default function StickyHeadTable({ props }) {
                           handelViewTray(e, data.muic);
                         }}
                       >
-                        Details
+                        Sku Summery
                       </Button>
                     </TableCell>
                   </TableRow>
