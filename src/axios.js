@@ -1,6 +1,6 @@
 import axios from "axios";
 export const axiosSuperAdminPrexo = axios.create({
-  baseURL: "http://localhost:8000/api/v1/superAdmin",
+  baseURL: "http://prexo-v2-uat-adminapi.dealsdray.com/api/v1/superAdmin",
   headers: { "x-access-token": localStorage.getItem("prexo-authentication") },
 });
 export const axiosMisUser = axios.create({
