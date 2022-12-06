@@ -242,9 +242,7 @@ export default function StickyHeadTable({ props }) {
           <Button
             type="submit"
             variant="contained"
-            disabled={
-              mergreData.sort_agent === "" || mergreData.toTray === ""
-            }
+            disabled={mergreData.sort_agent === "" || mergreData.toTray === ""}
             style={{ backgroundColor: "green" }}
             onClick={(e) => {
               handelSendRequest(e);
