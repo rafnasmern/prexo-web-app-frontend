@@ -139,7 +139,7 @@ export default function DialogBox() {
       if (admin) {
         let obj = {
           toTray: trayId,
-          fromTray: employeeData[0].from_mmt_merge,
+          fromTray: employeeData[0].from_merge,
         };
         let res = await axiosWarehouseIn.post("/mergeDoneMmttrayClose", obj);
         if (res.status === 200) {
@@ -432,7 +432,7 @@ export default function DialogBox() {
                   }}
                   {...label}
                 />
-                <label>{employeeData[0].from_mmt_merge} - Release</label>
+                <label>{employeeData[0].from_merge} - Release</label>
               </>
 
               <Button
