@@ -96,38 +96,23 @@ export default function DialogBox() {
   };
   /************************************************************************** */
   const addActualitem = async (uic) => {
-    if (
-      employeeData[0]?.actual_items?.filter(function (item) {
-        return item.status == "Valid";
-      }).length +
-        employeeData[0]?.actual_items?.filter(function (item) {
-          return item.status == "Invalid";
-        }).length >=
-      employeeData[0].limit
-    ) {
-      alert("Bag Is Full");
-    } else {
-      let data = employeeData[0]?.items?.filter(function (item) {
-        return item.awbn_number == uic.awbn_number;
-      });
-      try {
-        let obj = {
-          bag_id: trayId,
-          awbn_number: uic.awbn_number,
-          order_id: uic.order_id,
-          order_date: uic.order_date,
-          uic: uic.uic,
-          stock_in: new Date(),
-          status: data[0].status,
-        };
-        let res = await axiosWarehouseIn.post("/addActualitem", obj);
-        if (res?.status == 200) {
-          setAwbn("");
-          getitem();
-        }
-      } catch (error) {
-        alert(error);
+    try {
+      let obj = {
+        bag_id: trayId,
+        awbn_number: uic.awbn_number,
+        order_id: uic.order_id,
+        order_date: uic.order_date,
+        uic: uic.uic,
+        stock_in: new Date(),
+        status: data[0].status,
+      };
+      let res = await axiosWarehouseIn.post("/addActualitem", obj);
+      if (res?.status == 200) {
+        setAwbn("");
+        getitem();
       }
+    } catch (error) {
+      alert(error);
     }
   };
   /************************************************************************** */
