@@ -167,7 +167,7 @@ export default function StickyHeadTable({ props }) {
   const handelSendRequest = async (e) => {
     e.preventDefault();
     try {
-      let res = await axiosMisUser.post("/TrayMergeRequestSend", mergreData);
+      let res = await axiosMisUser.post("/mmtTrayMergeRequestSend", mergreData);
       if (res.status === 200) {
         alert(res.data.message);
         window.location.reload(false);
