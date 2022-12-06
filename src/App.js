@@ -22,6 +22,7 @@ import AuditTray from "./pages/super-admin-pages/audit-tray-page";
 import ItemTracking from "./pages/super-admin-pages/item-tracking-page";
 import Warehouse from "./pages/super-admin-pages/warehouse";
 import ReadyForCharging from "./pages/super-admin-pages/ready-for-charging";
+import MastersEditHistory from "./pages/super-admin-pages/masters-edit-history";
 
 /*--------------------------------------------------------------------------------------------
 MIS
@@ -109,7 +110,7 @@ import MmtFromAndToTrayView from "./pages/warehouse-page/mmt-merge-approve/from-
 import ReturnFromMmtMerge from "./pages/warehouse-page/return-from-merge/view-tray";
 import ReturnFromMergeMmtTrayClose from "./pages/warehouse-page/return-from-merge/mmt-tray-close";
 import InusePmtMmt from "./pages/warehouse-page/inuse-pmt-mmt/inuse-pmt-mmt";
-import SkuSummeryBot from "./pages/warehouse-page/bot-tray-report/sku-summery"
+import SkuSummeryBot from "./pages/warehouse-page/bot-tray-report/sku-summery";
 /**********************************CHARGING PANEL************************************* */
 import ChargingPanelDashboard from "./pages/charging-pages/charging-dashboard";
 import ViewAssignedTrayCharging from "./pages/charging-pages/view-assigned-tray";
@@ -357,6 +358,10 @@ function App() {
           <Route path="/ready-for-charging" element={<ReadyForCharging />} />
           <Route path="/inuse-pmt-mmt" element={<InusePmtMmt />} />
           <Route path="/bot-sku-summery/:trayId" element={<SkuSummeryBot />} />
+          <Route
+            path="/tray-edit-history/:trayId"
+            element={<MastersEditHistory />}
+          />
         </Routes>
       </BrowserRouter>
     </>
