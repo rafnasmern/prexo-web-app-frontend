@@ -108,7 +108,7 @@ export default function StickyHeadTable({ props }) {
                       <TableCell>{data.name}</TableCell>
                       <TableCell>
                         {" "}
-                        {data.actual_items.length}/{data.limit}
+                        {data.items.length}/{data.limit}
                       </TableCell>
                       <TableCell>{data.display}</TableCell>
                       <TableCell>{data.sort_id}</TableCell>

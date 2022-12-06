@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import MUIDataTable from "mui-datatables";
+// import MUIDataTable from "mui-datatables";
 import {
   TableCell,
   Paper,
@@ -189,6 +189,7 @@ export default function CustomizedMenus() {
     $("#example").DataTable({
       destroy: true,
       scrollX: true,
+      deferRender:true
       // paging: false,
       // ordering: false,
       // info: false,
@@ -543,7 +544,7 @@ const options = {
                 <MenuItem value="tracking_id">Tracking ID</MenuItem>
               </Select>
             </FormControl> */}
-            <TextField
+            {/* <TextField
               onChange={(e) => {
                 searchTrackItem(e);
               }}
@@ -551,7 +552,7 @@ const options = {
               variant="outlined"
               fullWidth
               sx={{ m: 2 }}
-            />
+            /> */}
           </Box>
         </Box>
       </Box>
@@ -570,37 +571,37 @@ const options = {
           </Box>
         </Container>
       ) : (
-        // <Paper sx={{ overflow: "hidden", mt: 2, mb: 2 }}>
-        //   <TableContainer>
-        //     {tableData}
-        //     {/* <TableFooter>
-        //       <TableRow>
-        //         <TablePagination
-        //           rowsPerPageOptions={[10, 50, 100]}
-        //           colSpan={3}
-        //           count={count}
-        //           rowsPerPage={rowsPerPage}
-        //           page={page}
-        //           SelectProps={{
-        //             inputProps: {
-        //               "aria-label": "rows per page",
-        //             },
-        //             native: true,
-        //           }}
-        //           onPageChange={handleChangePage}
-        //           onRowsPerPageChange={handleChangeRowsPerPage}
-        //           ActionsComponent={TablePaginationActions}
-        //         />
-        //       </TableRow>
-        //     </TableFooter> */}
-        //   </TableContainer>
-        // </Paper>
-        <MUIDataTable
-          title={"Employee List"}
-          data={data}
-          columns={columns}
-          options={options}
-        />
+        <Paper sx={{ overflow: "hidden", mt: 2, mb: 2 }}>
+          <TableContainer>
+            {tableData}
+            <TableFooter>
+              <TableRow>
+                <TablePagination
+                  rowsPerPageOptions={[10, 50, 100]}
+                  colSpan={3}
+                  count={count}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  SelectProps={{
+                    inputProps: {
+                      "aria-label": "rows per page",
+                    },
+                    native: true,
+                  }}
+                  onPageChange={handleChangePage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                  ActionsComponent={TablePaginationActions}
+                />
+              </TableRow>
+            </TableFooter>
+          </TableContainer>
+        </Paper>
+        // <MUIDataTable
+        //   title={"Employee List"}
+        //   data={data}
+        //   columns={columns}
+        //   options={options}
+        // />
       )}
     </>
   );
