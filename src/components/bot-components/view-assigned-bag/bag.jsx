@@ -487,7 +487,7 @@ export default function DialogBox() {
                   alt="No product image"
                   src={
                     awabnDetails?.[0]?.products.image == undefined
-                      ? "https://prexo-v1-dev-api.dealsdray.com/product/image/" +
+                      ? "http://prexo-v2-uat-adminapi.dealsdray.com/product/image/" +
                         awabnDetails?.[0]?.products.vendor_sku_id +
                         ".jpg"
                       : awabnDetails?.[0]?.products.image
