@@ -77,7 +77,7 @@ export default function StickyHeadTable({ props }) {
         if (res.status == 200) {
           alert(res.data.message);
           setLoading(false);
-          navigate("/mmt-merge-request");
+          navigate("/tray-merge-request");
         }
       } else {
         setLoading(false);
