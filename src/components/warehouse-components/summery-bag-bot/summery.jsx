@@ -11,11 +11,7 @@ import {
   Box,
   Dialog,
 } from "@mui/material";
-import {
-  axiosMisUser,
-  axiosSuperAdminPrexo,
-  axiosWarehouseIn,
-} from "../../../axios";
+import { axiosWarehouseIn } from "../../../axios";
 //Datatable Modules
 import $ from "jquery";
 import "datatables.net";
@@ -31,11 +27,12 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 
 export default function StickyHeadTable({ props }) {
   const [bot, setBot] = useState([]);
+  const navigate = useNavigate();
   const { bagId } = useParams();
 
   useEffect(() => {
+    const fetchData = async () => {
     try {
-      const fetchData = async () => {
         let botTray = await axiosWarehouseIn.post(
           "/summeryBotTrayBag/" + bagId
         );
@@ -43,11 +40,16 @@ export default function StickyHeadTable({ props }) {
           setBot(botTray.data.data);
           dataTableFun();
         }
-      };
-      fetchData();
-    } catch (error) {
-      alert(error);
-    }
+      } catch (error) {
+        if (error.response.status === 403) {
+          alert(error.response.data.message);
+          navigate(-1);
+        } else {
+          alert(error);
+        }
+      }
+    };
+    fetchData();
   }, []);
 
   function dataTableFun() {

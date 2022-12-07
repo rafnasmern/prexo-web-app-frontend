@@ -28,19 +28,16 @@ export default function DialogBox() {
   const [uic, setUic] = useState("");
   const [loading, setLoading] = useState(false);
   const [description, setDescription] = useState([]);
-  const [pageLoading, setPageLoading] = useState(false);
   /*********************************************************** */
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setPageLoading(false);
         let response = await axiosWarehouseIn.post(
           "/charging-done-recieved/" + trayId
         );
         if (response.status === 200) {
           setTrayData(response.data.data);
-          setPageLoading(true);
         }
       } catch (error) {
         if (error.response.status === 403) {
@@ -132,245 +129,223 @@ export default function DialogBox() {
   const label = { inputProps: { "aria-label": "Checkbox demo" } };
   return (
     <>
-      {pageLoading === false ? (
-        <Container>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              flexDirection: "column",
-              pt: 30,
-            }}
-          >
-            <CircularProgress />
-            <p style={{ paddingTop: "10px" }}>Loading...</p>
-          </Box>
-        </Container>
-      ) : (
-        <>
-          <Box
-            sx={{
-              mt: 11,
-              height: 70,
-              borderRadius: 1,
-            }}
-          >
+      <Box
+        sx={{
+          mt: 11,
+          height: 70,
+          borderRadius: 1,
+        }}
+      >
+        <Box
+          sx={{
+            float: "left",
+          }}
+        >
+          <h6 style={{ marginLeft: "13px" }}>Tray ID - {trayId}</h6>
+          <h6 style={{ marginLeft: "13px" }}>
+            AGENT NAME - {trayData?.issued_user_name}
+          </h6>
+        </Box>
+        <Box
+          sx={{
+            float: "right",
+          }}
+        >
+          <h6 style={{ marginRight: "13px" }}>
+            Closed On --{" "}
+            {new Date(trayData?.closed_time_bot).toLocaleString("en-GB", {
+              hour12: true,
+            })}
+          </h6>
+          <h6 style={{ marginRight: "13px" }}>Brand -- {trayData?.brand}</h6>
+          <h6 style={{ marginRight: "13px" }}>Model -- {trayData?.model}</h6>
+        </Box>
+      </Box>
+      <Grid container spacing={1}>
+        <Grid item xs={6}>
+          <Paper sx={{ width: "95%", overflow: "hidden", m: 1 }}>
+            <h6>Expected</h6>
             <Box
               sx={{
-                float: "left",
+                display: "flex",
+                justifyContent: "end",
               }}
             >
-              <h6 style={{ marginLeft: "13px" }}>Tray ID - {trayId}</h6>
-              <h6 style={{ marginLeft: "13px" }}>
-                AGENT NAME - {trayData?.issued_user_name}
-              </h6>
-            </Box>
-            <Box
-              sx={{
-                float: "right",
-              }}
-            >
-              <h6 style={{ marginRight: "13px" }}>
-                Closed On --{" "}
-                {new Date(trayData?.closed_time_bot).toLocaleString("en-GB", {
-                  hour12: true,
-                })}
-              </h6>
-              <h6 style={{ marginRight: "13px" }}>
-                Brand -- {trayData?.brand}
-              </h6>
-              <h6 style={{ marginRight: "13px" }}>
-                Model -- {trayData?.model}
-              </h6>
-            </Box>
-          </Box>
-          <Grid container spacing={1}>
-            <Grid item xs={6}>
-              <Paper sx={{ width: "95%", overflow: "hidden", m: 1 }}>
-                <h6>Expected</h6>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "end",
-                  }}
-                >
-                  <Box
-                    sx={{
-                      m: 2,
-                    }}
-                  >
-                    <Box sx={{}}>
-                      <h5>Total</h5>
-                      <p style={{ paddingLeft: "5px", fontSize: "22px" }}>
-                        {trayData?.actual_items?.length}/{trayData?.limit}
-                      </p>
-                    </Box>
-                  </Box>
-                  <Box
-                    sx={{
-                      m: 2,
-                    }}
-                  >
-                    <Box sx={{}}>
-                      <h5>Valid</h5>
-                      <p style={{ marginLeft: "14px", fontSize: "24px" }}>
-                        {trayData?.actual_items?.length}
-                      </p>
-                    </Box>
-                  </Box>
-                </Box>
-                <TableContainer>
-                  <Table
-                    style={{ width: "100%" }}
-                    id="example"
-                    stickyHeader
-                    aria-label="sticky table"
-                  >
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>S.NO</TableCell>
-                        <TableCell>UIC</TableCell>
-                        <TableCell>MUIC</TableCell>
-                        <TableCell>IMEI</TableCell>
-                        <TableCell>Brand Name</TableCell>
-                        <TableCell>Model Name</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {trayData?.actual_items?.map((data, index) => (
-                        <TableRow hover role="checkbox" tabIndex={-1}>
-                          <TableCell>{index + 1}</TableCell>
-                          <TableCell>{data?.uic}</TableCell>
-                          <TableCell>{data?.muic}</TableCell>
-                          <TableCell>{data?.imei}</TableCell>
-                          <TableCell>{data?.brand_name}</TableCell>
-                          <TableCell>{data?.model_name}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Paper>
-            </Grid>
-            <Grid item xs={6}>
-              <Paper sx={{ width: "98%", overflow: "hidden", m: 1 }}>
-                <h6>ACTUAL</h6>
-                <TextField
-                  sx={{ mt: 1 }}
-                  id="outlined-password-input"
-                  type="text"
-                  name="doorsteps_diagnostics"
-                  label="Please Enter UIC"
-                  value={uic}
-                  // onChange={(e) => setAwbn(e.target.value)}
-                  onChange={(e) => {
-                    setUic(e.target.value);
-                    handelUic(e);
-                  }}
-                  inputProps={{
-                    style: {
-                      width: "auto",
-                    },
-                  }}
-                />
-
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "end",
-                  }}
-                >
-                  <Box
-                    sx={{
-                      m: 2,
-                    }}
-                  >
-                    <Box sx={{}}>
-                      <h5>Total</h5>
-                      <p style={{ marginLeft: "5px", fontSize: "24px" }}>
-                        {trayData?.items?.length}/{trayData?.limit}
-                      </p>
-                    </Box>
-                  </Box>
-                  <Box
-                    sx={{
-                      m: 2,
-                    }}
-                  >
-                    <Box sx={{}}>
-                      <h5>Valid</h5>
-                      <p style={{ marginLeft: "19px", fontSize: "24px" }}>
-                        {trayData?.items?.length}
-                      </p>
-                    </Box>
-                  </Box>
-                </Box>
-                <TableContainer>
-                  <Table
-                    style={{ width: "100%" }}
-                    id="example"
-                    stickyHeader
-                    aria-label="sticky table"
-                  >
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>S.NO</TableCell>
-                        <TableCell>UIC</TableCell>
-                        <TableCell>MUIC</TableCell>
-                        <TableCell>IMEI</TableCell>
-                        <TableCell>Brand Name</TableCell>
-                        <TableCell>Model Name</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {trayData?.items?.map((data, index) => (
-                        <TableRow hover role="checkbox" tabIndex={-1}>
-                          <TableCell>{index + 1}</TableCell>
-                          <TableCell>{data?.uic}</TableCell>
-                          <TableCell>{data?.muic}</TableCell>
-                          <TableCell>{data?.imei}</TableCell>
-                          <TableCell>{data?.brand_name}</TableCell>
-                          <TableCell>{data?.model_name}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Paper>
-            </Grid>
-          </Grid>
-          <div style={{ float: "right" }}>
-            <Box sx={{ float: "right" }}>
-              <textarea
-                onChange={(e) => {
-                  setDescription(e.target.value);
-                }}
-                style={{ width: "400px" }}
-                placeholder="Description"
-              ></textarea>
-
-              <Button
-                sx={{ m: 3, mb: 9 }}
-                variant="contained"
-                disabled={
-                  trayData?.items?.length == trayData?.actual_items?.length ||
-                  loading == false
-                    ? false
-                    : true
-                }
-                style={{ backgroundColor: "green" }}
-                onClick={(e) => {
-                  if (window.confirm("You Want to Close?")) {
-                    handelIssue(e);
-                  }
+              <Box
+                sx={{
+                  m: 2,
                 }}
               >
-                Tray Close
-              </Button>
+                <Box sx={{}}>
+                  <h5>Total</h5>
+                  <p style={{ paddingLeft: "5px", fontSize: "22px" }}>
+                    {trayData?.actual_items?.length}/{trayData?.limit}
+                  </p>
+                </Box>
+              </Box>
+              <Box
+                sx={{
+                  m: 2,
+                }}
+              >
+                <Box sx={{}}>
+                  <h5>Valid</h5>
+                  <p style={{ marginLeft: "14px", fontSize: "24px" }}>
+                    {trayData?.actual_items?.length}
+                  </p>
+                </Box>
+              </Box>
             </Box>
-          </div>
-        </>
-      )}
+            <TableContainer>
+              <Table
+                style={{ width: "100%" }}
+                id="example"
+                stickyHeader
+                aria-label="sticky table"
+              >
+                <TableHead>
+                  <TableRow>
+                    <TableCell>S.NO</TableCell>
+                    <TableCell>UIC</TableCell>
+                    <TableCell>MUIC</TableCell>
+                    <TableCell>IMEI</TableCell>
+                    <TableCell>Brand Name</TableCell>
+                    <TableCell>Model Name</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {trayData?.actual_items?.map((data, index) => (
+                    <TableRow hover role="checkbox" tabIndex={-1}>
+                      <TableCell>{index + 1}</TableCell>
+                      <TableCell>{data?.uic}</TableCell>
+                      <TableCell>{data?.muic}</TableCell>
+                      <TableCell>{data?.imei}</TableCell>
+                      <TableCell>{data?.brand_name}</TableCell>
+                      <TableCell>{data?.model_name}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Paper>
+        </Grid>
+        <Grid item xs={6}>
+          <Paper sx={{ width: "98%", overflow: "hidden", m: 1 }}>
+            <h6>ACTUAL</h6>
+            <TextField
+              sx={{ mt: 1 }}
+              id="outlined-password-input"
+              type="text"
+              name="doorsteps_diagnostics"
+              label="Please Enter UIC"
+              value={uic}
+              // onChange={(e) => setAwbn(e.target.value)}
+              onChange={(e) => {
+                setUic(e.target.value);
+                handelUic(e);
+              }}
+              inputProps={{
+                style: {
+                  width: "auto",
+                },
+              }}
+            />
+
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "end",
+              }}
+            >
+              <Box
+                sx={{
+                  m: 2,
+                }}
+              >
+                <Box sx={{}}>
+                  <h5>Total</h5>
+                  <p style={{ marginLeft: "5px", fontSize: "24px" }}>
+                    {trayData?.items?.length}/{trayData?.limit}
+                  </p>
+                </Box>
+              </Box>
+              <Box
+                sx={{
+                  m: 2,
+                }}
+              >
+                <Box sx={{}}>
+                  <h5>Valid</h5>
+                  <p style={{ marginLeft: "19px", fontSize: "24px" }}>
+                    {trayData?.items?.length}
+                  </p>
+                </Box>
+              </Box>
+            </Box>
+            <TableContainer>
+              <Table
+                style={{ width: "100%" }}
+                id="example"
+                stickyHeader
+                aria-label="sticky table"
+              >
+                <TableHead>
+                  <TableRow>
+                    <TableCell>S.NO</TableCell>
+                    <TableCell>UIC</TableCell>
+                    <TableCell>MUIC</TableCell>
+                    <TableCell>IMEI</TableCell>
+                    <TableCell>Brand Name</TableCell>
+                    <TableCell>Model Name</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {trayData?.items?.map((data, index) => (
+                    <TableRow hover role="checkbox" tabIndex={-1}>
+                      <TableCell>{index + 1}</TableCell>
+                      <TableCell>{data?.uic}</TableCell>
+                      <TableCell>{data?.muic}</TableCell>
+                      <TableCell>{data?.imei}</TableCell>
+                      <TableCell>{data?.brand_name}</TableCell>
+                      <TableCell>{data?.model_name}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Paper>
+        </Grid>
+      </Grid>
+      <div style={{ float: "right" }}>
+        <Box sx={{ float: "right" }}>
+          <textarea
+            onChange={(e) => {
+              setDescription(e.target.value);
+            }}
+            style={{ width: "400px" }}
+            placeholder="Description"
+          ></textarea>
+
+          <Button
+            sx={{ m: 3, mb: 9 }}
+            variant="contained"
+            disabled={
+              trayData?.items?.length == trayData?.actual_items?.length ||
+              loading == false
+                ? false
+                : true
+            }
+            style={{ backgroundColor: "green" }}
+            onClick={(e) => {
+              if (window.confirm("You Want to Close?")) {
+                handelIssue(e);
+              }
+            }}
+          >
+            Tray Close
+          </Button>
+        </Box>
+      </div>
     </>
   );
 }

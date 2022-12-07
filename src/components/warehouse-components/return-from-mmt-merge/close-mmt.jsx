@@ -179,285 +179,257 @@ export default function DialogBox() {
 
   return (
     <>
-      {pageLoading === false ? (
-        <Container>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              flexDirection: "column",
-              pt: 30,
-            }}
-          >
-            <CircularProgress />
-            <p style={{ paddingTop: "10px" }}>Loading...</p>
-          </Box>
-        </Container>
-      ) : (
-        <>
-          <Box
-            sx={{
-              mt: 11,
-              height: 70,
-              borderRadius: 1,
-            }}
-          >
+      <Box
+        sx={{
+          mt: 11,
+          height: 70,
+          borderRadius: 1,
+        }}
+      >
+        <Box
+          sx={{
+            float: "left",
+          }}
+        >
+          <h6 style={{ marginLeft: "13px" }}>Tray ID - {trayId}</h6>
+          <h6 style={{ marginLeft: "13px" }}>
+            AGENT NAME - {employeeData[0]?.issued_user_name}
+          </h6>
+        </Box>
+        <Box
+          sx={{
+            float: "right",
+          }}
+        >
+          <h6 style={{ marginRight: "13px" }}>
+            Closed On --{" "}
+            {new Date(
+              employeeData[0]?.closed_time_sorting_agent
+            ).toLocaleString("en-GB", { hour12: true })}
+          </h6>
+        </Box>
+      </Box>
+      <Grid container spacing={1}>
+        <Grid item xs={6}>
+          <Paper sx={{ width: "95%", overflow: "hidden", m: 1 }}>
+            <h6>Expected</h6>
+
             <Box
               sx={{
-                float: "left",
+                display: "flex",
+                justifyContent: "end",
               }}
             >
-              <h6 style={{ marginLeft: "13px" }}>Tray ID - {trayId}</h6>
-              <h6 style={{ marginLeft: "13px" }}>
-                AGENT NAME - {employeeData[0]?.issued_user_name}
-              </h6>
-            </Box>
-            <Box
-              sx={{
-                float: "right",
-              }}
-            >
-              <h6 style={{ marginRight: "13px" }}>
-                Closed On --{" "}
-                {new Date(
-                  employeeData[0]?.closed_time_sorting_agent
-                ).toLocaleString("en-GB", { hour12: true })}
-              </h6>
-            </Box>
-          </Box>
-          <Grid container spacing={1}>
-            <Grid item xs={6}>
-              <Paper sx={{ width: "95%", overflow: "hidden", m: 1 }}>
-                <h6>Expected</h6>
-
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "end",
-                  }}
-                >
-                  <Box
-                    sx={{
-                      m: 2,
-                    }}
-                  >
-                    <Box sx={{}}>
-                      <h5>Total</h5>
-                      <p style={{ paddingLeft: "5px", fontSize: "22px" }}>
-                        {
-                          employeeData[0]?.items?.filter(function (item) {
-                            return item.status != "Duplicate";
-                          }).length
-                        }
-                        /{employeeData[0]?.limit}
-                      </p>
-                    </Box>
-                  </Box>
-                </Box>
-                <TableContainer>
-                  <Table
-                    style={{ width: "100%" }}
-                    id="example"
-                    stickyHeader
-                    aria-label="sticky table"
-                  >
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>S.NO</TableCell>
-                        <TableCell>UIC</TableCell>
-                        <TableCell>Bag Id</TableCell>
-                        {/* <TableCell>AWBN Number</TableCell> */}
-                        <TableCell>Order ID</TableCell>
-                        <TableCell>Order Date</TableCell>
-                        <TableCell>Status</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {employeeData[0]?.items?.map((data, index) => (
-                        <TableRow hover role="checkbox" tabIndex={-1}>
-                          <TableCell>{index + 1}</TableCell>
-                          <TableCell>{data?.uic}</TableCell>
-                          <TableCell>{data?.bag_id}</TableCell>
-                          {/* <TableCell>{data?.awbn_number}</TableCell> */}
-                          <TableCell>{data?.order_id}</TableCell>
-                          <TableCell>
-                            {new Date(data?.order_date).toLocaleString(
-                              "en-GB",
-                              {
-                                year: "numeric",
-                                month: "2-digit",
-                                day: "2-digit",
-                              }
-                            )}
-                          </TableCell>
-                          <TableCell
-                            style={
-                              data.status == "Valid"
-                                ? { color: "green" }
-                                : { color: "red" }
-                            }
-                          >
-                            {data.status}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Paper>
-            </Grid>
-            <Grid item xs={6}>
-              <Paper sx={{ width: "98%", overflow: "hidden", m: 1 }}>
-                <h6>ACTUAL</h6>
-                <TextField
-                  sx={{ m: 1 }}
-                  id="outlined-password-input"
-                  type="text"
-                  name="doorsteps_diagnostics"
-                  label="Please Enter UIC"
-                  value={awbn}
-                  onChange={(e) => {
-                    setAwbn(e.target.value);
-                    handelAwbn(e);
-                  }}
-                  inputProps={{
-                    style: {
-                      width: "auto",
-                    },
-                  }}
-                />
-
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "end",
-                  }}
-                >
-                  <Box
-                    sx={{
-                      m: 2,
-                    }}
-                  >
-                    <Box sx={{}}>
-                      <h5>Total</h5>
-                      <p style={{ marginLeft: "5px", fontSize: "24px" }}>
-                        {
-                          employeeData[0]?.actual_items?.filter(function (
-                            item
-                          ) {
-                            return item.status != "Duplicate";
-                          }).length
-                        }
-                        /{employeeData[0]?.limit}
-                      </p>
-                    </Box>
-                  </Box>
-                </Box>
-                <TableContainer>
-                  <Table
-                    style={{ width: "100%" }}
-                    id="example"
-                    stickyHeader
-                    aria-label="sticky table"
-                  >
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>S.NO</TableCell>
-                        <TableCell>UIC</TableCell>
-                        <TableCell>Bag Id</TableCell>
-                        {/* <TableCell>AWBN Number</TableCell> */}
-                        <TableCell>Order ID</TableCell>
-                        <TableCell>Order Date</TableCell>
-                        <TableCell>Status</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {employeeData[0]?.actual_items?.map((data, index) => (
-                        <TableRow hover role="checkbox" tabIndex={-1}>
-                          <TableCell>{index + 1}</TableCell>
-                          <TableCell>{data?.uic}</TableCell>
-                          <TableCell>{data?.bag_id}</TableCell>
-                          {/* <TableCell>{data?.awbn_number}</TableCell> */}
-                          <TableCell>{data?.order_id}</TableCell>
-                          <TableCell>
-                            {new Date(data?.order_date).toLocaleString(
-                              "en-GB",
-                              {
-                                year: "numeric",
-                                month: "2-digit",
-                                day: "2-digit",
-                              }
-                            )}
-                          </TableCell>
-                          <TableCell
-                            style={
-                              data.status == "Valid"
-                                ? { color: "green" }
-                                : { color: "red" }
-                            }
-                          >
-                            {data.status}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Paper>
-            </Grid>
-          </Grid>
-          <div style={{ float: "right" }}>
-            <Box sx={{ float: "right" }}>
-              <textarea
-                onChange={(e) => {
-                  setDescription(e.target.value);
-                }}
-                style={{ width: "400px" }}
-                placeholder="Description"
-              ></textarea>
-
-              <>
-                <Checkbox
-                  checked={bagReuse}
-                  onClick={(e) => {
-                    if (
-                      window.confirm(
-                        bagReuse
-                          ? "Already Added"
-                          : "You Want to Release Tray ?"
-                      )
-                    ) {
-                      setBagReuse(true);
-                    }
-                  }}
-                  {...label}
-                />
-                <label>{employeeData[0].from_merge} - Release</label>
-              </>
-
-              <Button
-                sx={{ m: 3, mb: 9 }}
-                variant="contained"
-                style={{ backgroundColor: "green" }}
-                disabled={
-                  loading == true ||
-                  description == "" ||
-                  bagReuse == false ||
-                  employeeData[0]?.actual_items?.length !==
-                    employeeData[0]?.items?.length
-                    ? true
-                    : false
-                }
-                onClick={(e) => {
-                  handelIssue(e, employeeData[0]?.code);
+              <Box
+                sx={{
+                  m: 2,
                 }}
               >
-                Tray Close
-              </Button>
+                <Box sx={{}}>
+                  <h5>Total</h5>
+                  <p style={{ paddingLeft: "5px", fontSize: "22px" }}>
+                    {
+                      employeeData[0]?.items?.filter(function (item) {
+                        return item.status != "Duplicate";
+                      }).length
+                    }
+                    /{employeeData[0]?.limit}
+                  </p>
+                </Box>
+              </Box>
             </Box>
-          </div>
-        </>
-      )}
+            <TableContainer>
+              <Table
+                style={{ width: "100%" }}
+                id="example"
+                stickyHeader
+                aria-label="sticky table"
+              >
+                <TableHead>
+                  <TableRow>
+                    <TableCell>S.NO</TableCell>
+                    <TableCell>UIC</TableCell>
+                    <TableCell>Bag Id</TableCell>
+                    {/* <TableCell>AWBN Number</TableCell> */}
+                    <TableCell>Order ID</TableCell>
+                    <TableCell>Order Date</TableCell>
+                    <TableCell>Status</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {employeeData[0]?.items?.map((data, index) => (
+                    <TableRow hover role="checkbox" tabIndex={-1}>
+                      <TableCell>{index + 1}</TableCell>
+                      <TableCell>{data?.uic}</TableCell>
+                      <TableCell>{data?.bag_id}</TableCell>
+                      {/* <TableCell>{data?.awbn_number}</TableCell> */}
+                      <TableCell>{data?.order_id}</TableCell>
+                      <TableCell>
+                        {new Date(data?.order_date).toLocaleString("en-GB", {
+                          year: "numeric",
+                          month: "2-digit",
+                          day: "2-digit",
+                        })}
+                      </TableCell>
+                      <TableCell
+                        style={
+                          data.status == "Valid"
+                            ? { color: "green" }
+                            : { color: "red" }
+                        }
+                      >
+                        {data.status}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Paper>
+        </Grid>
+        <Grid item xs={6}>
+          <Paper sx={{ width: "98%", overflow: "hidden", m: 1 }}>
+            <h6>ACTUAL</h6>
+            <TextField
+              sx={{ m: 1 }}
+              id="outlined-password-input"
+              type="text"
+              name="doorsteps_diagnostics"
+              label="Please Enter UIC"
+              value={awbn}
+              onChange={(e) => {
+                setAwbn(e.target.value);
+                handelAwbn(e);
+              }}
+              inputProps={{
+                style: {
+                  width: "auto",
+                },
+              }}
+            />
+
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "end",
+              }}
+            >
+              <Box
+                sx={{
+                  m: 2,
+                }}
+              >
+                <Box sx={{}}>
+                  <h5>Total</h5>
+                  <p style={{ marginLeft: "5px", fontSize: "24px" }}>
+                    {
+                      employeeData[0]?.actual_items?.filter(function (item) {
+                        return item.status != "Duplicate";
+                      }).length
+                    }
+                    /{employeeData[0]?.limit}
+                  </p>
+                </Box>
+              </Box>
+            </Box>
+            <TableContainer>
+              <Table
+                style={{ width: "100%" }}
+                id="example"
+                stickyHeader
+                aria-label="sticky table"
+              >
+                <TableHead>
+                  <TableRow>
+                    <TableCell>S.NO</TableCell>
+                    <TableCell>UIC</TableCell>
+                    <TableCell>Bag Id</TableCell>
+                    {/* <TableCell>AWBN Number</TableCell> */}
+                    <TableCell>Order ID</TableCell>
+                    <TableCell>Order Date</TableCell>
+                    <TableCell>Status</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {employeeData[0]?.actual_items?.map((data, index) => (
+                    <TableRow hover role="checkbox" tabIndex={-1}>
+                      <TableCell>{index + 1}</TableCell>
+                      <TableCell>{data?.uic}</TableCell>
+                      <TableCell>{data?.bag_id}</TableCell>
+                      {/* <TableCell>{data?.awbn_number}</TableCell> */}
+                      <TableCell>{data?.order_id}</TableCell>
+                      <TableCell>
+                        {new Date(data?.order_date).toLocaleString("en-GB", {
+                          year: "numeric",
+                          month: "2-digit",
+                          day: "2-digit",
+                        })}
+                      </TableCell>
+                      <TableCell
+                        style={
+                          data.status == "Valid"
+                            ? { color: "green" }
+                            : { color: "red" }
+                        }
+                      >
+                        {data.status}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Paper>
+        </Grid>
+      </Grid>
+      <div style={{ float: "right" }}>
+        <Box sx={{ float: "right" }}>
+          <textarea
+            onChange={(e) => {
+              setDescription(e.target.value);
+            }}
+            style={{ width: "400px" }}
+            placeholder="Description"
+          ></textarea>
+
+          <>
+            <Checkbox
+              checked={bagReuse}
+              onClick={(e) => {
+                if (
+                  window.confirm(
+                    bagReuse ? "Already Added" : "You Want to Release Tray ?"
+                  )
+                ) {
+                  setBagReuse(true);
+                }
+              }}
+              {...label}
+            />
+            <label>{employeeData[0]?.from_merge} - Release</label>
+          </>
+
+          <Button
+            sx={{ m: 3, mb: 9 }}
+            variant="contained"
+            style={{ backgroundColor: "green" }}
+            disabled={
+              loading == true ||
+              description == "" ||
+              bagReuse == false ||
+              employeeData[0]?.actual_items?.length !==
+                employeeData[0]?.items?.length
+                ? true
+                : false
+            }
+            onClick={(e) => {
+              handelIssue(e, employeeData[0]?.code);
+            }}
+          >
+            Tray Close
+          </Button>
+        </Box>
+      </div>
     </>
   );
 }
