@@ -21,9 +21,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 
 export default function StickyHeadTable({ props }) {
   const [loading, setLoading] = useState(false);
-
   const navigate = useNavigate();
-
   useEffect(() => {
     const fetchData = async () => {
       setLoading(false);
@@ -82,13 +80,16 @@ export default function StickyHeadTable({ props }) {
   const handelAudit = (id) => {
     navigate("/audit-tray/" + id);
   };
+  /* VIEW MASTERS EDIT HISTORY */
+  const handelMasterEditHistory = (id) => {
+    navigate("/tray-edit-history/" + id);
+  };
   function dataTableFun() {
     $("#example").DataTable({
       destroy: true,
       scrollX: true,
     });
   }
-
   return (
     <>
       <Box>
@@ -194,6 +195,19 @@ export default function StickyHeadTable({ props }) {
                           >
                             Delete
                           </Button>
+                          {data.type_taxanomy === "WHT" ? (
+                            <Button
+                              sx={{
+                                m: 1,
+                              }}
+                              variant="contained"
+                              style={{ backgroundColor: "#21b6ae" }}
+                              component="span"
+                              onClick={() => handelMasterEditHistory(data.code)}
+                            >
+                              History
+                            </Button>
+                          ) : null}
                         </TableCell>
                       </TableRow>
                     ))}

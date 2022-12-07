@@ -155,13 +155,12 @@ export default function DialogBox() {
       .nullable(),
     type_taxanomy: Yup.string().required("Required*").nullable(),
     warehouse: Yup.string().required("Required*").nullable(),
-    limit:  Yup
-    .number("Must be number")
-    .required("Required*")
-    .positive()
-    .integer()
-    .min(1, "Minimum is 1")
-    .nullable(),
+    limit: Yup.number("Must be number")
+      .required("Required*")
+      .positive()
+      .integer()
+      .min(1, "Minimum is 1")
+      .nullable(),
     brand: Yup.string()
       .required("Required*")
       .matches(/^.*((?=.*[aA-zZ\s]){1}).*$/, "Please enter valid brand")
@@ -208,7 +207,7 @@ export default function DialogBox() {
     } catch (error) {
       setLoading(false);
       if (error.response.status == 400) {
-        handleClose()
+        handleClose();
         Swal.fire({
           position: "top-center",
           icon: "error",
@@ -234,8 +233,9 @@ export default function DialogBox() {
         model: response.data.data.model,
         brand: response.data.data.brand,
         warehouse: response.data.data.warehouse,
-        cpc:response.data.data.cpc
+        cpc: response.data.data.cpc,
       });
+      fetchModel(response.data.data.brand)
       setId(response.data.data._id);
       setEditCall(true);
       setOpen(true);
@@ -294,8 +294,8 @@ export default function DialogBox() {
     }
   };
   /* Fetch model */
-  const fetchModel = async (e, brandName) => {
-    e.preventDefault();
+  const fetchModel = async ( brandName) => {
+   
     try {
       let res = await axiosSuperAdminPrexo.post(
         "/get-product-model/" + brandName
@@ -469,6 +469,7 @@ export default function DialogBox() {
                     labelId="demo-simple-select-label"
                     label="Bag Category"
                     fullWidth
+                    defaultValue={getValues("brand")}
                     {...register("brand")}
                     error={errors.brand ? true : false}
                     helperText={errors.brand ? errors.brand.message : ""}
@@ -491,9 +492,8 @@ export default function DialogBox() {
                     Select Model
                   </InputLabel>
                   <Select
-                    labelId="demo-simple-select-label"
-                    label="Bag Category"
                     fullWidth
+                    defaultValue={getValues("model")}
                     {...register("model")}
                     error={errors.model ? true : false}
                     helperText={errors.model ? errors.model.message : ""}

@@ -90,11 +90,8 @@ export default function DialogBox() {
             let res = await axiosWarehouseIn.post("/checkAwbn", obj);
             if (res.status == 200) {
               setAwbnSuccess(true);
-              if (res.data.message == "AWBN Number Is Invalid") {
-                setValid("Invalid");
-                setAwbn("");
-                handelSubmitStock(res.data.data, "Invalid");
-              } else if (res.data.message == "AWBN Number Is Duplicate") {
+
+              if (res.data.message == "AWBN Number Is Duplicate") {
                 setValid("Duplicate");
                 setAwbn("");
                 handelSubmitStock(res.data.data, "Duplicate");
@@ -130,7 +127,7 @@ export default function DialogBox() {
             order_id: awbn.order_id,
             order_date: awbn.order_date,
             status: status,
-            sotckin_date:Date.now()
+            sotckin_date: Date.now(),
           };
           let res = await axiosWarehouseIn.post("/stockInToWarehouse", obj);
           if (res.status == 200) {
@@ -325,26 +322,6 @@ export default function DialogBox() {
                 </h6>
               </Box>
             </Box>
-            <Box
-              sx={{
-                m: 2,
-              }}
-            >
-              <Box
-                sx={{
-                  m: 2,
-                }}
-              >
-                <h4>Invalid</h4>
-                <h6 style={{ marginLeft: "29px", fontSize: "24px" }}>
-                  {
-                    employeeData[0]?.items?.filter(function (item) {
-                      return item.status == "Invalid";
-                    }).length
-                  }
-                </h6>
-              </Box>
-            </Box>{" "}
             <Box
               sx={{
                 m: 2,
