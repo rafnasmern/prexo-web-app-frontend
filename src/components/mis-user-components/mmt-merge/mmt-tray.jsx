@@ -74,8 +74,8 @@ export default function StickyHeadTable({ props }) {
   const [sortingAgent, setSortingAgent] = useState([]);
   const [toMmtTray, setToMmtTray] = useState([]);
   const [mergreData, setMergeData] = useState({
-    fromTray: "",
-    toTray: "",
+    mmtTrayFrom: "",
+    toMmtTray: "",
     sort_agent: "",
   });
 
@@ -153,7 +153,7 @@ export default function StickyHeadTable({ props }) {
           setOpen(true);
           setToMmtTray(res.data.data);
         }
-        setMergeData((p) => ({ ...p, fromTray: trayId }));
+        setMergeData((p) => ({ ...p, mmtTrayFrom: trayId }));
       }
     } catch (error) {
       if (error.response.status == 403) {
@@ -167,7 +167,7 @@ export default function StickyHeadTable({ props }) {
   const handelSendRequest = async (e) => {
     e.preventDefault();
     try {
-      let res = await axiosMisUser.post("/TrayMergeRequestSend", mergreData);
+      let res = await axiosMisUser.post("/mmtTrayMergeRequestSend", mergreData);
       if (res.status === 200) {
         alert(res.data.message);
         window.location.reload(false);
@@ -206,7 +206,7 @@ export default function StickyHeadTable({ props }) {
               {toMmtTray.map((data) => (
                 <MenuItem
                   onClick={(e) => {
-                    setMergeData((p) => ({ ...p, toTray: data.code }));
+                    setMergeData((p) => ({ ...p, toMmtTray: data.code }));
                   }}
                   value={data.code}
                 >
@@ -242,7 +242,9 @@ export default function StickyHeadTable({ props }) {
           <Button
             type="submit"
             variant="contained"
-            disabled={mergreData.sort_agent === "" || mergreData.toTray === ""}
+            disabled={
+              mergreData.sort_agent === "" || mergreData.toMmtTray === ""
+            }
             style={{ backgroundColor: "green" }}
             onClick={(e) => {
               handelSendRequest(e);

@@ -270,6 +270,7 @@ export default function StickyHeadTable({ props }) {
                             m: 1,
                           }}
                           variant="contained"
+                          disabled={data.sort_id === "Closed By Bot"}
                           style={{ backgroundColor: "#21b6ae" }}
                           onClick={(e) => {
                             handelViewSummery(e, data?.items?.[0]?.bag_id);

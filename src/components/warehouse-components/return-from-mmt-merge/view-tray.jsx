@@ -203,6 +203,7 @@ export default function StickyHeadTable({ props }) {
                     <TableCell>Quantity</TableCell>
                     <TableCell>Tray Type</TableCell>
                     <TableCell>Status</TableCell>
+                    <TableCell>BQC Done Date</TableCell>
                     <TableCell>Agent Name</TableCell>
                     <TableCell>Action</TableCell>
                   </TableRow>
@@ -217,7 +218,13 @@ export default function StickyHeadTable({ props }) {
                       </TableCell>
                       <TableCell>{data.type_taxanomy}</TableCell>
                       <TableCell>{data.sort_id}</TableCell>
-                     
+                      <TableCell>
+                        {" "}
+                        {new Date(data.closed_time_bot).toLocaleString(
+                          "en-GB",
+                          { hour12: true }
+                        )}
+                      </TableCell>
                       <TableCell>{data.issued_user_name}</TableCell>
                       <TableCell>
                         <Button

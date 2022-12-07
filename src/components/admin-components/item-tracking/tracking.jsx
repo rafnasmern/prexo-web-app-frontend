@@ -189,10 +189,10 @@ export default function CustomizedMenus() {
     $("#example").DataTable({
       destroy: true,
       scrollX: true,
-      deferRender:true
-      // paging: false,
-      // ordering: false,
-      // info: false,
+      deferRender:true,
+      paging: false,
+     
+      info: false,
     });
   }
   const columns=[{
@@ -544,7 +544,7 @@ const options = {
                 <MenuItem value="tracking_id">Tracking ID</MenuItem>
               </Select>
             </FormControl> */}
-            {/* <TextField
+            <TextField
               onChange={(e) => {
                 searchTrackItem(e);
               }}
@@ -552,7 +552,7 @@ const options = {
               variant="outlined"
               fullWidth
               sx={{ m: 2 }}
-            /> */}
+            />
           </Box>
         </Box>
       </Box>

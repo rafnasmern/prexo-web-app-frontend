@@ -38,7 +38,12 @@ export default function StickyHeadTable({ props }) {
         navigate("/");
       }
     } catch (error) {
-      alert(error);
+      if (error.response.status === 403) {
+        alert(error.response.data.message);
+        navigate(-1);
+      } else {
+        alert(error);
+      }
     }
   }, []);
 
