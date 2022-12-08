@@ -235,7 +235,7 @@ export default function DialogBox() {
         warehouse: response.data.data.warehouse,
         cpc: response.data.data.cpc,
       });
-      fetchModel(response.data.data.brand)
+      fetchModel(response.data.data.brand);
       setId(response.data.data._id);
       setEditCall(true);
       setOpen(true);
@@ -294,8 +294,7 @@ export default function DialogBox() {
     }
   };
   /* Fetch model */
-  const fetchModel = async ( brandName) => {
-   
+  const fetchModel = async (brandName) => {
     try {
       let res = await axiosSuperAdminPrexo.post(
         "/get-product-model/" + brandName
@@ -378,6 +377,9 @@ export default function DialogBox() {
                 fullWidth
                 {...register("cpc")}
                 defaultValue={getValues("cpc")}
+                disabled={
+                  getValues("type_taxanomy") == "WHT" && editCall === true
+                }
                 error={errors.cpc ? true : false}
                 helperText={errors.cpc?.message}
                 sx={{ mt: 2 }}
@@ -400,6 +402,9 @@ export default function DialogBox() {
                 labelId="demo-simple-select-label"
                 label="Warehouse"
                 fullWidth
+                disabled={
+                  getValues("type_taxanomy") == "WHT" && editCall === true
+                }
                 defaultValue={getValues("warehouse")}
                 {...register("warehouse")}
                 error={errors.warehouse ? true : false}
@@ -419,6 +424,9 @@ export default function DialogBox() {
                 labelId="demo-simple-select-label"
                 label="Bag Category"
                 fullWidth
+                disabled={
+                  getValues("type_taxanomy") == "WHT" && editCall === true
+                }
                 {...register("type_taxanomy")}
                 defaultValue={getValues("type_taxanomy")}
                 error={errors.type_taxanomy ? true : false}
@@ -479,7 +487,7 @@ export default function DialogBox() {
                       <MenuItem
                         value={brandData.brand_name}
                         onClick={(e) => {
-                          fetchModel(e, brandData.brand_name);
+                          fetchModel(brandData.brand_name);
                         }}
                       >
                         {brandData.brand_name}
@@ -535,6 +543,9 @@ export default function DialogBox() {
               variant="outlined"
               fullWidth
               {...register("name")}
+              disabled={
+                getValues("type_taxanomy") == "WHT" && editCall === true
+              }
               error={errors.name ? true : false}
               helperText={errors.name ? errors.name.message : ""}
               sx={{ mt: 2 }}
@@ -564,6 +575,9 @@ export default function DialogBox() {
               variant="outlined"
               fullWidth
               {...register("display")}
+              disabled={
+                getValues("type_taxanomy") == "WHT" && editCall === true
+              }
               error={errors.display ? true : false}
               helperText={errors.display ? errors.display.message : ""}
               sx={{ mt: 2 }}

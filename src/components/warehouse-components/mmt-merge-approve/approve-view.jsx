@@ -91,6 +91,7 @@ export default function StickyHeadTable({ props }) {
     }
   };
 
+
   return (
     <>
       <Box

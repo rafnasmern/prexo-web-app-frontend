@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useMemo } from "react";
-import { styled, alpha } from "@mui/material/styles";
+import React, { useEffect, useState } from "react";
+import { styled } from "@mui/material/styles";
 import {
   Paper,
   Table,
@@ -19,7 +19,6 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Menu,
 } from "@mui/material";
 import { axiosMisUser } from "../../../axios";
 import CloseIcon from "@mui/icons-material/Close";
@@ -65,7 +64,7 @@ BootstrapDialogTitle.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
-export default function StickyHeadTable({ props }) {
+export default function AssignToBot({ props }) {
   const [infraData, setInfraData] = useState([]);
   const [botName, setBotName] = useState("");
   const [bagId, setBagId] = useState("");
@@ -189,6 +188,7 @@ export default function StickyHeadTable({ props }) {
               >
                 {botArr.map((data) => (
                   <MenuItem
+                    key={data.user_name}
                     value={data.user_name}
                     onClick={(e) => {
                       setBotName(data.user_name);
@@ -296,80 +296,34 @@ export default function StickyHeadTable({ props }) {
                       </TableCell>
                       <TableCell>{data?.items?.length}</TableCell>
                       <TableCell>
-                        {
-                          // request == data.code && clickState == true ? (
-                          //   <Button
-                          //     type="submit"
-                          //     variant="contained"
-                          //     style={{ backgroundColor: "#206CE2" }}
-                          //     onClick={(e) => {
-                          //       {
-                          //         if (window.confirm("You Want to Send Request?"))
-                          //           handelSendRequestConfirm(e, data.code);
-                          //       }
-                          //     }}
-                          //   >
-                          //     Send Request
-                          //   </Button>
-                          // ) :
-                          data.sort_id != "Requested to Warehouse" &&
-                          data.sort_id != "Issued" &&
-                          data.sort_id != "Closed By Bot" ? (
-                            <>
-                              <Button
-                                variant="contained"
-                                // aria-controls={open ? "basic-menu" : undefined}
-                                // aria-haspopup="true"
-                                // aria-expanded={open ? "true" : undefined}
-                                // onClick={(e) => {
-                                //   handleClick(e, data.code);
-                                // }}
-                                disabled={
-                                  data.sort_id == "In Progress" ? true : false
-                                }
-                                // endIcon={<KeyboardArrowDownIcon />}
-                                onClick={(e) => {
-                                  handelClickOpen(data.code);
-                                }}
-                              >
-                                Assign To BOT
-                              </Button>
-                              {/* <Menu
-                              id="basic-menu"
-                              anchorEl={anchorEl}
-                              open={open}
-                              onClose={handleClose}
-                              MenuListProps={{
-                                "aria-labelledby": "basic-button",
-                              }}
-                            >
-                              {botArr.map((botData) => (
-                                <MenuItem
-                                  onClick={(e) => {
-                                    handelSendRequest(botData.user_name);
-                                    handleClose();
-                                  }}
-                                >
-                                  {botData.user_name}
-                                </MenuItem>
-                              ))}
-                            </Menu> */}
-                            </>
-                          ) : data.sort_id != "Issued" &&
-                            data.sort_id != "Closed By Bot" ? (
+                        {data.sort_id != "Requested to Warehouse" &&
+                        data.sort_id != "Issued" &&
+                        data.sort_id != "Closed By Bot" ? (
+                          <>
                             <Button
                               variant="contained"
-                              style={{ backgroundColor: "#206CE2" }}
-                              // onClick={
-                              //   handleSubmit(onSubmit)
-                              // }
+                              disabled={
+                                data.sort_id == "In Progress" ? true : false
+                              }
+                              // endIcon={<KeyboardArrowDownIcon />}
+                              onClick={(e) => {
+                                handelClickOpen(data.code);
+                              }}
                             >
-                              Requested
+                              Assign To BOT
                             </Button>
-                          ) : (
-                            ""
-                          )
-                        }
+                          </>
+                        ) : data.sort_id != "Issued" &&
+                          data.sort_id != "Closed By Bot" ? (
+                          <Button
+                            variant="contained"
+                            style={{ backgroundColor: "#206CE2" }}
+                          >
+                            Requested
+                          </Button>
+                        ) : (
+                          ""
+                        )}
                         <Button
                           sx={{
                             ml: 2,

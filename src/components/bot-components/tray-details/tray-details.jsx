@@ -18,7 +18,6 @@ import $ from "jquery";
 import "datatables.net";
 export default function StickyHeadTable({ props }) {
   const [infraData, setInfraData] = useState([]);
-  const [anchorEl, setAnchorEl] = React.useState(null);
   const { trayId } = useParams();
   const navigate = useNavigate();
   useEffect(() => {
@@ -104,13 +103,18 @@ export default function StickyHeadTable({ props }) {
                       <TableCell>{data.item_recieved}</TableCell>
                       <TableCell>{data.model_brand}</TableCell>
                       <TableCell>
-                        {data?.stickerOne +
-                          "," +
-                          data?.stickerTwo +
-                          "," +
-                          data?.stickerThree +
-                          "," +
-                          data?.stickerFour}
+                        {(data.stickerOne !== undefined
+                          ? data?.stickerOne + ","
+                          : "") +
+                          (data?.stickerTwo !== undefined
+                            ? data?.stickerTwo + ","
+                            : "") +
+                          (data?.stickerThree !== undefined
+                            ? data?.stickerThree + ","
+                            : "") +
+                          (data?.stickerFour !== undefined
+                            ? data?.stickerFour
+                            : "")}
                       </TableCell>
                       <TableCell>
                         {new Date(data.added_time).toLocaleString("en-GB", {

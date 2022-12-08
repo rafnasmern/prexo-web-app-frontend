@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   Box,
   Button,
@@ -11,7 +11,6 @@ import {
   TableHead,
   TableRow,
   Grid,
-  Container,
 } from "@mui/material";
 import { useParams } from "react-router-dom";
 import "yup-phone";
@@ -20,7 +19,6 @@ import { axiosWarehouseIn } from "../../../axios";
 import Checkbox from "@mui/material/Checkbox";
 // import jwt from "jsonwebtoken"
 import jwt_decode from "jwt-decode";
-import CircularProgress from "@mui/material/CircularProgress";
 
 export default function DialogBox() {
   const navigate = useNavigate();
@@ -30,6 +28,7 @@ export default function DialogBox() {
   const [awbn, setAwbn] = useState("");
   const [bagReuse, setBagReuse] = useState(false);
   const [description, setDescription] = useState([]);
+  const [bagStatus, setBagStatus] = useState(0);
   const [loading, setLoading] = useState(false);
   /******************************************************************************** */
 
@@ -53,6 +52,28 @@ export default function DialogBox() {
     };
     fetchData();
   }, []);
+  useEffect(() => {
+    const checkBagValidation = async () => {
+      try {
+        let res = await axiosWarehouseIn.post(
+          "/bagValidation/" + employeeData[0]?.items[0]?.bag_id
+        );
+        if (res.status === 200) {
+          setBagStatus(res.data.status);
+        }
+      } catch (error) {
+        if (error.response.status === 403) {
+          alert(error.response.data.message);
+        } else {
+          alert(error);
+        }
+      }
+    };
+    if (employeeData[0]?.items[0]?.bag_id !== undefined) {
+      checkBagValidation();
+    }
+  }, [employeeData]);
+  console.log(employeeData[0]?.items[0]?.bag_id);
   /******************************************************************************** */
   const getitem = async () => {
     try {
@@ -206,43 +227,9 @@ export default function DialogBox() {
   /***************************************************************************************** */
   const label = { inputProps: { "aria-label": "Checkbox demo" } };
   /******************************************************************************** */
-
-  return (
-    <>
-      <Box
-        sx={{
-          mt: 11,
-          height: 70,
-          borderRadius: 1,
-        }}
-      >
-        <Box
-          sx={{
-            float: "left",
-          }}
-        >
-          <h6 style={{ marginLeft: "13px" }}>Tray ID - {trayId}</h6>
-          <h6 style={{ marginLeft: "13px" }}>
-            AGENT NAME - {employeeData[0]?.issued_user_name}
-          </h6>
-        </Box>
-        <Box
-          sx={{
-            float: "right",
-          }}
-        >
-          <h6 style={{ marginRight: "13px" }}>
-            Closed On --{" "}
-            {new Date(employeeData[0]?.closed_time_bot).toLocaleString(
-              "en-GB",
-              { hour12: true }
-            )}
-          </h6>
-        </Box>
-      </Box>
-      <Grid container spacing={1}>
-        <Grid item xs={6}>
-          <Paper sx={{ width: "95%", overflow: "hidden", m: 1 }}>
+  const tableExpected=useMemo(()=>{
+          return (
+            <Paper sx={{ width: "95%", overflow: "hidden", m: 1 }}>
             <h6>Expected</h6>
 
             <Box
@@ -313,7 +300,6 @@ export default function DialogBox() {
                     <TableCell>S.NO</TableCell>
                     <TableCell>UIC</TableCell>
                     <TableCell>Bag Id</TableCell>
-                    {/* <TableCell>AWBN Number</TableCell> */}
                     <TableCell>Order ID</TableCell>
                     <TableCell>Order Date</TableCell>
                     <TableCell>Status</TableCell>
@@ -325,7 +311,7 @@ export default function DialogBox() {
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>{data?.uic}</TableCell>
                       <TableCell>{data?.bag_id}</TableCell>
-                      {/* <TableCell>{data?.awbn_number}</TableCell> */}
+
                       <TableCell>{data?.order_id}</TableCell>
                       <TableCell>
                         {new Date(data?.order_date).toLocaleString("en-GB", {
@@ -349,9 +335,11 @@ export default function DialogBox() {
               </Table>
             </TableContainer>
           </Paper>
-        </Grid>
-        <Grid item xs={6}>
-          <Paper sx={{ width: "98%", overflow: "hidden", m: 1 }}>
+          )
+  },[employeeData[0]?.items])
+  const tableActual=useMemo(()=>{
+      return (
+        <Paper sx={{ width: "98%", overflow: "hidden", m: 1 }}>
             <h6>ACTUAL</h6>
             <TextField
               sx={{ m: 1 }}
@@ -494,6 +482,47 @@ export default function DialogBox() {
               </Table>
             </TableContainer>
           </Paper>
+      )
+  },[employeeData[0]?.actual_items])
+  return (
+    <>
+      <Box
+        sx={{
+          mt: 11,
+          height: 70,
+          borderRadius: 1,
+        }}
+      >
+        <Box
+          sx={{
+            float: "left",
+          }}
+        >
+          <h6 style={{ marginLeft: "13px" }}>Tray ID - {trayId}</h6>
+          <h6 style={{ marginLeft: "13px" }}>
+            AGENT NAME - {employeeData[0]?.issued_user_name}
+          </h6>
+        </Box>
+        <Box
+          sx={{
+            float: "right",
+          }}
+        >
+          <h6 style={{ marginRight: "13px" }}>
+            Closed On --{" "}
+            {new Date(employeeData[0]?.closed_time_bot).toLocaleString(
+              "en-GB",
+              { hour12: true }
+            )}
+          </h6>
+        </Box>
+      </Box>
+      <Grid container spacing={1}>
+        <Grid item xs={6}>
+         {tableExpected}
+        </Grid>
+        <Grid item xs={6}>
+          {tableActual}
         </Grid>
       </Grid>
       <div style={{ float: "right" }}>
@@ -529,7 +558,7 @@ export default function DialogBox() {
             sx={{ m: 3, mb: 9 }}
             variant="contained"
             style={{ backgroundColor: "green" }}
-            disabled={loading == true ? true : false}
+            disabled={loading == true || bagStatus !== 1 ? true : false}
             onClick={(e) => {
               handelIssue(e, employeeData[0]?.items[0]?.bag_id);
             }}

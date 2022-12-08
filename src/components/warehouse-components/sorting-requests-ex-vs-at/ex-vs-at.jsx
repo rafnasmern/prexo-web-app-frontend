@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   Box,
   Button,
@@ -11,34 +11,27 @@ import {
   TableHead,
   TableRow,
   Grid,
-  Container,
 } from "@mui/material";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import "yup-phone";
-import { useNavigate } from "react-router-dom";
 import { axiosWarehouseIn } from "../../../axios";
-import CircularProgress from "@mui/material/CircularProgress";
 
 export default function DialogBox() {
   const navigate = useNavigate();
   const [trayData, setTrayData] = useState([]);
   const { trayId } = useParams();
-  const [loading, setLoading] = useState(false);
   /**************************************************************************** */
   const [uic, setUic] = useState("");
   const [refresh, setRefresh] = useState(false);
   /*********************************************************** */
-
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(false);
         let response = await axiosWarehouseIn.post(
           "/get-tray-sorting/" + trayId
         );
         if (response.status === 200) {
           setTrayData(response.data.data);
-          setLoading(true);
         }
       } catch (error) {
         alert(error);
@@ -97,120 +90,91 @@ export default function DialogBox() {
     e.preventDefault();
     navigate(-1);
   };
-
-  /***************************************************************************************** */
-  const label = { inputProps: { "aria-label": "Checkbox demo" } };
-  return (
-    <>
+  /************************************************************************** */
+  const tableExpected=useMemo(()=>{
+    return(
+    <Paper sx={{ width: "95%", overflow: "hidden", m: 1 }}>
+    <Box sx={{}}>
       <Box
         sx={{
-          mt: 11,
-          height: 70,
-          borderRadius: 1,
+          float: "left",
+          ml: 2,
         }}
       >
-        <Box
-          sx={{
-            float: "left",
-          }}
-        >
-          <h6 style={{ marginLeft: "13px" }}>TRAY ID - {trayId}</h6>
-          <h6 style={{ marginLeft: "13px" }}>
-            AGENT NAME - {trayData?.issued_user_name}
-          </h6>
-        </Box>
-        {/* <Box
-          sx={{
-            float: "right",
-          }}
-        >
-          <h6 style={{ marginRight: "13px" }}>Brand -- {trayData?.brand}</h6>
-          <h6 style={{ marginRight: "13px" }}>Model -- {trayData?.model}</h6>
-        </Box> */}
+        <h6>Expected</h6>
       </Box>
-      <Grid container spacing={1}>
-        <Grid item xs={6}>
-          <Paper sx={{ width: "95%", overflow: "hidden", m: 1 }}>
-            <Box sx={{}}>
-              <Box
-                sx={{
-                  float: "left",
-                  ml: 2,
-                }}
-              >
-                <h6>Expected</h6>
-              </Box>
-              <Box
-                sx={{
-                  float: "right",
-                  mr: 2,
-                }}
-              >
-                <Box sx={{}}>
-                  <h5>Total</h5>
-                  <p style={{ paddingLeft: "5px", fontSize: "22px" }}>
-                    {
-                      trayData?.items?.filter(function (item) {
-                        return item.status != "Duplicate";
-                      }).length
-                    }
-                    /{trayData?.limit}
-                  </p>
-                </Box>
-              </Box>
-            </Box>
-            <TableContainer>
-              <Table
-                style={{ width: "100%" }}
-                id="example"
-                stickyHeader
-                aria-label="sticky table"
-              >
-                <TableHead>
-                  <TableRow>
-                    <TableCell>S.NO</TableCell>
-                    <TableCell>UIC</TableCell>
-                    {trayData?.type_taxanomy === "MMT" &&
-                    trayData?.prefix == "tray-master" ? (
-                      <TableCell>AWBN Number</TableCell>
-                    ) : (
-                      <TableCell>MUIC</TableCell>
-                    )}
-                    {trayData?.type_taxanomy === "MMT" &&
-                    trayData?.prefix == "tray-master" ? (
-                      <TableCell>Bag ID</TableCell>
-                    ) : (
-                      <TableCell>BOT Tray</TableCell>
-                    )}
-                    {/* <TableCell>Tracking Number</TableCell> */}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {trayData?.items?.map((data, index) => (
-                    <TableRow hover role="checkbox" tabIndex={-1}>
-                      <TableCell>{index + 1}</TableCell>
-                      <TableCell>{data?.uic}</TableCell>
-                      {trayData?.type_taxanomy === "MMT" &&
-                      trayData?.prefix == "tray-master" ? (
-                        <TableCell>{data?.awbn_number}</TableCell>
-                      ) : (
-                        <TableCell>{data?.muic}</TableCell>
-                      )}
-                      {trayData?.type_taxanomy === "MMT" &&
-                      trayData?.prefix == "tray-master" ? (
-                        <TableCell>{data?.bag_id}</TableCell>
-                      ) : (
-                        <TableCell>{data?.tray_id}</TableCell>
-                      )}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Paper>
-        </Grid>
-        <Grid item xs={6}>
-          <Paper sx={{ width: "98%", overflow: "hidden", m: 1 }}>
+      <Box
+        sx={{
+          float: "right",
+          mr: 2,
+        }}
+      >
+        <Box sx={{}}>
+          <h5>Total</h5>
+          <p style={{ paddingLeft: "5px", fontSize: "22px" }}>
+            {
+              trayData?.items?.filter(function (item) {
+                return item.status != "Duplicate";
+              }).length
+            }
+            /{trayData?.limit}
+          </p>
+        </Box>
+      </Box>
+    </Box>
+    <TableContainer>
+      <Table
+        style={{ width: "100%" }}
+        id="example"
+        stickyHeader
+        aria-label="sticky table"
+      >
+        <TableHead>
+          <TableRow>
+            <TableCell>S.NO</TableCell>
+            <TableCell>UIC</TableCell>
+            {trayData?.type_taxanomy === "MMT" &&
+            trayData?.prefix == "tray-master" ? (
+              <TableCell>AWBN Number</TableCell>
+            ) : (
+              <TableCell>MUIC</TableCell>
+            )}
+            {trayData?.type_taxanomy === "MMT" &&
+            trayData?.prefix == "tray-master" ? (
+              <TableCell>Bag ID</TableCell>
+            ) : (
+              <TableCell>BOT Tray</TableCell>
+            )}
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {trayData?.items?.map((data, index) => (
+            <TableRow hover role="checkbox" tabIndex={-1}>
+              <TableCell>{index + 1}</TableCell>
+              <TableCell>{data?.uic}</TableCell>
+              {trayData?.type_taxanomy === "MMT" &&
+              trayData?.prefix == "tray-master" ? (
+                <TableCell>{data?.awbn_number}</TableCell>
+              ) : (
+                <TableCell>{data?.muic}</TableCell>
+              )}
+              {trayData?.type_taxanomy === "MMT" &&
+              trayData?.prefix == "tray-master" ? (
+                <TableCell>{data?.bag_id}</TableCell>
+              ) : (
+                <TableCell>{data?.tray_id}</TableCell>
+              )}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  </Paper>
+    )
+  },[trayData?.items])
+  const tableActul=useMemo(()=>{
+       return(
+        <Paper sx={{ width: "98%", overflow: "hidden", m: 1 }}>
             <Box sx={{}}>
               <Box
                 sx={{
@@ -226,7 +190,6 @@ export default function DialogBox() {
                   name="doorsteps_diagnostics"
                   label="Please Enter UIC"
                   value={uic}
-                  // onChange={(e) => setAwbn(e.target.value)}
                   onChange={(e) => {
                     setUic(e.target.value);
                     handelUic(e);
@@ -280,7 +243,6 @@ export default function DialogBox() {
                     ) : (
                       <TableCell>BOT Tray</TableCell>
                     )}
-                    {/* <TableCell>Tracking Number</TableCell> */}
                   </TableRow>
                 </TableHead>
 
@@ -307,6 +269,34 @@ export default function DialogBox() {
               </Table>
             </TableContainer>
           </Paper>
+       )
+  },[trayData?.actual_items])
+  return (
+    <>
+      <Box
+        sx={{
+          mt: 11,
+          height: 70,
+          borderRadius: 1,
+        }}
+      >
+        <Box
+          sx={{
+            float: "left",
+          }}
+        >
+          <h6 style={{ marginLeft: "13px" }}>TRAY ID - {trayId}</h6>
+          <h6 style={{ marginLeft: "13px" }}>
+            AGENT NAME - {trayData?.issued_user_name}
+          </h6>
+        </Box>
+      </Box>
+      <Grid container spacing={1}>
+        <Grid item xs={6}>
+         {tableExpected}
+        </Grid>
+        <Grid item xs={6}>
+          {tableActul}
         </Grid>
       </Grid>
       <div style={{ float: "right" }}>

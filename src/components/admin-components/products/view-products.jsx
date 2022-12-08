@@ -142,7 +142,7 @@ export default function StickyHeadTable({ props }) {
                             width="80px"
                             src={
                               data.image == undefined
-                                ? "http://prexo-v3-adminapi.dealsdray.com/product/image/" +
+                                ? "https://prexo-v1-dev-api.dealsdray.com/product/image/" +
                                   data.vendor_sku_id +
                                   ".jpg"
                                 : data.image

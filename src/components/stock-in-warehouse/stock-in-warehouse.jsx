@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -24,39 +24,33 @@ export default function DialogBox() {
   const [bagId, setBagId] = useState("");
   const [bagSuccess, setbagSuccess] = useState(false);
   const [awbn, setAwbn] = useState("");
-  const [awbnSuccess, setAwbnSuccess] = useState(false);
   const [uic, setUic] = useState(false);
   const [sleaves, setSleaves] = useState(false);
-  const [valid, setValid] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   /***************************************************************************************** */
   const handelCheckBagId = async (e) => {
-    if (bagId == "") {
-      alert("Please Enter Bag ID");
-    } else {
-      try {
-        let admin = localStorage.getItem("prexo-authentication");
-        if (admin) {
-          let { location } = jwt_decode(admin);
-          let obj = {
-            location: location,
-            bagId: bagId,
-          };
-          let res = await axiosWarehouseIn.post("/checkBagId", obj);
-          if (res.status == 200) {
-            alert(res.data.message);
-            getitem();
-            setbagSuccess(true);
-          }
-        } else {
-          navigate("/");
+    try {
+      let admin = localStorage.getItem("prexo-authentication");
+      if (admin) {
+        let { location } = jwt_decode(admin);
+        let obj = {
+          location: location,
+          bagId: bagId,
+        };
+        let res = await axiosWarehouseIn.post("/checkBagId", obj);
+        if (res.status == 200) {
+          alert(res.data.message);
+          getitem();
+          setbagSuccess(true);
         }
-      } catch (error) {
-        setbagSuccess(false);
-        alert(error.response.data.message);
+      } else {
+        navigate("/");
       }
+    } catch (error) {
+      setbagSuccess(false);
+      alert(error.response.data.message);
     }
   };
   const getitem = async () => {
@@ -89,21 +83,16 @@ export default function DialogBox() {
             };
             let res = await axiosWarehouseIn.post("/checkAwbn", obj);
             if (res.status == 200) {
-              setAwbnSuccess(true);
-
               if (res.data.message == "AWBN Number Is Duplicate") {
-                setValid("Duplicate");
                 setAwbn("");
                 handelSubmitStock(res.data.data, "Duplicate");
               } else {
-                setValid("Valid");
                 setAwbn("");
                 handelSubmitStock(res.data.data, "Valid");
               }
             }
           }
         } catch (error) {
-          setAwbnSuccess(false);
           alert(error.response.data.message);
         }
       }
@@ -131,7 +120,6 @@ export default function DialogBox() {
           };
           let res = await axiosWarehouseIn.post("/stockInToWarehouse", obj);
           if (res.status == 200) {
-            setAwbnSuccess(false);
             setAwbn("");
             getitem();
           }
@@ -242,6 +230,7 @@ export default function DialogBox() {
           <Button
             sx={{ ml: 3, mt: 1 }}
             variant="contained"
+            disabled={bagId == ""}
             style={{ backgroundColor: "#206CE2" }}
             onClick={handelCheckBagId}
           >
