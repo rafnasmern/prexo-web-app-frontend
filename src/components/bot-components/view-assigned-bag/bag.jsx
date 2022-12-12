@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useMemo } from "react";
 import {
   Box,
   Button,
@@ -95,6 +95,7 @@ export default function DialogBox() {
   const [pageLoading, setPageLoading] = useState(false);
   const [awbn, setAwbn] = useState("");
   const [bodyDamage, setBodyDamage] = useState("NO");
+  const [textBoxDis,setTextBoxDis]=useState(false)
   /******************************************************************************** */
   let admin = localStorage.getItem("prexo-authentication");
   let user_name1;
@@ -212,6 +213,7 @@ export default function DialogBox() {
           awbn_number: e.target.value,
           username: user_name1,
         };
+        setTextBoxDis(true)
         let res = await axiosBot.post("/awbnScanning", obj);
         if (res.status === 200) {
           setAwbnDetails(res.data.data);
@@ -220,6 +222,7 @@ export default function DialogBox() {
         }
       } catch (error) {
         if (error.response.status === 403) {
+          setTextBoxDis(false)
           alert(error.response.data.message);
           setAwbn("");
         } else {
@@ -289,6 +292,7 @@ export default function DialogBox() {
           };
           let res = await axiosBot.post("/traySegregation", obj);
           if (res.status == 200) {
+            setTextBoxDis(false)
             setLoading(false);
             alert("Successfully Added");
             setRefresh((refresh) => !refresh);
@@ -339,6 +343,7 @@ export default function DialogBox() {
           };
           let res = await axiosBot.post("/traySegregation", obj);
           if (res.status == 200) {
+            setTextBoxDis(false)
             setLoading(false);
             alert("Successfully Added");
             setRefresh((refresh) => !refresh);
@@ -394,7 +399,115 @@ export default function DialogBox() {
   };
   /***************************************************************************************** */
   const label = { inputProps: { "aria-label": "Checkbox demo" } };
+ const table=useMemo(()=>{
+  return(
+    <Grid container spacing={2}>
+    {bagData[1]?.tray?.map((data, index) => (
+      <Grid item xs={12} md={4}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-start",
+          }}
+        >
+          <h5 style={{ paddingLeft: "10px" }}>
+            {" "}
+            {data.type_taxanomy +
+              "-" +
+              data.code +
+              " (" +
+              bagData[1]?.tray?.[index]?.items?.length +
+              "/" +
+              data.limit +
+              ")  "}
+          </h5>
+          {data.sort_id == "Closed By Bot" ||
+          data.sort_id == "Received From BOT" ||
+          data.sort_id == "Closed By Warehouse" ? (
+            <h6 style={{ color: "red" }}>-Tray Closed</h6>
+          ) : (
+            ""
+          )}
+        </Box>
+        <Paper sx={{ width: "95%", overflow: "hidden", m: 1 }}>
+          <TableContainer>
+            <Table
+              style={{ width: "100%" }}
+              id="example"
+              stickyHeader
+              aria-label="sticky table"
+            >
+              <TableHead>
+                <TableRow>
+                  <TableCell>S.NO</TableCell>
+                  <TableCell>AWBN Number</TableCell>
+                  <TableCell>Order ID</TableCell>
+                  <TableCell>Order Date</TableCell>
+                  <TableCell>Status</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {data?.items?.map((itemData, index) => (
+                  <TableRow hover role="checkbox" tabIndex={-1}>
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>{itemData.awbn_number}</TableCell>
+                    <TableCell>{itemData.order_id}</TableCell>
 
+                    <TableCell>
+                      {" "}
+                      {itemData.order_date == null
+                        ? "No Order Date"
+                        : new Date(
+                            itemData.order_date
+                          ).toLocaleString("en-GB", {
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                          })}
+                    </TableCell>
+                    <TableCell
+                      style={
+                        itemData.status == "Valid"
+                          ? { color: "green" }
+                          : { color: "red" }
+                      }
+                    >
+                      {itemData.status}
+                    </TableCell>
+                    {itemData.status != "Valid" ? (
+                      <TableCell>
+                        <Button
+                          sx={{
+                            ml: 2,
+                          }}
+                          variant="contained"
+                          style={{ backgroundColor: "red" }}
+                          component="span"
+                          onClick={() => {
+                            if (window.confirm("Remove the item?")) {
+                              handelDelete(
+                                data.code,
+                                itemData._id,
+                                itemData.awbn_number
+                              );
+                            }
+                          }}
+                        >
+                          Remove
+                        </Button>
+                      </TableCell>
+                    ) : null}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Paper>
+      </Grid>
+    ))}
+  </Grid>
+  )
+ },[bagData[1]?.tray])
   return (
     <>
       <BootstrapDialog
@@ -647,32 +760,6 @@ export default function DialogBox() {
               borderRadius: 1,
             }}
           >
-            {/* <h6>
-              {" "}
-              <Checkbox
-                onClick={(e) => {
-                  stickerOne == ""
-                    ? setStickerOne("UIC Pasted On Device")
-                    : setStickerOne("");
-                }}
-                {...label}
-                sx={{ ml: 3 }}
-              />
-              UIC Pasted On Device
-            </h6> */}
-            {/* <h6>
-              {" "}
-              <Checkbox
-                onClick={(e) => {
-                  stickerTwo == ""
-                    ? setStickerTwo("Device Putin Sleeve")
-                    : setStickerTwo("");
-                }}
-                {...label}
-                sx={{ ml: 3 }}
-              />
-              Device Putin Sleeve
-            </h6> */}
 
             <h6>
               {" "}
@@ -786,18 +873,7 @@ export default function DialogBox() {
               />
               Device Put On Sleeve
             </h6>
-            {/* <h6>
-              {" "}
-              <Checkbox
-                onClick={(e) => {
-                  stickerFour == ""
-                    ? setStickerFour("Blank UIC Pasted On Sleeve")
-                    : setStickerFour("");
-                }}
-                {...label}
-              />
-              Blank UIC Pasted On Sleeve
-            </h6> */}
+           
             <FormControl sx={{ ml: 2 }}>
               <FormLabel id="demo-radio-buttons-group-label">
                 Any Damage
@@ -939,21 +1015,6 @@ export default function DialogBox() {
                       sx={{ ml: 3 }}
                     />
                   </Box>
-
-                  {/* <Box
-                  sx={{
-                    ml: 4,
-                  }}
-                >
-                  <h5>Duplicate</h5>
-                  <p style={{ paddingLeft: "34px", fontSize: "22px" }}>
-                    {
-                      bagData[0]?.actual_items?.filter(function (item) {
-                        return item.status == "Duplicate";
-                      }).length
-                    }
-                  </p>
-                </Box> */}
                   <Box
                     sx={{
                       ml: 4,
@@ -1023,111 +1084,7 @@ export default function DialogBox() {
             />
           </Box>
           <Box sx={{ mt: 10 }}>
-            <Grid container spacing={2}>
-              {bagData[1]?.tray?.map((data, index) => (
-                <Grid item xs={12} md={4}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "flex-start",
-                    }}
-                  >
-                    <h5 style={{ paddingLeft: "10px" }}>
-                      {" "}
-                      {data.type_taxanomy +
-                        "-" +
-                        data.code +
-                        " (" +
-                        bagData[1]?.tray?.[index]?.items?.length +
-                        "/" +
-                        data.limit +
-                        ")  "}
-                    </h5>
-                    {data.sort_id == "Closed By Bot" ||
-                    data.sort_id == "Received From BOT" ||
-                    data.sort_id == "Closed By Warehouse" ? (
-                      <h6 style={{ color: "red" }}>-Tray Closed</h6>
-                    ) : (
-                      ""
-                    )}
-                  </Box>
-                  <Paper sx={{ width: "95%", overflow: "hidden", m: 1 }}>
-                    <TableContainer>
-                      <Table
-                        style={{ width: "100%" }}
-                        id="example"
-                        stickyHeader
-                        aria-label="sticky table"
-                      >
-                        <TableHead>
-                          <TableRow>
-                            <TableCell>S.NO</TableCell>
-                            <TableCell>AWBN Number</TableCell>
-                            <TableCell>Order ID</TableCell>
-                            <TableCell>Order Date</TableCell>
-                            <TableCell>Status</TableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {data?.items?.map((itemData, index) => (
-                            <TableRow hover role="checkbox" tabIndex={-1}>
-                              <TableCell>{index + 1}</TableCell>
-                              <TableCell>{itemData.awbn_number}</TableCell>
-                              <TableCell>{itemData.order_id}</TableCell>
-
-                              <TableCell>
-                                {" "}
-                                {itemData.order_date == null
-                                  ? "No Order Date"
-                                  : new Date(
-                                      itemData.order_date
-                                    ).toLocaleString("en-GB", {
-                                      year: "numeric",
-                                      month: "2-digit",
-                                      day: "2-digit",
-                                    })}
-                              </TableCell>
-                              <TableCell
-                                style={
-                                  itemData.status == "Valid"
-                                    ? { color: "green" }
-                                    : { color: "red" }
-                                }
-                              >
-                                {itemData.status}
-                              </TableCell>
-                              {itemData.status != "Valid" ? (
-                                <TableCell>
-                                  <Button
-                                    sx={{
-                                      ml: 2,
-                                    }}
-                                    variant="contained"
-                                    style={{ backgroundColor: "red" }}
-                                    component="span"
-                                    onClick={() => {
-                                      if (window.confirm("Remove the item?")) {
-                                        handelDelete(
-                                          data.code,
-                                          itemData._id,
-                                          itemData.awbn_number
-                                        );
-                                      }
-                                    }}
-                                  >
-                                    Remove
-                                  </Button>
-                                </TableCell>
-                              ) : null}
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-                  </Paper>
-                </Grid>
-              ))}
-            </Grid>
+           {table}
           </Box>
           <Box
             sx={{

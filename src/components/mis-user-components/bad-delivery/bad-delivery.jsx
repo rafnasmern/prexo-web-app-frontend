@@ -355,6 +355,7 @@ export default function Home() {
                 <TableCell>Buyback Category</TableCell>
                 <TableCell>Doorsteps Diagnostics</TableCell>
                 <TableCell>Delivered Date</TableCell>
+                <TableCell>Reason</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -407,6 +408,9 @@ export default function Home() {
                     {new Date(data?.delivery_date).toLocaleString("en-GB", {
                       hour12: true,
                     })}
+                  </TableCell>
+                  <TableCell style={{color:"red"}}>
+                    {data.reason}
                   </TableCell>
                 </TableRow>
               ))}

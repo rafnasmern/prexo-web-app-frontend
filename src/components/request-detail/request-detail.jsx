@@ -33,6 +33,7 @@ export default function DialogBox() {
   const [sleaves, setSleaves] = useState(false);
   const [description, setDescription] = useState([]);
   const [readyForAssign, setReadyForAssign] = useState(0);
+  const [textBoxDis,setTextBoxDis]=useState(false)
   /*********************************************************** */
   const [botTray, setBotTray] = useState("");
   const [pmtTray, setPmtTray] = useState(null);
@@ -121,15 +122,18 @@ export default function DialogBox() {
           awbn: e.target.value,
           id: bagId,
         };
+        setTextBoxDis(true)
         let res = await axiosWarehouseIn.post("/actualCheckAwbn", obj);
         if (res?.status == 200) {
           addActualitem(res.data.data);
         }
       } catch (error) {
         if (error.response.status == 403) {
+          setTextBoxDis(false)
           setAwbn("");
           alert(error.response.data.message);
         } else if (error.response.status == 400) {
+          setTextBoxDis(false)
           alert("This Item Does Not Exist In This Bag");
         } else {
           alert(error);
@@ -150,6 +154,7 @@ export default function DialogBox() {
     ) {
       alert("Bag Is Full");
     } else {
+      setTextBoxDis(true)
       let data = employeeData[0]?.items?.filter(function (item) {
         return item.awbn_number == awbn.tracking_id;
       });
@@ -419,6 +424,7 @@ export default function DialogBox() {
           sx={{ m: 1 }}
           id="outlined-password-input"
           type="text"
+          disabled={textBoxDis}
           name="doorsteps_diagnostics"
           label="Please Enter AWB Number"
           value={awbn}
@@ -555,7 +561,7 @@ export default function DialogBox() {
         </TableContainer>
       </Paper>
     );
-  }, [employeeData[0]?.actual_items]);
+  }, [employeeData[0]?.actual_items,textBoxDis]);
   return (
     <>
       <Box

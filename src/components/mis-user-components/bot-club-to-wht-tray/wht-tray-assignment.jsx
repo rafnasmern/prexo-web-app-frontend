@@ -207,6 +207,7 @@ export default function DialogBox() {
     e.preventDefault();
     navigate(-1);
   };
+  console.log(clubModel?.items?.filter((item) => console.log(item)));
   return (
     <>
       <Box
@@ -288,7 +289,7 @@ export default function DialogBox() {
                     {whtTray.map((data, index) => (
                       <TableRow hover role="checkbox" tabIndex={-1}>
                         <TableCell>{index + 1}</TableCell>
-                        <TableCell>{data?.code}</TableCell>
+                        <TableCell>{data.code}</TableCell>
                         <TableCell>
                           {data.items.length +
                             "/" +
@@ -299,12 +300,17 @@ export default function DialogBox() {
                         {count === clubModel?.temp_array?.length ? null : (
                           <TableCell>
                             {data?.items?.length < data.limit &&
-                            data?.temp_array?.length < data.limit &&
-                            data?.items?.length + data?.temp_array?.length <
-                              data.limit ? (
+                            data?.temp_array?.length < data.limit ? (
                               <Checkbox
                                 {...label}
-                                disabled={loading === true ? true : false}
+                                disabled={
+                                  loading === true ||
+                                  clubModel?.items?.filter((item) => {
+                                    return item.wht_tray == data.code;
+                                  }).length !== 0
+                                    ? true
+                                    : false
+                                }
                                 onClick={(e) => {
                                   handelSelect(
                                     data.code,
