@@ -37,13 +37,13 @@ export default function DialogBox() {
     const fetchData = async () => {
       try {
         let response = await axiosWarehouseIn.post(
-          "/getBagItemRequest/" + trayId
+          "/getBagItemRequest/" + trayId + "/" + "Received From BOT"
         );
         if (response.status === 200) {
           setEmployeeData(response.data.data);
         }
       } catch (error) {
-        if (error.response.status === 201) {
+        if (error.response.status === 403) {
           alert(error.response.data.message);
           navigate(-1);
         } else {
@@ -57,7 +57,7 @@ export default function DialogBox() {
   const getitem = async () => {
     try {
       let response = await axiosWarehouseIn.post(
-        "/getBagItemRequest/" + trayId
+        "/getBagItemRequest/" + trayId + "/" + "Received From BOT"
       );
       if (response.status === 200) {
         setEmployeeData(response.data.data);

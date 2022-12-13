@@ -36,13 +36,20 @@ export default function DialogBox() {
     const fetchData = async () => {
       try {
         setPageLoading(false);
-        let response = await axiosWarehouseIn.post("/getWhtTrayItem/" + trayId);
+        let response = await axiosWarehouseIn.post(
+          "/getWhtTrayItem/" + trayId + "/" + "Send for charging"
+        );
         if (response.status === 200) {
           setTrayData(response.data.data);
           setPageLoading(true);
         }
       } catch (error) {
-        alert(error);
+        if (error.response.status === 403) {
+          alert(error.response.data.message);
+          navigate(-1);
+        } else {
+          alert(error);
+        }
       }
     };
     fetchData();

@@ -116,13 +116,20 @@ export default function DialogBox() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        let response = await axiosBqc.post("/assigned-wht-item/" + trayId);
+        let response = await axiosBqc.post(
+          "/assigned-wht-item/" + trayId + user_name1 + "/" + "BQC IN"
+        );
         if (response.status === 200) {
           setTrayData(response.data.data);
           //   dataTableFun()
         }
       } catch (error) {
-        alert(error);
+        if (error.response.status === 403) {
+          alert(error.response.data.message);
+          navigate(-1);
+        } else {
+          alert(error);
+        }
       }
     };
     fetchData();

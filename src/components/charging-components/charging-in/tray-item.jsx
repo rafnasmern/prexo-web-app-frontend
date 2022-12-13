@@ -33,7 +33,9 @@ export default function DialogBox() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        let response = await axiosWarehouseIn.post("/getWhtTrayItem/" + trayId);
+        let response = await axiosWarehouseIn.post(
+          "/getWhtTrayItem/" + trayId + "/" + "Issued to Charging"
+        );
         if (response.status === 200) {
           setTrayData(response.data.data);
           //   dataTableFun()
@@ -41,7 +43,12 @@ export default function DialogBox() {
           navigate("/bag-issue-request");
         }
       } catch (error) {
-        alert(error);
+        if (error.response.status === 403) {
+          alert(error.response.data.message);
+          navigate(-1);
+        } else {
+          alert(error);
+        }
       }
     };
     fetchData();

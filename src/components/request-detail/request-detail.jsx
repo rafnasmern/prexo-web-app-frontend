@@ -48,7 +48,7 @@ export default function DialogBox() {
     const fetchData = async () => {
       try {
         let response = await axiosWarehouseIn.post(
-          "/getBagItemRequest/" + bagId
+          "/getBagItemRequest/" + bagId + "/" + "Requested to Warehouse"
         );
         if (
           response.status === 200 &&
@@ -70,7 +70,12 @@ export default function DialogBox() {
           navigate("/bag-issue-request");
         }
       } catch (error) {
-        alert(error);
+        if (error.response.status === 403) {
+          alert(error.response.data.message);
+          navigate(-1);
+        } else {
+          alert(error);
+        }
       }
     };
     fetchData();
@@ -78,7 +83,9 @@ export default function DialogBox() {
 
   const getitem = async () => {
     try {
-      let response = await axiosWarehouseIn.post("/getBagItemRequest/" + bagId);
+      let response = await axiosWarehouseIn.post(
+        "/getBagItemRequest/" + bagId + "/" + "Requested to Warehouse"
+      );
       if (response.status === 200) {
         setEmployeeData(response.data.data);
         setUic(response.data.data[0]?.uic === "true");
@@ -91,7 +98,12 @@ export default function DialogBox() {
         alert(response.data.message);
       }
     } catch (error) {
-      alert(error);
+      if (error.response.status === 403) {
+        alert(error.response.data.status);
+        navigate(-1);
+      } else {
+        alert(error);
+      }
     }
   };
   const handelAwbn = async (e) => {

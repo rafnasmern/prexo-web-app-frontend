@@ -76,37 +76,7 @@ export default function StickyHeadTable({ props }) {
   const [trayStatus, setTrayStatus] = useState("");
   const [trayIdCheck, setTrayIdCheck] = useState("");
   const navigate = useNavigate();
-  // YUP SCHEMA
-  const schema = Yup.object().shape({
-    user_name: Yup.string().required("Required*").nullable(),
-    tray_type: Yup.string().required("Required*").nullable(),
-    tray_Id: Yup.string().required("Required*").nullable(),
-  });
-  // ON SUBMIT FOR ASSIGN NEW TRAY
-  const onSubmit = async (values) => {
-    try {
-      let res = await axiosWarehouseIn.post("/assignNewTray", values);
-      if (res.status === 200) {
-        alert(res.data.message);
-        setAssignNewTray(false);
-        setUserTray("");
-        setTrayStatus("");
-      }
-    } catch (error) {
-      if (error.response.status == 403) {
-        alert(error.response.data.message);
-      }
-    }
-  };
-  const {
-    register,
-    handleSubmit,
-    getValues,
-    formState: { errors },
-    reset,
-  } = useForm({
-    resolver: yupResolver(schema),
-  });
+
 
   useEffect(() => {
     try {
@@ -168,58 +138,6 @@ export default function StickyHeadTable({ props }) {
       } catch (error) {
         alert(error);
       }
-    }
-  };
-  // CHECK TRAY
-  const handelBotTrayCheck = async (username, trayType) => {
-    if (username === "") {
-      alert("Please select user");
-      reset({
-        user_name: null,
-      });
-    } else {
-      try {
-        setUserTray("");
-        let obj = {
-          username: username,
-          trayType: trayType,
-        };
-        let res = await axiosWarehouseIn.post("/checkBotUserTray", obj);
-        if (res.status === 200) {
-        }
-      } catch (error) {
-        if (error.response.status == 403) {
-          setUserTray(error.response.data.message);
-        }
-      }
-    }
-  };
-  const handelTrayId = async (e) => {
-    try {
-      if (getValues("user_name") === "" || getValues("tray_type") === "") {
-        alert("Please select user and tray type");
-      } else if (trayIdCheck == "") {
-        alert("Please add tray id");
-      } else {
-        if (getValues("tray_type") == "MMT") {
-          let res = await axiosWarehouseIn.post("/checkMmtTray/" + trayIdCheck);
-          if (res.status == 200) {
-            setTrayStatus(res.data.status);
-          }
-        } else if (getValues("tray_type") == "PMT") {
-          let res = await axiosWarehouseIn.post("/checkPmtTray/" + trayIdCheck);
-          if (res.status == 200) {
-            setTrayStatus(res.data.status);
-          }
-        } else {
-          let res = await axiosWarehouseIn.post("/checkBotTray/" + trayIdCheck);
-          if (res.status == 200) {
-            setTrayStatus(res.data.status);
-          }
-        }
-      }
-    } catch (error) {
-      alert(error.response.data.message);
     }
   };
   return (

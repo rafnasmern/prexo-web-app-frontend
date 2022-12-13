@@ -34,23 +34,28 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   useEffect(() => {
     let admin = localStorage.getItem("prexo-authentication");
-    try {
-      if (admin) {
-        let { location } = jwt_decode(admin);
-        const fetchData = async () => {
+    const fetchData = async () => {
+      try {
+        if (admin) {
+          let { location } = jwt_decode(admin);
           let res = await axiosMisUser.post("/getBagItemWithUic/" + bagId);
           if (res.status == 200) {
             setItem(res.data.data);
             dataTableFun();
           }
-        };
-        fetchData();
-      } else {
-        navigate("/");
+        } else {
+          navigate("/");
+        }
+      } catch (error) {
+        if (error.response.status === 403) {
+          alert(error.response.data.message);
+          navigate(-1);
+        } else {
+          alert(error);
+        }
       }
-    } catch (error) {
-      alert(error);
-    }
+    };
+    fetchData();
   }, [refresh]);
   let token = localStorage.getItem("prexo-authentication");
   let user_name1;

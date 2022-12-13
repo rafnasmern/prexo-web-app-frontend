@@ -39,14 +39,19 @@ export default function DialogBox() {
       try {
         setPageLoading(false);
         let response = await axiosWarehouseIn.post(
-          "/getBagItemRequest/" + trayId
+          "/getBagItemRequest/" + trayId + "/" + "Received From Merging"
         );
         if (response.status === 200) {
           setEmployeeData(response.data.data);
           setPageLoading(true);
         }
       } catch (error) {
-        alert(error);
+        if (error.response.status === 403) {
+          alert(error.response.data.message);
+          navigate(-1);
+        } else {
+          alert(error);
+        }
       }
     };
     fetchData();
@@ -56,7 +61,7 @@ export default function DialogBox() {
     try {
       setPageLoading(false);
       let response = await axiosWarehouseIn.post(
-        "/getBagItemRequest/" + trayId
+        "/getBagItemRequest/" + trayId + "/" + "Received From Merging"
       );
       if (response.status === 200) {
         setEmployeeData(response.data.data);
@@ -68,7 +73,12 @@ export default function DialogBox() {
         alert(response.data.message);
       }
     } catch (error) {
-      alert(error);
+      if (error.response.status === 403) {
+        alert(error.response.data.message);
+        navigate(-1);
+      } else {
+        alert(error);
+      }
     }
   };
   /******************************************************************************** */

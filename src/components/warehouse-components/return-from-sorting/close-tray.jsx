@@ -35,7 +35,7 @@ export default function DialogBox() {
       try {
         setPageLoading(false);
         let response = await axiosWarehouseIn.post(
-          "/charging-done-recieved/" + trayId
+          "/charging-done-recieved/" + trayId + "/" + "Received From Sorting"
         );
         if (response.status === 200) {
           setTrayData(response.data.data);
@@ -44,6 +44,7 @@ export default function DialogBox() {
       } catch (error) {
         if (error.response.status === 403) {
           alert(error.response.data.message);
+          navigate(-1)
         } else {
           alert(error);
         }

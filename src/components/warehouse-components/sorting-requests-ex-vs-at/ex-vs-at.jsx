@@ -13,16 +13,14 @@ import {
   Grid,
   Container,
 } from "@mui/material";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import "yup-phone";
-import { useNavigate } from "react-router-dom";
 import { axiosWarehouseIn } from "../../../axios";
-import CircularProgress from "@mui/material/CircularProgress";
 
 export default function DialogBox() {
   const navigate = useNavigate();
   const [trayData, setTrayData] = useState([]);
-  const { trayId } = useParams();
+  const { trayId, sortId } = useParams();
   const [loading, setLoading] = useState(false);
   /**************************************************************************** */
   const [uic, setUic] = useState("");
@@ -41,7 +39,12 @@ export default function DialogBox() {
           setLoading(true);
         }
       } catch (error) {
-        alert(error);
+        if (error.response.status === 403) {
+          alert(error.response.data.message);
+          navigate(-1);
+        } else {
+          alert(error);
+        }
       }
     };
     fetchData();

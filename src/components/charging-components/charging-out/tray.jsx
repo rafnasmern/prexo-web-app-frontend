@@ -168,7 +168,7 @@ export default function DialogBox() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        let response = await axiosWarehouseIn.post("/getWhtTrayItem/" + trayId);
+        let response = await axiosWarehouseIn.post("/getWhtTrayItem/" + trayId + "/" + "Charging Station IN");
         if (response.status === 200) {
           setTrayData(response.data.data);
           //   dataTableFun()

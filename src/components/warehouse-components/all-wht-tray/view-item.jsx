@@ -26,7 +26,9 @@ export default function StickyHeadTable({ props }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        let response = await axiosWarehouseIn.post("/getWhtTrayItem/" + trayId);
+        let response = await axiosWarehouseIn.post(
+          "/getWhtTrayItem/" + trayId + "/" + "all-wht-tray"
+        );
         if (response.status === 200) {
           if (response.data.data?.items?.length == 0) {
             setWhtTray(response.data.data.actual_items);

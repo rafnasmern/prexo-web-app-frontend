@@ -12,9 +12,10 @@ import {
   TableRow,
   Grid,
 } from "@mui/material";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+// import jwt from "jsonwebtoken"
+import jwt_decode from "jwt-decode";
 import "yup-phone";
-import { useNavigate } from "react-router-dom";
 import { axiosBqc, axiosWarehouseIn } from "../../../axios";
 export default function DialogBox() {
   const navigate = useNavigate();
@@ -36,13 +37,29 @@ export default function DialogBox() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        let response = await axiosBqc.post("/assigned-wht-item/" + trayId);
-        if (response.status === 200) {
-          setTrayData(response.data.data);
-          //   dataTableFun()
+        let admin = localStorage.getItem("prexo-authentication");
+        if (admin) {
+          let { user_name } = jwt_decode(admin);
+          let response = await axiosBqc.post(
+            "/assigned-wht-item/" +
+              trayId +
+              "/" +
+              user_name +
+              "/" +
+              "Issued to BQC"
+          );
+          if (response.status === 200) {
+            setTrayData(response.data.data);
+            //   dataTableFun()
+          }
         }
       } catch (error) {
-        alert(error);
+        if (error.response.status === 403) {
+          alert(error.response.data.message);
+          navigate(-1);
+        } else {
+          alert(error);
+        }
       }
     };
     fetchData();
@@ -289,6 +306,7 @@ export default function DialogBox() {
           </Paper>
         </Grid>
       </Grid>
+
       <Box sx={{ float: "right" }}>
         <textarea
           onChange={(e) => {

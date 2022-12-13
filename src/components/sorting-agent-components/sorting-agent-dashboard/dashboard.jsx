@@ -43,7 +43,7 @@ export default function Dashboard() {
           m: 3,
           width: 300,
           boxShadow: 2,
-          height: "237px",
+          height: "173px",
           backgroundColor: "#FFFFFF",
         }}
       >
@@ -75,7 +75,7 @@ export default function Dashboard() {
             </Link>
           </Box>
           <hr />
-          <Box
+          {/* <Box
             style={{ marginBottom: "12px", marginTop: "20" }}
             sx={{ display: "flex", flexDirection: "start" }}
           >
@@ -94,7 +94,7 @@ export default function Dashboard() {
               WHT Tray
             </Link>
           </Box>
-          <hr />
+          <hr /> */}
           <Box
             style={{ marginBottom: "12px", marginTop: "20" }}
             sx={{ display: "flex", flexDirection: "start" }}
