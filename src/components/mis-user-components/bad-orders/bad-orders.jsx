@@ -365,6 +365,7 @@ export default function Home() {
                 <TableCell>Revised Partner Price</TableCell>
                 <TableCell>Delivery Fee</TableCell>
                 <TableCell>Exchange Facilitation Fee</TableCell>
+                <TableCell>Reason</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -457,6 +458,9 @@ export default function Home() {
                   <TableCell>₹{data.delivery_fee?.toString()}</TableCell>
                   <TableCell>
                     ₹{data.exchange_facilitation_fee?.toString()}
+                  </TableCell>
+                  <TableCell style={{color:"red"}}>
+                    {data.reason}
                   </TableCell>
                 </TableRow>
               ))}

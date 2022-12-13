@@ -116,32 +116,38 @@ export default function Home() {
           data?.order_date == undefined ||
           data?.order_date == ""
         ) {
+          obj.reason="Order date does not exists"
           obj.invalidItem.push(data);
         } else if (
           err?.duplicate_tracking_id?.includes(data?.tracking_id) ||
           data?.tracking_id == undefined ||
           data?.tracking_id == ""
         ) {
+          obj.reason="Tracking id does not exitsts or duplicate tracking id"
           obj.invalidItem.push(data);
         } else if (
           err?.duplicate_order_id_found?.includes(data?.order_id) ||
           data?.order_id == undefined ||
           data?.order_id == ""
         ) {
+          obj.reason="Duplicate order id or order id does not exists"
           obj.invalidItem.push(data);
         } else if (err?.no_orders?.includes(data?.order_id)) {
+          obj.reason="Order not found"
           obj.invalidItem.push(data);
         } else if (
           err?.item_does_not_exist?.includes(data?.item_id) ||
           data?.item_id == undefined ||
           data?.item_id == ""
         ) {
+          obj.reason="Item does not exitsts"
           obj.invalidItem.push(data);
         } else if (
           err?.location_does_not_exist?.includes(data?.partner_shop) ||
           data?.partner_shop == undefined ||
           data?.partner_shop == ""
         ) {
+          obj.reason="Partner shop does not exitsts"
           obj.invalidItem.push(data);
         } else {
           obj.validItem.push(data);

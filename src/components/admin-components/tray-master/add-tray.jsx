@@ -72,8 +72,6 @@ export default function DialogBox() {
   const [allModel, setAllModel] = useState([]);
   const [loading, setLoading] = useState(false);
   const [cpc, setCpc] = useState([]);
-
-
   useEffect(() => {
     try {
       const fetchData = async () => {
@@ -157,13 +155,12 @@ export default function DialogBox() {
       .nullable(),
     type_taxanomy: Yup.string().required("Required*").nullable(),
     warehouse: Yup.string().required("Required*").nullable(),
-    limit:  Yup
-    .number("Must be number")
-    .required("Required*")
-    .positive()
-    .integer()
-    .min(1, "Minimum is 1")
-    .nullable(),
+    limit: Yup.number("Must be number")
+      .required("Required*")
+      .positive()
+      .integer()
+      .min(1, "Minimum is 1")
+      .nullable(),
     brand: Yup.string()
       .required("Required*")
       .matches(/^.*((?=.*[aA-zZ\s]){1}).*$/, "Please enter valid brand")
@@ -210,7 +207,7 @@ export default function DialogBox() {
     } catch (error) {
       setLoading(false);
       if (error.response.status == 400) {
-        handleClose()
+        handleClose();
         Swal.fire({
           position: "top-center",
           icon: "error",
@@ -236,8 +233,9 @@ export default function DialogBox() {
         model: response.data.data.model,
         brand: response.data.data.brand,
         warehouse: response.data.data.warehouse,
-        cpc:response.data.data.cpc
+        cpc: response.data.data.cpc,
       });
+      fetchModel(response.data.data.brand);
       setId(response.data.data._id);
       setEditCall(true);
       setOpen(true);
@@ -296,8 +294,7 @@ export default function DialogBox() {
     }
   };
   /* Fetch model */
-  const fetchModel = async (e, brandName) => {
-    e.preventDefault();
+  const fetchModel = async (brandName) => {
     try {
       let res = await axiosSuperAdminPrexo.post(
         "/get-product-model/" + brandName
@@ -380,6 +377,9 @@ export default function DialogBox() {
                 fullWidth
                 {...register("cpc")}
                 defaultValue={getValues("cpc")}
+                disabled={
+                  getValues("type_taxanomy") == "WHT" && editCall === true
+                }
                 error={errors.cpc ? true : false}
                 helperText={errors.cpc?.message}
                 sx={{ mt: 2 }}
@@ -402,6 +402,9 @@ export default function DialogBox() {
                 labelId="demo-simple-select-label"
                 label="Warehouse"
                 fullWidth
+                disabled={
+                  getValues("type_taxanomy") == "WHT" && editCall === true
+                }
                 defaultValue={getValues("warehouse")}
                 {...register("warehouse")}
                 error={errors.warehouse ? true : false}
@@ -421,6 +424,9 @@ export default function DialogBox() {
                 labelId="demo-simple-select-label"
                 label="Bag Category"
                 fullWidth
+                disabled={
+                  getValues("type_taxanomy") == "WHT" && editCall === true
+                }
                 {...register("type_taxanomy")}
                 defaultValue={getValues("type_taxanomy")}
                 error={errors.type_taxanomy ? true : false}
@@ -471,6 +477,7 @@ export default function DialogBox() {
                     labelId="demo-simple-select-label"
                     label="Bag Category"
                     fullWidth
+                    defaultValue={getValues("brand")}
                     {...register("brand")}
                     error={errors.brand ? true : false}
                     helperText={errors.brand ? errors.brand.message : ""}
@@ -480,7 +487,7 @@ export default function DialogBox() {
                       <MenuItem
                         value={brandData.brand_name}
                         onClick={(e) => {
-                          fetchModel(e, brandData.brand_name);
+                          fetchModel(brandData.brand_name);
                         }}
                       >
                         {brandData.brand_name}
@@ -493,9 +500,8 @@ export default function DialogBox() {
                     Select Model
                   </InputLabel>
                   <Select
-                    labelId="demo-simple-select-label"
-                    label="Bag Category"
                     fullWidth
+                    defaultValue={getValues("model")}
                     {...register("model")}
                     error={errors.model ? true : false}
                     helperText={errors.model ? errors.model.message : ""}
@@ -537,6 +543,9 @@ export default function DialogBox() {
               variant="outlined"
               fullWidth
               {...register("name")}
+              disabled={
+                getValues("type_taxanomy") == "WHT" && editCall === true
+              }
               error={errors.name ? true : false}
               helperText={errors.name ? errors.name.message : ""}
               sx={{ mt: 2 }}
@@ -566,6 +575,9 @@ export default function DialogBox() {
               variant="outlined"
               fullWidth
               {...register("display")}
+              disabled={
+                getValues("type_taxanomy") == "WHT" && editCall === true
+              }
               error={errors.display ? true : false}
               helperText={errors.display ? errors.display.message : ""}
               sx={{ mt: 2 }}

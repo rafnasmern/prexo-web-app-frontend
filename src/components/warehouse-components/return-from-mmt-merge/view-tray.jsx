@@ -106,7 +106,7 @@ export default function StickyHeadTable({ props }) {
   };
   const handelViewDetailTray = (e, id) => {
     e.preventDefault();
-    navigate("/return-from-mmt-merge-close/" + id);
+    navigate("/tray-return-from-merging-close/" + id);
   };
   const label = { inputProps: { "aria-label": "Checkbox demo" } };
   // HANDEL RECEIVED TRY
@@ -227,7 +227,7 @@ export default function StickyHeadTable({ props }) {
                       </TableCell>
                       <TableCell>{data.issued_user_name}</TableCell>
                       <TableCell>
-                        <Button
+                        {/* <Button
                           sx={{
                             m: 1,
                           }}
@@ -238,7 +238,7 @@ export default function StickyHeadTable({ props }) {
                           }}
                         >
                           View
-                        </Button>
+                        </Button> */}
                         {data.sort_id != "Received From Merging" ? (
                           <Button
                             sx={{

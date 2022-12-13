@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useMemo } from "react";
 import {
   Box,
   Button,
@@ -13,7 +13,6 @@ import {
   TableRow,
   Grid,
   InputAdornment,
-  Container,
 } from "@mui/material";
 import { useParams } from "react-router-dom";
 import "yup-phone";
@@ -23,7 +22,6 @@ import jwt_decode from "jwt-decode";
 import { axiosWarehouseIn } from "../../axios";
 import Checkbox from "@mui/material/Checkbox";
 import SearchIcon from "@mui/icons-material/Search";
-import CircularProgress from "@mui/material/CircularProgress";
 export default function DialogBox() {
   const navigate = useNavigate();
   const [employeeData, setEmployeeData] = useState([]);
@@ -34,6 +32,8 @@ export default function DialogBox() {
   const [uic, setUic] = useState(false);
   const [sleaves, setSleaves] = useState(false);
   const [description, setDescription] = useState([]);
+  const [readyForAssign, setReadyForAssign] = useState(0);
+  const [textBoxDis,setTextBoxDis]=useState(false)
   /*********************************************************** */
   const [botTray, setBotTray] = useState("");
   const [pmtTray, setPmtTray] = useState(null);
@@ -80,7 +80,28 @@ export default function DialogBox() {
     };
     fetchData();
   }, []);
-
+  useEffect(() => {
+    const fetchAgentStatus = async () => {
+      try {
+        let res = await axiosWarehouseIn.post(
+          "/checkBotUserStatus/" + employeeData[0]?.issued_user_name
+        );
+        if (res.status === 200) {
+          setReadyForAssign(res.data.status);
+        }
+      } catch (error) {
+        if (error.response.status === 403) {
+          alert(error.response.data.message);
+          navigate(-1);
+        } else {
+          alert(error);
+        }
+      }
+    };
+    if (employeeData[0]?.issued_user_name !== undefined) {
+      fetchAgentStatus();
+    }
+  }, [employeeData]);
   const getitem = async () => {
     try {
       let response = await axiosWarehouseIn.post(
@@ -113,15 +134,18 @@ export default function DialogBox() {
           awbn: e.target.value,
           id: bagId,
         };
+        setTextBoxDis(true)
         let res = await axiosWarehouseIn.post("/actualCheckAwbn", obj);
         if (res?.status == 200) {
           addActualitem(res.data.data);
         }
       } catch (error) {
         if (error.response.status == 403) {
+          setTextBoxDis(false)
           setAwbn("");
           alert(error.response.data.message);
         } else if (error.response.status == 400) {
+          setTextBoxDis(false)
           alert("This Item Does Not Exist In This Bag");
         } else {
           alert(error);
@@ -142,6 +166,7 @@ export default function DialogBox() {
     ) {
       alert("Bag Is Full");
     } else {
+      setTextBoxDis(true)
       let data = employeeData[0]?.items?.filter(function (item) {
         return item.awbn_number == awbn.tracking_id;
       });
@@ -296,6 +321,259 @@ export default function DialogBox() {
   };
   /***************************************************************************************** */
   const label = { inputProps: { "aria-label": "Checkbox demo" } };
+  const tabelDataExpected = useMemo(() => {
+    return (
+      <Paper sx={{ width: "95%", overflow: "hidden", m: 1 }}>
+        <h6>Expected</h6>
+
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "end",
+          }}
+        >
+          <Box
+            sx={{
+              m: 2,
+            }}
+          >
+            <Box sx={{}}>
+              <h5>Total</h5>
+              <p style={{ paddingLeft: "5px", fontSize: "22px" }}>
+                {
+                  employeeData[0]?.items?.filter(function (item) {
+                    return item.status != "Duplicate";
+                  }).length
+                }
+                /{employeeData[0]?.limit}
+              </p>
+            </Box>
+          </Box>
+          <Box
+            sx={{
+              m: 2,
+            }}
+          >
+            <Box sx={{}}>
+              <h5>Valid</h5>
+              <p style={{ marginLeft: "14px", fontSize: "24px" }}>
+                {
+                  employeeData[0]?.items?.filter(function (item) {
+                    return item.status == "Valid";
+                  }).length
+                }
+              </p>
+            </Box>
+          </Box>
+          <Box
+            sx={{
+              m: 2,
+            }}
+          >
+            <Box sx={{}}>
+              <h5>Invalid</h5>
+              <p style={{ marginLeft: "20px", fontSize: "24px" }}>
+                {
+                  employeeData[0]?.items?.filter(function (item) {
+                    return item.status == "Invalid";
+                  }).length
+                }
+              </p>
+            </Box>
+          </Box>{" "}
+        </Box>
+        <TableContainer>
+          <Table
+            style={{ width: "100%" }}
+            id="example"
+            stickyHeader
+            aria-label="sticky table"
+          >
+            <TableHead>
+              <TableRow>
+                <TableCell>S.NO</TableCell>
+                <TableCell>AWBN Number</TableCell>
+                <TableCell>Order ID</TableCell>
+                <TableCell>Order Date</TableCell>
+                <TableCell>Status</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {employeeData[0]?.items?.map((data, index) => (
+                <TableRow hover role="checkbox" tabIndex={-1}>
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>{data?.awbn_number}</TableCell>
+                  <TableCell>{data?.order_id}</TableCell>
+                  <TableCell>
+                    {new Date(data?.order_date).toLocaleString("en-GB", {
+                      year: "numeric",
+                      month: "2-digit",
+                      day: "2-digit",
+                    })}
+                  </TableCell>
+                  <TableCell
+                    style={
+                      data.status == "Valid"
+                        ? { color: "green" }
+                        : { color: "red" }
+                    }
+                  >
+                    {data.status}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Paper>
+    );
+  }, [employeeData[0]?.items]);
+  const tableDataActul = useMemo(() => {
+    return (
+      <Paper sx={{ width: "98%", overflow: "hidden", m: 1 }}>
+        <h6>ACTUAL</h6>
+        <TextField
+          sx={{ m: 1 }}
+          id="outlined-password-input"
+          type="text"
+          disabled={textBoxDis}
+          name="doorsteps_diagnostics"
+          label="Please Enter AWB Number"
+          value={awbn}
+          // onChange={(e) => setAwbn(e.target.value)}
+          onChange={(e) => {
+            setAwbn(e.target.value);
+            handelAwbn(e);
+          }}
+          inputProps={{
+            style: {
+              width: "auto",
+            },
+          }}
+        />
+
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "end",
+          }}
+        >
+          <Box
+            sx={{
+              m: 2,
+            }}
+          >
+            <Box sx={{}}>
+              <h5>Total</h5>
+              <p style={{ marginLeft: "5px", fontSize: "24px" }}>
+                {
+                  employeeData[0]?.actual_items?.filter(function (item) {
+                    return item.status != "Duplicate";
+                  }).length
+                }
+                /{employeeData[0]?.limit}
+              </p>
+            </Box>
+          </Box>
+          <Box
+            sx={{
+              m: 2,
+            }}
+          >
+            <Box sx={{}}>
+              <h5>Valid</h5>
+              <p style={{ marginLeft: "19px", fontSize: "24px" }}>
+                {
+                  employeeData[0]?.actual_items?.filter(function (item) {
+                    return item.status == "Valid";
+                  }).length
+                }
+              </p>
+            </Box>
+          </Box>
+          <Box
+            sx={{
+              m: 2,
+            }}
+          >
+            <Box sx={{}}>
+              <h5>Invalid</h5>
+              <p style={{ marginLeft: "25px", fontSize: "24px" }}>
+                {
+                  employeeData[0]?.actual_items?.filter(function (item) {
+                    return item.status == "Invalid";
+                  }).length
+                }
+              </p>
+            </Box>
+          </Box>{" "}
+        </Box>
+        <TableContainer>
+          <Table
+            style={{ width: "100%" }}
+            id="example"
+            stickyHeader
+            aria-label="sticky table"
+          >
+            <TableHead>
+              <TableRow>
+                <TableCell>S.NO</TableCell>
+                <TableCell>AWBN Number</TableCell>
+                <TableCell>Order ID</TableCell>
+                <TableCell>Order Date</TableCell>
+                <TableCell>Status</TableCell>
+              </TableRow>
+            </TableHead>
+
+            <TableBody>
+              {employeeData[0]?.actual_items?.map((data, index) => (
+                <TableRow hover role="checkbox" tabIndex={-1}>
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>{data?.awbn_number}</TableCell>
+                  <TableCell>{data?.order_id}</TableCell>
+                  <TableCell>
+                    {new Date(data?.order_date).toLocaleString("en-GB", {
+                      year: "numeric",
+                      month: "2-digit",
+                      day: "2-digit",
+                    })}
+                  </TableCell>
+                  <TableCell
+                    style={
+                      data.status == "Valid"
+                        ? { color: "green" }
+                        : { color: "red" }
+                    }
+                  >
+                    {data.status}
+                  </TableCell>
+                  <TableCell>
+                    {data.status !== "Valid" ? (
+                      <Button
+                        sx={{
+                          ml: 2,
+                        }}
+                        variant="contained"
+                        style={{ backgroundColor: "red" }}
+                        component="span"
+                        onClick={() => {
+                          if (window.confirm("You want to Remove?")) {
+                            handelDelete(data._id);
+                          }
+                        }}
+                      >
+                        Remove
+                      </Button>
+                    ) : null}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Paper>
+    );
+  }, [employeeData[0]?.actual_items,textBoxDis]);
   return (
     <>
       <Box
@@ -358,301 +636,10 @@ export default function DialogBox() {
       </Box>
       <Grid container spacing={1}>
         <Grid item xs={6}>
-          <Paper sx={{ width: "95%", overflow: "hidden", m: 1 }}>
-            <h6>Expected</h6>
-
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "end",
-              }}
-            >
-              <Box
-                sx={{
-                  m: 2,
-                }}
-              >
-                <Box sx={{}}>
-                  <h5>Total</h5>
-                  <p style={{ paddingLeft: "5px", fontSize: "22px" }}>
-                    {
-                      employeeData[0]?.items?.filter(function (item) {
-                        return item.status != "Duplicate";
-                      }).length
-                    }
-                    /{employeeData[0]?.limit}
-                  </p>
-                </Box>
-              </Box>
-              <Box
-                sx={{
-                  m: 2,
-                }}
-              >
-                <Box sx={{}}>
-                  <h5>Valid</h5>
-                  <p style={{ marginLeft: "14px", fontSize: "24px" }}>
-                    {
-                      employeeData[0]?.items?.filter(function (item) {
-                        return item.status == "Valid";
-                      }).length
-                    }
-                  </p>
-                </Box>
-              </Box>
-              <Box
-                sx={{
-                  m: 2,
-                }}
-              >
-                <Box sx={{}}>
-                  <h5>Invalid</h5>
-                  <p style={{ marginLeft: "20px", fontSize: "24px" }}>
-                    {
-                      employeeData[0]?.items?.filter(function (item) {
-                        return item.status == "Invalid";
-                      }).length
-                    }
-                  </p>
-                </Box>
-              </Box>{" "}
-              {/* <Box
-                sx={{
-                  m: 2,
-                }}
-              >
-                <Box sx={{}}>
-                  <h5>Duplicate</h5>
-                  <p style={{ marginLeft: "34px", fontSize: "24px" }}>
-                    {
-                      employeeData[0]?.items?.filter(function (item) {
-                        return item.status == "Duplicate";
-                      }).length
-                    }
-                  </p>
-                </Box>
-              </Box> */}
-            </Box>
-            <TableContainer>
-              <Table
-                style={{ width: "100%" }}
-                id="example"
-                stickyHeader
-                aria-label="sticky table"
-              >
-                <TableHead>
-                  <TableRow>
-                    <TableCell>S.NO</TableCell>
-                    <TableCell>AWBN Number</TableCell>
-                    <TableCell>Order ID</TableCell>
-                    <TableCell>Order Date</TableCell>
-                    <TableCell>Status</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {employeeData[0]?.items?.map((data, index) => (
-                    <TableRow hover role="checkbox" tabIndex={-1}>
-                      <TableCell>{index + 1}</TableCell>
-                      <TableCell>{data?.awbn_number}</TableCell>
-                      <TableCell>{data?.order_id}</TableCell>
-                      <TableCell>
-                        {new Date(data?.order_date).toLocaleString("en-GB", {
-                          year: "numeric",
-                          month: "2-digit",
-                          day: "2-digit",
-                        })}
-                      </TableCell>
-                      <TableCell
-                        style={
-                          data.status == "Valid"
-                            ? { color: "green" }
-                            : { color: "red" }
-                        }
-                      >
-                        {data.status}
-                      </TableCell>
-                      {/* <TableCell>
-                        <Button
-                          sx={{
-                            ml: 2,
-                          }}
-                          variant="contained"
-                          style={{ backgroundColor: "red" }}
-                          component="span"
-                          onClick={() => {
-                            if (window.confirm("Delete the item?")) {
-                              handelDelete(data._id);
-                            }
-                          }}
-                        >
-                          Remove
-                        </Button>
-                      </TableCell> */}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Paper>
+          {tabelDataExpected}
         </Grid>
         <Grid item xs={6}>
-          <Paper sx={{ width: "98%", overflow: "hidden", m: 1 }}>
-            <h6>ACTUAL</h6>
-            <TextField
-              sx={{ m: 1 }}
-              id="outlined-password-input"
-              type="text"
-              name="doorsteps_diagnostics"
-              label="Please Enter AWB Number"
-              value={awbn}
-              // onChange={(e) => setAwbn(e.target.value)}
-              onChange={(e) => {
-                setAwbn(e.target.value);
-                handelAwbn(e);
-              }}
-              inputProps={{
-                style: {
-                  width: "auto",
-                },
-              }}
-            />
-
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "end",
-              }}
-            >
-              <Box
-                sx={{
-                  m: 2,
-                }}
-              >
-                <Box sx={{}}>
-                  <h5>Total</h5>
-                  <p style={{ marginLeft: "5px", fontSize: "24px" }}>
-                    {
-                      employeeData[0]?.actual_items?.filter(function (item) {
-                        return item.status != "Duplicate";
-                      }).length
-                    }
-                    /{employeeData[0]?.limit}
-                  </p>
-                </Box>
-              </Box>
-              <Box
-                sx={{
-                  m: 2,
-                }}
-              >
-                <Box sx={{}}>
-                  <h5>Valid</h5>
-                  <p style={{ marginLeft: "19px", fontSize: "24px" }}>
-                    {
-                      employeeData[0]?.actual_items?.filter(function (item) {
-                        return item.status == "Valid";
-                      }).length
-                    }
-                  </p>
-                </Box>
-              </Box>
-              <Box
-                sx={{
-                  m: 2,
-                }}
-              >
-                <Box sx={{}}>
-                  <h5>Invalid</h5>
-                  <p style={{ marginLeft: "25px", fontSize: "24px" }}>
-                    {
-                      employeeData[0]?.actual_items?.filter(function (item) {
-                        return item.status == "Invalid";
-                      }).length
-                    }
-                  </p>
-                </Box>
-              </Box>{" "}
-              {/* <Box
-                sx={{
-                  m: 2,
-                }}
-              >
-                <Box sx={{}}>
-                  <h5>Duplicate</h5>
-                  <p style={{ marginLeft: "39px", fontSize: "24px" }}>
-                    {
-                      employeeData[0]?.actual_items?.filter(function (item) {
-                        return item.status == "Duplicate";
-                      }).length
-                    }
-                  </p>
-                </Box>
-              </Box> */}
-            </Box>
-            <TableContainer>
-              <Table
-                style={{ width: "100%" }}
-                id="example"
-                stickyHeader
-                aria-label="sticky table"
-              >
-                <TableHead>
-                  <TableRow>
-                    <TableCell>S.NO</TableCell>
-                    <TableCell>AWBN Number</TableCell>
-                    <TableCell>Order ID</TableCell>
-                    <TableCell>Order Date</TableCell>
-                    <TableCell>Status</TableCell>
-                  </TableRow>
-                </TableHead>
-
-                <TableBody>
-                  {employeeData[0]?.actual_items?.map((data, index) => (
-                    <TableRow hover role="checkbox" tabIndex={-1}>
-                      <TableCell>{index + 1}</TableCell>
-                      <TableCell>{data?.awbn_number}</TableCell>
-                      <TableCell>{data?.order_id}</TableCell>
-                      <TableCell>
-                        {new Date(data?.order_date).toLocaleString("en-GB", {
-                          year: "numeric",
-                          month: "2-digit",
-                          day: "2-digit",
-                        })}
-                      </TableCell>
-                      <TableCell
-                        style={
-                          data.status == "Valid"
-                            ? { color: "green" }
-                            : { color: "red" }
-                        }
-                      >
-                        {data.status}
-                      </TableCell>
-                      <TableCell>
-                        {data.status !== "Valid" ? (
-                          <Button
-                            sx={{
-                              ml: 2,
-                            }}
-                            variant="contained"
-                            style={{ backgroundColor: "red" }}
-                            component="span"
-                            onClick={() => {
-                              if (window.confirm("You want to Remove?")) {
-                                handelDelete(data._id);
-                              }
-                            }}
-                          >
-                            Remove
-                          </Button>
-                        ) : null}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Paper>
+          {tableDataActul}
         </Grid>
       </Grid>
       <Grid container spacing={3} sx={{ mt: 2 }}>
@@ -743,7 +730,7 @@ export default function DialogBox() {
             <Button
               sx={{ m: 3, mb: 9 }}
               variant="contained"
-              disabled={loading == true ? true : false}
+              disabled={loading == true || readyForAssign !== 1 ? true : false}
               style={{ backgroundColor: "green" }}
               onClick={() => {
                 if (window.confirm("You Want to Issue?")) {
@@ -751,7 +738,9 @@ export default function DialogBox() {
                 }
               }}
             >
-              Issue To Agent
+              {readyForAssign == 2
+                ? `${employeeData[0]?.issued_user_name} have one bag`
+                : "Issue To Agent"}
             </Button>
           </Box>
         </Grid>

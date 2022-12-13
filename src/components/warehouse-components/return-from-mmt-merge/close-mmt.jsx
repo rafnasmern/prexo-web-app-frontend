@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   Box,
   Button,
@@ -11,16 +11,12 @@ import {
   TableHead,
   TableRow,
   Grid,
-  Container,
 } from "@mui/material";
 import { useParams } from "react-router-dom";
 import "yup-phone";
 import { useNavigate } from "react-router-dom";
 import { axiosWarehouseIn } from "../../../axios";
 import Checkbox from "@mui/material/Checkbox";
-// import jwt from "jsonwebtoken"
-import jwt_decode from "jwt-decode";
-import CircularProgress from "@mui/material/CircularProgress";
 
 export default function DialogBox() {
   const navigate = useNavigate();
@@ -186,7 +182,181 @@ export default function DialogBox() {
   /***************************************************************************************** */
   const label = { inputProps: { "aria-label": "Checkbox demo" } };
   /******************************************************************************** */
+  const tableExpected = useMemo(() => {
+    return (
+      <Paper sx={{ width: "95%", overflow: "hidden", m: 1 }}>
+        <h6>Expected</h6>
 
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "end",
+          }}
+        >
+          <Box
+            sx={{
+              m: 2,
+            }}
+          >
+            <Box sx={{}}>
+              <h5>Total</h5>
+              <p style={{ paddingLeft: "5px", fontSize: "22px" }}>
+                {
+                  employeeData[0]?.items?.filter(function (item) {
+                    return item.status != "Duplicate";
+                  }).length
+                }
+                /{employeeData[0]?.limit}
+              </p>
+            </Box>
+          </Box>
+        </Box>
+        <TableContainer>
+          <Table
+            style={{ width: "100%" }}
+            id="example"
+            stickyHeader
+            aria-label="sticky table"
+          >
+            <TableHead>
+              <TableRow>
+                <TableCell>S.NO</TableCell>
+                <TableCell>UIC</TableCell>
+                <TableCell>Bag Id</TableCell>
+                {/* <TableCell>AWBN Number</TableCell> */}
+                <TableCell>Order ID</TableCell>
+                <TableCell>Order Date</TableCell>
+                <TableCell>Status</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {employeeData[0]?.items?.map((data, index) => (
+                <TableRow hover role="checkbox" tabIndex={-1}>
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>{data?.uic}</TableCell>
+                  <TableCell>{data?.bag_id}</TableCell>
+                  {/* <TableCell>{data?.awbn_number}</TableCell> */}
+                  <TableCell>{data?.order_id}</TableCell>
+                  <TableCell>
+                    {new Date(data?.order_date).toLocaleString("en-GB", {
+                      year: "numeric",
+                      month: "2-digit",
+                      day: "2-digit",
+                    })}
+                  </TableCell>
+                  <TableCell
+                    style={
+                      data.status == "Valid"
+                        ? { color: "green" }
+                        : { color: "red" }
+                    }
+                  >
+                    {data.status}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Paper>
+    );
+  }, [employeeData[0]?.items]);
+  const tableActual = useMemo(() => {
+    return(
+    <Paper sx={{ width: "98%", overflow: "hidden", m: 1 }}>
+      <h6>ACTUAL</h6>
+      <TextField
+        sx={{ m: 1 }}
+        id="outlined-password-input"
+        type="text"
+        name="doorsteps_diagnostics"
+        label="Please Enter UIC"
+        value={awbn}
+        onChange={(e) => {
+          setAwbn(e.target.value);
+          handelAwbn(e);
+        }}
+        inputProps={{
+          style: {
+            width: "auto",
+          },
+        }}
+      />
+
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "end",
+        }}
+      >
+        <Box
+          sx={{
+            m: 2,
+          }}
+        >
+          <Box sx={{}}>
+            <h5>Total</h5>
+            <p style={{ marginLeft: "5px", fontSize: "24px" }}>
+              {
+                employeeData[0]?.actual_items?.filter(function (item) {
+                  return item.status != "Duplicate";
+                }).length
+              }
+              /{employeeData[0]?.limit}
+            </p>
+          </Box>
+        </Box>
+      </Box>
+      <TableContainer>
+        <Table
+          style={{ width: "100%" }}
+          id="example"
+          stickyHeader
+          aria-label="sticky table"
+        >
+          <TableHead>
+            <TableRow>
+              <TableCell>S.NO</TableCell>
+              <TableCell>UIC</TableCell>
+              <TableCell>Bag Id</TableCell>
+              {/* <TableCell>AWBN Number</TableCell> */}
+              <TableCell>Order ID</TableCell>
+              <TableCell>Order Date</TableCell>
+              <TableCell>Status</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {employeeData[0]?.actual_items?.map((data, index) => (
+              <TableRow hover role="checkbox" tabIndex={-1}>
+                <TableCell>{index + 1}</TableCell>
+                <TableCell>{data?.uic}</TableCell>
+                <TableCell>{data?.bag_id}</TableCell>
+                {/* <TableCell>{data?.awbn_number}</TableCell> */}
+                <TableCell>{data?.order_id}</TableCell>
+                <TableCell>
+                  {new Date(data?.order_date).toLocaleString("en-GB", {
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+                  })}
+                </TableCell>
+                <TableCell
+                  style={
+                    data.status == "Valid"
+                      ? { color: "green" }
+                      : { color: "red" }
+                  }
+                >
+                  {data.status}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Paper>
+    )
+  }, [employeeData[0]?.actual_items]);
   return (
     <>
       <Box
@@ -221,175 +391,10 @@ export default function DialogBox() {
       </Box>
       <Grid container spacing={1}>
         <Grid item xs={6}>
-          <Paper sx={{ width: "95%", overflow: "hidden", m: 1 }}>
-            <h6>Expected</h6>
-
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "end",
-              }}
-            >
-              <Box
-                sx={{
-                  m: 2,
-                }}
-              >
-                <Box sx={{}}>
-                  <h5>Total</h5>
-                  <p style={{ paddingLeft: "5px", fontSize: "22px" }}>
-                    {
-                      employeeData[0]?.items?.filter(function (item) {
-                        return item.status != "Duplicate";
-                      }).length
-                    }
-                    /{employeeData[0]?.limit}
-                  </p>
-                </Box>
-              </Box>
-            </Box>
-            <TableContainer>
-              <Table
-                style={{ width: "100%" }}
-                id="example"
-                stickyHeader
-                aria-label="sticky table"
-              >
-                <TableHead>
-                  <TableRow>
-                    <TableCell>S.NO</TableCell>
-                    <TableCell>UIC</TableCell>
-                    <TableCell>Bag Id</TableCell>
-                    {/* <TableCell>AWBN Number</TableCell> */}
-                    <TableCell>Order ID</TableCell>
-                    <TableCell>Order Date</TableCell>
-                    <TableCell>Status</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {employeeData[0]?.items?.map((data, index) => (
-                    <TableRow hover role="checkbox" tabIndex={-1}>
-                      <TableCell>{index + 1}</TableCell>
-                      <TableCell>{data?.uic}</TableCell>
-                      <TableCell>{data?.bag_id}</TableCell>
-                      {/* <TableCell>{data?.awbn_number}</TableCell> */}
-                      <TableCell>{data?.order_id}</TableCell>
-                      <TableCell>
-                        {new Date(data?.order_date).toLocaleString("en-GB", {
-                          year: "numeric",
-                          month: "2-digit",
-                          day: "2-digit",
-                        })}
-                      </TableCell>
-                      <TableCell
-                        style={
-                          data.status == "Valid"
-                            ? { color: "green" }
-                            : { color: "red" }
-                        }
-                      >
-                        {data.status}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Paper>
+          {tableExpected}
         </Grid>
         <Grid item xs={6}>
-          <Paper sx={{ width: "98%", overflow: "hidden", m: 1 }}>
-            <h6>ACTUAL</h6>
-            <TextField
-              sx={{ m: 1 }}
-              id="outlined-password-input"
-              type="text"
-              name="doorsteps_diagnostics"
-              label="Please Enter UIC"
-              value={awbn}
-              onChange={(e) => {
-                setAwbn(e.target.value);
-                handelAwbn(e);
-              }}
-              inputProps={{
-                style: {
-                  width: "auto",
-                },
-              }}
-            />
-
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "end",
-              }}
-            >
-              <Box
-                sx={{
-                  m: 2,
-                }}
-              >
-                <Box sx={{}}>
-                  <h5>Total</h5>
-                  <p style={{ marginLeft: "5px", fontSize: "24px" }}>
-                    {
-                      employeeData[0]?.actual_items?.filter(function (item) {
-                        return item.status != "Duplicate";
-                      }).length
-                    }
-                    /{employeeData[0]?.limit}
-                  </p>
-                </Box>
-              </Box>
-            </Box>
-            <TableContainer>
-              <Table
-                style={{ width: "100%" }}
-                id="example"
-                stickyHeader
-                aria-label="sticky table"
-              >
-                <TableHead>
-                  <TableRow>
-                    <TableCell>S.NO</TableCell>
-                    <TableCell>UIC</TableCell>
-                    <TableCell>Bag Id</TableCell>
-                    {/* <TableCell>AWBN Number</TableCell> */}
-                    <TableCell>Order ID</TableCell>
-                    <TableCell>Order Date</TableCell>
-                    <TableCell>Status</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {employeeData[0]?.actual_items?.map((data, index) => (
-                    <TableRow hover role="checkbox" tabIndex={-1}>
-                      <TableCell>{index + 1}</TableCell>
-                      <TableCell>{data?.uic}</TableCell>
-                      <TableCell>{data?.bag_id}</TableCell>
-                      {/* <TableCell>{data?.awbn_number}</TableCell> */}
-                      <TableCell>{data?.order_id}</TableCell>
-                      <TableCell>
-                        {new Date(data?.order_date).toLocaleString("en-GB", {
-                          year: "numeric",
-                          month: "2-digit",
-                          day: "2-digit",
-                        })}
-                      </TableCell>
-                      <TableCell
-                        style={
-                          data.status == "Valid"
-                            ? { color: "green" }
-                            : { color: "red" }
-                        }
-                      >
-                        {data.status}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Paper>
+          {tableActual}
         </Grid>
       </Grid>
       <div style={{ float: "right" }}>

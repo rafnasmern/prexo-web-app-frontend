@@ -22,6 +22,7 @@ import AuditTray from "./pages/super-admin-pages/audit-tray-page";
 import ItemTracking from "./pages/super-admin-pages/item-tracking-page";
 import Warehouse from "./pages/super-admin-pages/warehouse";
 import ReadyForCharging from "./pages/super-admin-pages/ready-for-charging";
+import MastersEditHistory from "./pages/super-admin-pages/masters-edit-history";
 
 /*--------------------------------------------------------------------------------------------
 MIS
@@ -109,7 +110,7 @@ import MmtFromAndToTrayView from "./pages/warehouse-page/mmt-merge-approve/from-
 import ReturnFromMmtMerge from "./pages/warehouse-page/return-from-merge/view-tray";
 import ReturnFromMergeMmtTrayClose from "./pages/warehouse-page/return-from-merge/mmt-tray-close";
 import InusePmtMmt from "./pages/warehouse-page/inuse-pmt-mmt/inuse-pmt-mmt";
-import SkuSummeryBot from "./pages/warehouse-page/bot-tray-report/sku-summery"
+import SkuSummeryBot from "./pages/warehouse-page/bot-tray-report/sku-summery";
 /**********************************CHARGING PANEL************************************* */
 import ChargingPanelDashboard from "./pages/charging-pages/charging-dashboard";
 import ViewAssignedTrayCharging from "./pages/charging-pages/view-assigned-tray";
@@ -326,7 +327,7 @@ function App() {
           <Route path="/issued-mmt-pmt" element={<IssuedMmtPmtTray />} />
           <Route path="/pmt-report" element={<PmtReport />} />
           <Route path="/mmt-report" element={<MmtReport />} />
-          <Route path="/mmt-merge-request" element={<MmttrayMerge />} />
+          <Route path="/tray-merge-request" element={<MmttrayMerge />} />
           <Route path="/wht-tray-merge" element={<WhtTrayMerge />} />
           <Route path="/bot-tray-report" element={<BotTrayReport />} />
           <Route path="/bag-transfer" element={<BagTransfer />} />
@@ -344,19 +345,23 @@ function App() {
             path="/mmt-merge-approve/:mmtTrayId"
             element={<MmtFromAndToTrayView />}
           />
-          <Route path="/merge-mmt-tray" element={<ViewAssignedMmt />} />
+          <Route path="/tray-merge" element={<ViewAssignedMmt />} />
           <Route path="/start-mmt-merge/:trayId" element={<StartMmtMerge />} />
           <Route
-            path="/return-from-mmt-merge"
+            path="/tray-return-from-merging"
             element={<ReturnFromMmtMerge />}
           />
           <Route
-            path="/return-from-mmt-merge-close/:trayId"
+            path="/tray-return-from-merging-close/:trayId"
             element={<ReturnFromMergeMmtTrayClose />}
           />
           <Route path="/ready-for-charging" element={<ReadyForCharging />} />
           <Route path="/inuse-pmt-mmt" element={<InusePmtMmt />} />
           <Route path="/bot-sku-summery/:trayId" element={<SkuSummeryBot />} />
+          <Route
+            path="/tray-edit-history/:trayId"
+            element={<MastersEditHistory />}
+          />
         </Routes>
       </BrowserRouter>
     </>

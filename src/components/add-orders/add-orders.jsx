@@ -138,24 +138,28 @@ export default function Home() {
             data?.order_id == undefined ||
             data?.order_id == ""
           ) {
+            obj.reason="Duplicate order id or order does not exists"
             obj.invalidItem.push(data);
           } else if (
             err?.partner_id_does_not_exist?.includes(data?.partner_id) ||
             data?.partner_id == undefined ||
             data?.partner_id == ""
           ) {
+            obj.reason="Partner id does not exists"
             obj.invalidItem.push(data);
           } else if (
             err?.partner_id_does_not_exist?.includes(data?.partner_shop) ||
             data?.partner_shop == undefined ||
             data?.partner_shop == ""
           ) {
+            obj.reason="Partner shop does not exists"
             obj.invalidItem.push(data);
           } else if (
             err?.item_id_does_not_exist?.includes(data.item_id) ||
             data?.item_id == undefined ||
             data?.item_id == ""
           ) {
+            obj.reason="Item id does not exists"
             obj.invalidItem.push(data);
           } else if (
             err?.brand_name_does_not_exist?.includes(
@@ -164,6 +168,7 @@ export default function Home() {
             data?.old_item_details?.split(":")?.[0] == undefined ||
             data?.old_item_details?.split(":")?.[0] == ""
           ) {
+            obj.reason="Model name does not exists"
             obj.invalidItem.push(data);
           } else if (
             err?.brand_name_does_not_exist?.includes(
@@ -172,6 +177,7 @@ export default function Home() {
             data?.old_item_details?.split(":")?.[1] == undefined ||
             data?.old_item_details?.split(":")?.[1] == ""
           ) {
+            obj.reason="Brand name does not exists"
             obj.invalidItem.push(data);
           } else if (
             err?.imei_number_is_duplicate?.some(
@@ -180,11 +186,13 @@ export default function Home() {
             data?.imei == undefined ||
             data.imei == ""
           ) {
+            obj.reason="Duplicate IMEI number or imei number not exists"
             obj.invalidItem.push(data);
           } else {
             obj.validItem.push(data);
           }
         } else {
+          obj.reason="Not NEW order"
           obj.invalidItem.push(data);
         }
       });

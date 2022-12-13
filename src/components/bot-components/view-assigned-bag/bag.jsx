@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useMemo } from "react";
 import {
   Box,
   Button,
@@ -89,11 +89,13 @@ export default function DialogBox() {
   const [stickerOne, setStickerOne] = useState("");
   const [stickerTwo, setStickerTwo] = useState("");
   const [stickertThree, setStickerThree] = useState("");
-  const [stickerFour, setStickerFour] = useState("");
+  const [bodyDamageDes, setBodyDamageDes] = useState("");
+  const [itemRecievedDet, setItemRecieveDet] = useState("");
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(false);
   const [awbn, setAwbn] = useState("");
   const [bodyDamage, setBodyDamage] = useState("NO");
+  const [textBoxDis,setTextBoxDis]=useState(false)
   /******************************************************************************** */
   let admin = localStorage.getItem("prexo-authentication");
   let user_name1;
@@ -151,7 +153,8 @@ export default function DialogBox() {
     setStickerOne("");
     setStickerTwo("");
     setStickerThree("");
-    setStickerFour("");
+    setItemRecieveDet("");
+    setBodyDamageDes("");
     setOpneProductMisMatch(false);
     setBodyDamage("NO");
   };
@@ -159,7 +162,8 @@ export default function DialogBox() {
     setStickerOne("");
     setStickerTwo("");
     setStickerThree("");
-    setStickerFour("");
+    setBodyDamageDes("");
+    setItemRecieveDet("");
     setOpenApprove(false);
     setBodyDamage("NO");
   };
@@ -167,7 +171,8 @@ export default function DialogBox() {
     setStickerOne("");
     setStickerTwo("");
     setStickerThree("");
-    setStickerFour("");
+    setItemRecieveDet("");
+    setBodyDamageDes("");
     setModelMisMatch(false);
     setBodyDamage("NO");
   };
@@ -208,6 +213,7 @@ export default function DialogBox() {
           awbn_number: e.target.value,
           username: user_name1,
         };
+        setTextBoxDis(true)
         let res = await axiosBot.post("/awbnScanning", obj);
         if (res.status === 200) {
           setAwbnDetails(res.data.data);
@@ -216,6 +222,7 @@ export default function DialogBox() {
         }
       } catch (error) {
         if (error.response.status === 403) {
+          setTextBoxDis(false)
           alert(error.response.data.message);
           setAwbn("");
         } else {
@@ -250,15 +257,7 @@ export default function DialogBox() {
     });
     try {
       if (trayType == "MMT" && tray?.length !== 0) {
-        if (
-          stickerOne == "" ||
-          stickerTwo == "" ||
-          stickertThree == "" ||
-          stickerFour == ""
-        ) {
-          setLoading(false);
-          alert("Please Confirm All Stickers");
-        } else if (tray[0]?.limit <= tray?.[0]?.items?.length) {
+        if (tray[0]?.limit <= tray?.[0]?.items?.length) {
           if (tray[0]?.sort_id == "Issued") {
             alert("Tray Is Full");
             if (window.confirm("You Want to Close Tray?")) {
@@ -278,11 +277,13 @@ export default function DialogBox() {
             stickerOne: stickerOne,
             stickerTwo: stickerTwo,
             stickerThree: stickertThree,
-            stickerFour: stickerFour,
             status: awabnDetails?.[0].status,
             tray_id: tray[0].code,
             bag_id: bagId,
             user_name: user_name1,
+            body_damage: bodyDamage,
+            body_damage_des: bodyDamageDes,
+            model_brand: itemRecievedDet,
             bag_assigned_date: bagData[0]?.assigned_date,
             uic:
               awabnDetails?.[0]?.uic_code?.code == undefined
@@ -291,25 +292,19 @@ export default function DialogBox() {
           };
           let res = await axiosBot.post("/traySegregation", obj);
           if (res.status == 200) {
+            setTextBoxDis(false)
             setLoading(false);
             alert("Successfully Added");
             setRefresh((refresh) => !refresh);
             setStickerOne("");
             setStickerTwo("");
             setStickerThree("");
-            setStickerFour("");
             setBodyDamage("NO");
             setModelMisMatch(false);
           }
         }
       } else if (tray?.length !== 0) {
-        if (stickerOne == "" || stickerTwo == "" || stickertThree == "") {
-          alert("Please Confirm All Stickers");
-          setLoading(false);
-        } else if (
-          tray[0].limit <= tray?.[0]?.items?.length &&
-          trayType == "BOT"
-        ) {
+        if (tray[0].limit <= tray?.[0]?.items?.length && trayType == "BOT") {
           setLoading(false);
           alert("Tray Is Full");
         } else if (
@@ -333,8 +328,6 @@ export default function DialogBox() {
             imei: awabnDetails?.[0]?.imei,
             stickerOne: stickerOne,
             stickerTwo: stickerTwo,
-            stickerThree: stickertThree,
-            stickerFour: stickerFour,
             status: awabnDetails?.[0].status,
             tray_id: tray[0].code,
             bag_id: bagId,
@@ -345,16 +338,19 @@ export default function DialogBox() {
                 ? "PENDING"
                 : awabnDetails?.[0]?.uic_code?.code,
             body_damage: bodyDamage,
+            body_damage_des: bodyDamageDes,
+            item_recieved: itemRecievedDet,
           };
           let res = await axiosBot.post("/traySegregation", obj);
           if (res.status == 200) {
+            setTextBoxDis(false)
             setLoading(false);
             alert("Successfully Added");
             setRefresh((refresh) => !refresh);
             setStickerOne("");
             setStickerTwo("");
-            setStickerThree("");
-            setStickerFour("");
+            setItemRecieveDet("");
+            setBodyDamageDes("");
             setOpenApprove(false);
             setBodyDamage("NO");
             setOpneProductMisMatch(false);
@@ -365,10 +361,11 @@ export default function DialogBox() {
         setStickerOne("");
         setStickerTwo("");
         setStickerThree("");
-        setStickerFour("");
         setOpenApprove(false);
         setModelMisMatch(false);
         setBodyDamage("NO");
+        setItemRecieveDet("");
+        setBodyDamageDes("");
         setOpneProductMisMatch(false);
         setLoading(false);
       }
@@ -402,7 +399,115 @@ export default function DialogBox() {
   };
   /***************************************************************************************** */
   const label = { inputProps: { "aria-label": "Checkbox demo" } };
+ const table=useMemo(()=>{
+  return(
+    <Grid container spacing={2}>
+    {bagData[1]?.tray?.map((data, index) => (
+      <Grid item xs={12} md={4}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-start",
+          }}
+        >
+          <h5 style={{ paddingLeft: "10px" }}>
+            {" "}
+            {data.type_taxanomy +
+              "-" +
+              data.code +
+              " (" +
+              bagData[1]?.tray?.[index]?.items?.length +
+              "/" +
+              data.limit +
+              ")  "}
+          </h5>
+          {data.sort_id == "Closed By Bot" ||
+          data.sort_id == "Received From BOT" ||
+          data.sort_id == "Closed By Warehouse" ? (
+            <h6 style={{ color: "red" }}>-Tray Closed</h6>
+          ) : (
+            ""
+          )}
+        </Box>
+        <Paper sx={{ width: "95%", overflow: "hidden", m: 1 }}>
+          <TableContainer>
+            <Table
+              style={{ width: "100%" }}
+              id="example"
+              stickyHeader
+              aria-label="sticky table"
+            >
+              <TableHead>
+                <TableRow>
+                  <TableCell>S.NO</TableCell>
+                  <TableCell>AWBN Number</TableCell>
+                  <TableCell>Order ID</TableCell>
+                  <TableCell>Order Date</TableCell>
+                  <TableCell>Status</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {data?.items?.map((itemData, index) => (
+                  <TableRow hover role="checkbox" tabIndex={-1}>
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>{itemData.awbn_number}</TableCell>
+                    <TableCell>{itemData.order_id}</TableCell>
 
+                    <TableCell>
+                      {" "}
+                      {itemData.order_date == null
+                        ? "No Order Date"
+                        : new Date(
+                            itemData.order_date
+                          ).toLocaleString("en-GB", {
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                          })}
+                    </TableCell>
+                    <TableCell
+                      style={
+                        itemData.status == "Valid"
+                          ? { color: "green" }
+                          : { color: "red" }
+                      }
+                    >
+                      {itemData.status}
+                    </TableCell>
+                    {itemData.status != "Valid" ? (
+                      <TableCell>
+                        <Button
+                          sx={{
+                            ml: 2,
+                          }}
+                          variant="contained"
+                          style={{ backgroundColor: "red" }}
+                          component="span"
+                          onClick={() => {
+                            if (window.confirm("Remove the item?")) {
+                              handelDelete(
+                                data.code,
+                                itemData._id,
+                                itemData.awbn_number
+                              );
+                            }
+                          }}
+                        >
+                          Remove
+                        </Button>
+                      </TableCell>
+                    ) : null}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Paper>
+      </Grid>
+    ))}
+  </Grid>
+  )
+ },[bagData[1]?.tray])
   return (
     <>
       <BootstrapDialog
@@ -487,7 +592,7 @@ export default function DialogBox() {
                   alt="No product image"
                   src={
                     awabnDetails?.[0]?.products.image == undefined
-                      ? "http://prexo-v2-uat-adminapi.dealsdray.com/product/image/" +
+                      ? "http://prexo-v3-adminapi.dealsdray.com/product/image/" +
                         awabnDetails?.[0]?.products.vendor_sku_id +
                         ".jpg"
                       : awabnDetails?.[0]?.products.image
@@ -532,7 +637,7 @@ export default function DialogBox() {
                     : setStickerOne("");
                 }}
                 {...label}
-                sx={{ ml: 3 }}
+                sx={{ ml: 1 }}
               />
               UIC Pasted On Device
             </h6>
@@ -545,11 +650,11 @@ export default function DialogBox() {
                     : setStickerTwo("");
                 }}
                 {...label}
-                sx={{ ml: 3 }}
+                sx={{ ml: 1 }}
               />
               Device Putin Sleeve
             </h6>
-            <h6>
+            {/* <h6>
               {" "}
               <Checkbox
                 onClick={(e) => {
@@ -561,9 +666,9 @@ export default function DialogBox() {
                 sx={{ ml: 3 }}
               />
               UIC Pasted On Sleeve
-            </h6>
-            <FormControl sx={{ ml: 5 }}>
-              <FormLabel id="demo-radio-buttons-group-label" sx={{ mt: 2 }}>
+            </h6> */}
+            <FormControl sx={{ ml: 3 }}>
+              <FormLabel id="demo-radio-buttons-group-label">
                 Any Damage
               </FormLabel>
               <RadioGroup
@@ -591,6 +696,16 @@ export default function DialogBox() {
                 </Box>
               </RadioGroup>
             </FormControl>
+            {bodyDamage == "YES" ? (
+              <textarea
+                placeholder="Details of damage parts"
+                maxWidth="50px"
+                onChange={(e) => {
+                  setBodyDamageDes(e.target.value);
+                }}
+                style={{ width: "300px", marginLeft: "22px", height: "60px" }}
+              />
+            ) : null}
           </Box>
         </DialogContent>
         <DialogActions>
@@ -601,7 +716,12 @@ export default function DialogBox() {
             fullwidth
             variant="contained"
             style={{ backgroundColor: "green" }}
-            disabled={loading}
+            disabled={
+              loading ||
+              stickerOne == "" ||
+              stickerTwo == "" ||
+              (bodyDamage === "YES" && bodyDamageDes === "")
+            }
             component="span"
             onClick={(e) => {
               setLoading(true);
@@ -640,56 +760,38 @@ export default function DialogBox() {
               borderRadius: 1,
             }}
           >
+
             <h6>
               {" "}
               <Checkbox
                 onClick={(e) => {
                   stickerOne == ""
-                    ? setStickerOne("UIC Pasted On Device")
+                    ? setStickerOne("UIC Pasted On Sleeve")
                     : setStickerOne("");
                 }}
                 {...label}
-                sx={{ ml: 3 }}
-              />
-              UIC Pasted On Device
-            </h6>
-            <h6>
-              {" "}
-              <Checkbox
-                onClick={(e) => {
-                  stickerTwo == ""
-                    ? setStickerTwo("Device Putin Sleeve")
-                    : setStickerTwo("");
-                }}
-                {...label}
-                sx={{ ml: 3 }}
-              />
-              Device Putin Sleeve
-            </h6>
-            <h6>
-              {" "}
-              <Checkbox
-                onClick={(e) => {
-                  stickertThree == ""
-                    ? setStickerThree("UIC Pasted On Sleeve")
-                    : setStickerThree("");
-                }}
-                {...label}
-                sx={{ ml: 3 }}
+                sx={{ ml: 1 }}
               />
               UIC Pasted On Sleeve
             </h6>
+            <TextField
+              label="Item received in packet"
+              variant="outlined"
+              onChange={(e) => {
+                setItemRecieveDet(e.target.value);
+              }}
+              sx={{ mt: 1, ml: 2 }}
+            />
           </Box>
         </DialogContent>
         <DialogActions>
-          <LoadingButton
+          <Button
             sx={{
               ml: 2,
             }}
             fullwidth
             variant="contained"
-            loadingPosition="end"
-            loading={loading}
+            disabled={loading || stickerOne === "" || itemRecievedDet === ""}
             style={{ backgroundColor: "green" }}
             component="span"
             onClick={(e) => {
@@ -702,7 +804,7 @@ export default function DialogBox() {
             }}
           >
             Add To PMT
-          </LoadingButton>
+          </Button>
         </DialogActions>
       </BootstrapDialog>
       <BootstrapDialog
@@ -771,29 +873,74 @@ export default function DialogBox() {
               />
               Device Put On Sleeve
             </h6>
-            <h6>
-              {" "}
-              <Checkbox
-                onClick={(e) => {
-                  stickerFour == ""
-                    ? setStickerFour("Blank UIC Pasted On Sleeve")
-                    : setStickerFour("");
+           
+            <FormControl sx={{ ml: 2 }}>
+              <FormLabel id="demo-radio-buttons-group-label">
+                Any Damage
+              </FormLabel>
+              <RadioGroup
+                aria-labelledby="demo-radio-buttons-group-label"
+                defaultValue="NO"
+                name="radio-buttons-group"
+              >
+                <Box>
+                  <FormControlLabel
+                    value="YES"
+                    onClick={(e) => {
+                      setBodyDamage("YES");
+                    }}
+                    control={<Radio />}
+                    label="YES"
+                  />
+                  <FormControlLabel
+                    value="NO"
+                    control={<Radio />}
+                    onClick={(e) => {
+                      setBodyDamage("NO");
+                    }}
+                    label="NO"
+                  />
+                </Box>
+              </RadioGroup>
+            </FormControl>
+            {bodyDamage == "YES" ? (
+              <textarea
+                placeholder="Details of damage parts"
+                maxWidth="50px"
+                onChange={(e) => {
+                  setBodyDamageDes(e.target.value);
                 }}
-                {...label}
+                style={{ width: "300px", marginLeft: "18px", height: "60px" }}
               />
-              Blank UIC Pasted On Sleeve
-            </h6>
+            ) : null}
+            <TextField
+              label="Mismatched model brand name"
+              variant="outlined"
+              onChange={(e) => {
+                setItemRecieveDet(e.target.value);
+              }}
+              inputProps={{
+                width: "300px",
+              }}
+              sx={{ mt: 1, ml: 2 }}
+            />
           </Box>
         </DialogContent>
         <DialogActions>
-          <LoadingButton
+          <Button
             sx={{
               ml: 2,
             }}
             fullwidth
             variant="contained"
-            loadingPosition="end"
-            loading={loading}
+            disabled={
+              loading ||
+              stickerOne === "" ||
+              stickerTwo === "" ||
+              stickertThree === "" ||
+              itemRecievedDet === "" ||
+              (bodyDamage === "YES" && bodyDamageDes === "")
+            }
             style={{ backgroundColor: "green" }}
             component="span"
             onClick={(e) => {
@@ -806,7 +953,7 @@ export default function DialogBox() {
             }}
           >
             Add To MMT
-          </LoadingButton>
+          </Button>
         </DialogActions>
       </BootstrapDialog>
       {pageLoading === false ? (
@@ -868,21 +1015,6 @@ export default function DialogBox() {
                       sx={{ ml: 3 }}
                     />
                   </Box>
-
-                  {/* <Box
-                  sx={{
-                    ml: 4,
-                  }}
-                >
-                  <h5>Duplicate</h5>
-                  <p style={{ paddingLeft: "34px", fontSize: "22px" }}>
-                    {
-                      bagData[0]?.actual_items?.filter(function (item) {
-                        return item.status == "Duplicate";
-                      }).length
-                    }
-                  </p>
-                </Box> */}
                   <Box
                     sx={{
                       ml: 4,
@@ -952,111 +1084,7 @@ export default function DialogBox() {
             />
           </Box>
           <Box sx={{ mt: 10 }}>
-            <Grid container spacing={2}>
-              {bagData[1]?.tray?.map((data, index) => (
-                <Grid item xs={12} md={4}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "flex-start",
-                    }}
-                  >
-                    <h5 style={{ paddingLeft: "10px" }}>
-                      {" "}
-                      {data.type_taxanomy +
-                        "-" +
-                        data.code +
-                        " (" +
-                        bagData[1]?.tray?.[index]?.items?.length +
-                        "/" +
-                        data.limit +
-                        ")  "}
-                    </h5>
-                    {data.sort_id == "Closed By Bot" ||
-                    data.sort_id == "Received From BOT" ||
-                    data.sort_id == "Closed By Warehouse" ? (
-                      <h6 style={{ color: "red" }}>-Tray Closed</h6>
-                    ) : (
-                      ""
-                    )}
-                  </Box>
-                  <Paper sx={{ width: "95%", overflow: "hidden", m: 1 }}>
-                    <TableContainer>
-                      <Table
-                        style={{ width: "100%" }}
-                        id="example"
-                        stickyHeader
-                        aria-label="sticky table"
-                      >
-                        <TableHead>
-                          <TableRow>
-                            <TableCell>S.NO</TableCell>
-                            <TableCell>AWBN Number</TableCell>
-                            <TableCell>Order ID</TableCell>
-                            <TableCell>Order Date</TableCell>
-                            <TableCell>Status</TableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {data?.items?.map((itemData, index) => (
-                            <TableRow hover role="checkbox" tabIndex={-1}>
-                              <TableCell>{index + 1}</TableCell>
-                              <TableCell>{itemData.awbn_number}</TableCell>
-                              <TableCell>{itemData.order_id}</TableCell>
-
-                              <TableCell>
-                                {" "}
-                                {itemData.order_date == null
-                                  ? "No Order Date"
-                                  : new Date(
-                                      itemData.order_date
-                                    ).toLocaleString("en-GB", {
-                                      year: "numeric",
-                                      month: "2-digit",
-                                      day: "2-digit",
-                                    })}
-                              </TableCell>
-                              <TableCell
-                                style={
-                                  itemData.status == "Valid"
-                                    ? { color: "green" }
-                                    : { color: "red" }
-                                }
-                              >
-                                {itemData.status}
-                              </TableCell>
-                              {itemData.status != "Valid" ? (
-                                <TableCell>
-                                  <Button
-                                    sx={{
-                                      ml: 2,
-                                    }}
-                                    variant="contained"
-                                    style={{ backgroundColor: "red" }}
-                                    component="span"
-                                    onClick={() => {
-                                      if (window.confirm("Remove the item?")) {
-                                        handelDelete(
-                                          data.code,
-                                          itemData._id,
-                                          itemData.awbn_number
-                                        );
-                                      }
-                                    }}
-                                  >
-                                    Remove
-                                  </Button>
-                                </TableCell>
-                              ) : null}
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-                  </Paper>
-                </Grid>
-              ))}
-            </Grid>
+           {table}
           </Box>
           <Box
             sx={{

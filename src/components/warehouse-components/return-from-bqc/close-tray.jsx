@@ -15,7 +15,7 @@ import {
 import { useParams } from "react-router-dom";
 import "yup-phone";
 import { useNavigate } from "react-router-dom";
-import { axiosWarehouseIn } from "../../../axios";
+import {  axiosWarehouseIn } from "../../../axios";
 
 export default function DialogBox() {
   const navigate = useNavigate();

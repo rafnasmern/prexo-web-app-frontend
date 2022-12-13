@@ -172,6 +172,7 @@ export default function StickyHeadTable({ props }) {
                     <TableCell>Agent Name</TableCell>
                     <TableCell>Status</TableCell>
                     <TableCell>SKU Count</TableCell>
+                    <TableCell>SKU Summery</TableCell>
                     <TableCell>Actions</TableCell>
                   </TableRow>
                 </TableHead>
@@ -181,11 +182,12 @@ export default function StickyHeadTable({ props }) {
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>{data.code}</TableCell>
                       <TableCell>
-                        {data.items.length}/ {data.limit}
+                        {data.items.length}/{data.limit}
                       </TableCell>
                       <TableCell>{data.issued_user_name}</TableCell>
                       <TableCell>{data.sort_id}</TableCell>
                       <TableCell>{data.temp_array.length}</TableCell>
+                      <TableCell>{data.actual_items?.join(",  ")}</TableCell>
                       <TableCell>
                         <Button
                           sx={{
@@ -209,7 +211,7 @@ export default function StickyHeadTable({ props }) {
                             handelSkuSummery(e, data.code);
                           }}
                         >
-                          Sku Summery
+                          View Sku
                         </Button>
                       </TableCell>
                     </TableRow>

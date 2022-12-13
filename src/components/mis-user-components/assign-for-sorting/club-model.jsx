@@ -273,7 +273,7 @@ export default function CustomizedMenus(props) {
               variant="contained"
               style={{ backgroundColor: "green" }}
               component="span"
-              disabled={item.not_assigned}
+              // disabled={item.not_assigned}
               onClick={(e) => {
                 handelClickOpen();
               }}

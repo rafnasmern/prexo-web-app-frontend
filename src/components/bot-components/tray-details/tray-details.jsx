@@ -18,7 +18,6 @@ import $ from "jquery";
 import "datatables.net";
 export default function StickyHeadTable({ props }) {
   const [infraData, setInfraData] = useState([]);
-  const [anchorEl, setAnchorEl] = React.useState(null);
   const { trayId } = useParams();
   const navigate = useNavigate();
   useEffect(() => {
@@ -85,6 +84,9 @@ export default function StickyHeadTable({ props }) {
                     <TableCell>IMEI</TableCell>
                     <TableCell>BagId</TableCell>
                     <TableCell>Body Damage</TableCell>
+                    <TableCell>Body Damage Description</TableCell>
+                    <TableCell>Item Received In Packet</TableCell>
+                    <TableCell>Mismatched Model Brand Name</TableCell>
                     <TableCell>Other Info</TableCell>
                     <TableCell>Added Date Time</TableCell>
                   </TableRow>
@@ -97,14 +99,22 @@ export default function StickyHeadTable({ props }) {
                       <TableCell>{data.imei}</TableCell>
                       <TableCell>{data.bag_id}</TableCell>
                       <TableCell>{data.body_damage}</TableCell>
+                      <TableCell>{data.body_damage_des}</TableCell>
+                      <TableCell>{data.item_recieved}</TableCell>
+                      <TableCell>{data.model_brand}</TableCell>
                       <TableCell>
-                        {data?.stickerOne +
-                          "," +
-                          data?.stickerTwo +
-                          "," +
-                          data?.stickerThree +
-                          "," +
-                          data?.stickerFour}
+                        {(data.stickerOne !== undefined
+                          ? data?.stickerOne + ","
+                          : "") +
+                          (data?.stickerTwo !== undefined
+                            ? data?.stickerTwo + ","
+                            : "") +
+                          (data?.stickerThree !== undefined
+                            ? data?.stickerThree + ","
+                            : "") +
+                          (data?.stickerFour !== undefined
+                            ? data?.stickerFour
+                            : "")}
                       </TableCell>
                       <TableCell>
                         {new Date(data.added_time).toLocaleString("en-GB", {

@@ -67,15 +67,15 @@ BootstrapDialogTitle.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
-export default function StickyHeadTable({ props }) {
+export default function MmtMerge() {
   const [mmtTray, setMmtTray] = useState([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [sortingAgent, setSortingAgent] = useState([]);
   const [toMmtTray, setToMmtTray] = useState([]);
   const [mergreData, setMergeData] = useState({
-    mmtTrayFrom: "",
-    toMmtTray: "",
+    fromTray: "",
+    toTray: "",
     sort_agent: "",
   });
 
@@ -153,7 +153,7 @@ export default function StickyHeadTable({ props }) {
           setOpen(true);
           setToMmtTray(res.data.data);
         }
-        setMergeData((p) => ({ ...p, mmtTrayFrom: trayId }));
+        setMergeData((p) => ({ ...p, fromTray: trayId }));
       }
     } catch (error) {
       if (error.response.status == 403) {
@@ -167,7 +167,7 @@ export default function StickyHeadTable({ props }) {
   const handelSendRequest = async (e) => {
     e.preventDefault();
     try {
-      let res = await axiosMisUser.post("/mmtTrayMergeRequestSend", mergreData);
+      let res = await axiosMisUser.post("/TrayMergeRequestSend", mergreData);
       if (res.status === 200) {
         alert(res.data.message);
         window.location.reload(false);
@@ -206,7 +206,7 @@ export default function StickyHeadTable({ props }) {
               {toMmtTray.map((data) => (
                 <MenuItem
                   onClick={(e) => {
-                    setMergeData((p) => ({ ...p, toMmtTray: data.code }));
+                    setMergeData((p) => ({ ...p, toTray: data.code }));
                   }}
                   value={data.code}
                 >
@@ -243,7 +243,7 @@ export default function StickyHeadTable({ props }) {
             type="submit"
             variant="contained"
             disabled={
-              mergreData.sort_agent === "" || mergreData.toMmtTray === ""
+              mergreData.sort_agent === "" || mergreData.toTray === ""
             }
             style={{ backgroundColor: "green" }}
             onClick={(e) => {
